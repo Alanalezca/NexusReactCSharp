@@ -1,0 +1,19 @@
+.SubscribeModalBot {
+    background-color: var(--backgroundColorC) !important;
+}
+
+.bxTopRight {
+    position: absolute;
+    top: 16px;  /* Ajuste la distance du haut si nécessaire */
+    right: 16px;  /* Aligne à droite avec un léger espacement */
+  }
+
+.login {
+  color: var(--txtColorWhite);
+  cursor: pointer;
+  transition: color 0.3s ease, color 0.3s ease;
+}
+
+.login:hover {
+  color: var(--ColorB);
+}

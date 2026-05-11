@@ -1,0 +1,242 @@
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    position: sticky;
+    top: 0;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--backgroundColorB);
+    color: white;
+    border-bottom: 2px solid #FF9901;
+    height: 45px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    z-index: 9;
+}
+
+/* --- Menu Principal --- */
+.burger {
+    display: none;
+}
+
+.MenuHeader {
+    display: flex;
+    list-style: none;
+    height: 45px;
+    padding-left: 300px;
+    margin: auto;
+    margin-top: -0px;
+}
+
+.MenuHeader li {
+    width: 125px;
+    position: relative;
+    text-align: center;
+    padding-top: 6px;
+    cursor: pointer;
+}
+
+.MenuHeader li a {
+    transition: color 0.3s ease;
+}
+
+.MenuHeader li:hover > a {
+    color: var(--ColorA);
+}
+
+.MenuHeader a {
+    text-decoration: none;
+    color: white;
+}
+
+/* --- Sous-menus (Dropdown) --- */
+.subMenus {
+    /*display: none;*/
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.4s ease;
+    overflow: hidden;
+    position: absolute;
+    background-color: var(--txtColorDarkBis);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    top: 100%;
+    left: 0;
+    border-bottom-left-radius: 10px;   /* obligatoire pour que le fond du ul li ne déborde pas du radius */
+    border-bottom-right-radius: 10px;  /* obligatoire pour que le fond du ul li ne déborde pas du radius */
+}
+
+.MenuHeader li:hover .subMenus {
+    /*display: block;*/
+    opacity: 1;
+    visibility: visible;
+}
+
+.subMenus li {
+    padding: 10px;
+    transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.4s ease;
+}
+
+.subMenus li > a {
+    color: white;
+    display: block;
+}
+
+.subMenus li:hover {
+    transition: opacity 0.4s ease, visibility 0.4s ease, background-color 0.4s ease;
+    background-color: var(--txtColorDarkBisLight);
+}
+
+.MenuHeader li ul li {
+    border-left: 2px solid #FF9901;
+    border-right: 2px solid #FF9901;
+}
+
+.MenuHeader li ul li:last-child {
+    border-left: 2px solid #FF9901;
+    border-right: 2px solid #FF9901;
+    border-bottom: 2px solid #FF9901;
+    border-top: none;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* --- Zone Utilisateur (Pseudo + Déco) --- */
+.userInfo {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.blocLoginEnglobant {
+    width: 300px;
+}
+
+.blocLogin {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Aligne le contenu à droite à l’intérieur */
+    flex: 1; /* Prend tout l'espace restant à droite */
+}
+
+.txtBold {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.bxNormalOrange {
+    cursor: pointer;
+    color: orange;
+}
+
+.pseudoUser {
+    margin-top: -15px;
+}
+
+.btnDisconnect {
+    margin-top: -8px;
+}
+
+.btnLogin {
+    margin-top: 0px;
+}
+
+/* --- Menu Principal en mode mini --- */
+/* --- Responsive Mobile --- */
+@media (max-width: 768px) {
+    .burger {
+        display: inline-block;
+    }
+
+    .MenuHeader {
+        display: none;
+    }
+    
+    .MenuHeaderMini {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: -100%; /* caché par défaut */
+        width: 85%; /* largeur du panneau sur mobile */
+        max-width: 85%;
+        height: 100vh;
+        background: linear-gradient(to bottom, var(--txtColorDark), var(--txtColorDarkBis), var(--txtColorDark));
+        border-left: 2px solid #FF9901;
+        transition: right 0.5s ease-in-out;
+        padding-left: 0px;
+        z-index: 1000;
+    }
+
+        /* état ouvert */
+        .MenuHeaderMini.open {
+            right: 0%;
+        }
+
+        .MenuHeaderMini li {
+            list-style: none;
+            padding: 15px 20px;
+            width: 100%;
+            text-align: center;
+            border-bottom: 2px solid transparent; /* taille de la bordure */
+            border-image: linear-gradient(
+                to right,
+                transparent,
+                #FF9901 50%,
+                transparent
+            ) 1;
+        }
+
+            .MenuHeaderMini li a {
+                transition: color 0.5s ease;
+                color: white;
+                text-decoration: none;
+                display: block;
+            }
+
+            .MenuHeaderMini li a:hover {
+                color: #FF9901;
+                transition: color 0.5s ease;
+                text-decoration: none;
+                display: block;
+            }
+
+    /* sous-menu */
+    .subMenusMini {
+        display: none;
+        flex-direction: column;
+        padding-bottom: 15px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-top: 15px;
+        max-height: 0%;
+    }
+
+        .subMenusMini li {
+           border-bottom: 0px; 
+    }
+
+    .MenuHeaderMini li:hover .subMenusMini {
+        display: flex;
+        max-height: 100%;
+    }
+
+    /* hover sur parent uniquement */
+    .MenuHeaderMini li:hover > a {
+    color: #FF9901;
+    }
+}
+
+.userInfo {
+    margin-top: 10px;
+}
+
+.marginRight {
+    margin-right: 10px;
+}
+
+.positionBtnCnx {
+    margin-right: 10px;
+}

@@ -1,0 +1,1069 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.testNeon {
+    color: #FF5E00;
+    text-shadow: 0 0 5px #FF5E00, 0 0 10px #FF5E00, 0 0 20px #FF5E00;
+}
+
+*{
+  margin: 0px;
+  padding: 0px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.bx {
+  font-family: 'boxicons' !important;
+}
+
+/* Pousser le footer vers le bas : Début */
+main {
+  flex: 1;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+/* Pousser le footer vers le bas : Fin */
+
+:root {
+  --font-xs: clamp(0.75rem, 2vw, 0.875rem); /* Texte très petit */
+  --font-sm: clamp(0.875rem, 2.5vw, 1rem); /* Petit texte */
+  --font-base: clamp(1rem, 3vw, 1.125rem); /* Taille normale */
+  --font-lg: clamp(1.125rem, 3.5vw, 1.5rem); /* Grand texte */
+  --font-xl: clamp(1.5rem, 4vw, 2rem); /* Très grand texte */
+  --font-xxl: clamp(2rem, 5vw, 3rem); /* Titre XXL */
+
+  --backgroundColorA: #191919;
+  --backgroundColorARGB: rgba(025, 025, 025);
+  --backgroundColorB: #212121;
+  --backgroundColorBRGB: rgba(033, 033, 033);
+  --backgroundColorC: #29292E;
+  --backgroundColorCRGB: rgba(041, 041, 046);
+  --backgroundColorD: #333439;
+  --backgroundColorDRGB: rgba(051, 052, 057);
+  --backgroundColorE: #70757b;
+  --backgroundColorERGB: rgba(112, 117, 123);
+  --backgroundColorERGBTrans: rgba(112, 117, 123, 0.75);
+  --backgroundColorF: #adb5bd;
+  --backgroundColorFRGB: rgba(173, 181, 189);
+
+  --backgroundColorSuccess: #1B722F;
+  --backgroundColorSuccessRGB: rgba(27, 114, 47);
+
+  --backgroundColorSuccessLight: #228C3A;
+  --backgroundColorSuccessLightRGB: rgba(34, 140, 58);
+
+  --backgroundColorSuccessDark: #051B11;
+  --backgroundColorSuccessDarkRGB: rgba(5, 27, 17);
+
+  --backgroundColorDanger: #96242F;
+  --backgroundColorDangerRGB: rgba(150, 36, 47);
+
+  --backgroundColorDangerSmoothLight: #b84450;
+  --backgroundColorDangerSmoothLightRGB: rgb(184, 68, 80);
+
+  --backgroundColorDangerLight: #bb6c74;
+  --backgroundColorDangerLightRGB: rgb(187, 108, 116);
+
+  --backgroundColorDangerDark: #2C0B0E;
+  --backgroundColorDangerDarkRGB: rgb(44, 11, 14);
+
+  --backgroundColorCaution: #AD8305;
+  --backgroundColorCautionRGB: rgba(173, 131, 5);
+
+  --backgroundColorCautionLight: #D56A11;
+  --backgroundColorCautionLightRGB: rgba(213, 106, 17);
+
+  --backgroundColorHalo: #ad830580;
+  --backgroundColorHaloRGB: rgba(173, 131, 5, 0.5);
+  
+  --ColorA: #FF9901;
+  --ColorARGB: rgba(255, 153, 1);
+
+  --ColorB: #FFB300;
+  --ColorARGB: rgba(255, 179, 0);
+  --ColorARGBHalo: rgba(255, 179, 0, 0.55);
+
+  --ColorC: #C47215;
+  --ColorCRGB: rgba(196, 114, 21);
+
+  --ColorD: #adb5bd;
+  --ColorCRGD: rgba(173, 181, 189);
+
+  --ColorE: #C47215;
+  --ColorCRGE: rgba(196, 114, 21);
+
+  --ColorF: #ad830580;
+  --ColorCRGF: rgba(173, 131, 5, 0.5);
+
+  --txtColorWhite: #FFFFFF;
+  --txtColorWhiteRGB: rgba(255, 255, 255);
+
+  --txtColorLight: #E9E9D8;
+  --txtColorLightRGB: rgba(233, 233, 216);
+
+  --txtColorA: #FF9901;
+  --txtColorARGB: rgba(255, 153, 1);
+
+  --txtColorB: #FFB300;
+  --txtColorBRGB: rgba(255, 179, 0);
+
+  --txtColorDark: #343a40;
+  --txtColorDarkRGB: rgba(052, 058, 064);
+
+  --txtColorDarkBis: #444444;
+  --txtColorDarkBisRGB: rgba(068, 068, 068);
+
+  --txtColorDarkBisLight: #6E6E6E;
+  --txtColorDarkBisLightRGB: rgba(110, 110, 110);
+
+  --txtColorDarkLight: #adb5bd;
+  --txtColorDarkLightRGB: #adb5bd;
+
+  --txtColorOrange: #FF9901;
+  --txtColorOrangeRGB: rgba(255, 153, 1);
+
+  --txtColorGreen: #42BC5A;
+  --txtColorGreenRGB: rgba(66, 188, 90);
+
+  --txtColorPlayerRed: #E53935;
+  --txtColorPlayerRedRGB: rgba(229, 57, 53);
+
+  --txtColorPlayerRedMiddle: ##EC405F;
+  --txtColorPlayerRedMiddleRGB: rgba(229, 57, 53);
+
+  --txtColorPlayerRedLight: #E7848D;
+  --txtColorPlayerRedLightRGB: rgba(231, 132, 141);
+
+  --txtColorPlayerBlue: #1E88E5;
+  --txtColorPlayerBlueRGB: rgba(30, 136, 229);
+
+  --txtColorPlayerGreen: #42BC5A;
+  --txtColorPlayerGreenRGB: rgba(66, 188, 90);
+
+  --txtColorPlayerGreenLight: #74B596;
+  --txtColorPlayerGreenLightRGB: rgba(116, 181, 150);
+
+  --txtColorPlayerYellow: #FDD835;
+  --txtColorPlayerYellowRGB: rgba(253, 216, 53);
+}
+
+.alignIconText {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bxNormalOrangeWithoutHover {
+  color: #FF9901;
+  font-size: 32px;
+}
+
+.bxNormalOrange {
+  color: #FF9901;
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+  background-color: transparent;
+  border: 0px;
+}
+
+.bxNormalOrange:hover {
+  color: #FFB300;
+  font-size: 32px;
+  animation: tada 1s;
+}
+
+.bxNormalGrey {
+  color: var(--backgroundColorE);
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+  background-color: transparent;
+  border: 0px;
+}
+
+.bxNormalGrey:hover {
+  color: var(--backgroundColorF);
+  font-size: 32px;
+  animation: tada 1s;
+}
+
+.bxSmallGrey {
+  color: var(--backgroundColorE);
+  font-size: 24px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxSmallGrey:hover {
+  color: var(--backgroundColorF);
+  font-size: 24px;
+  animation: tada 1s;
+}
+
+.bxMiniGreyWithoutAnim {
+  color: var(--backgroundColorE);
+  font-size: 16px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxMiniGreyWithAnim {
+  color: var(--backgroundColorF);
+  font-size: 16px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxMiniGreyWithAnim :hover{
+  color: white;
+  font-size: 16px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxMiniGreyWithAnim :active{
+  color: var(--ColorA);
+  font-size: 16px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxNormalOrangeToRed {
+  color: #FF9901;
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxNormalOrangeToRed:hover {
+  color: var(--backgroundColorDangerLight);
+  font-size: 32px;
+  animation: tada 1s;
+}
+
+.bxNormalRedSmoothLight {
+  color: var(--backgroundColorDangerSmoothLight);
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxNormalRedSmoothLight:hover {
+  color: var(--backgroundColorDangerLight);
+  font-size: 32px;
+  animation: tada 1s;
+}
+
+.bxEnabledToDisabled {
+  color: var(--backgroundColorSuccess);
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxEnabledToDisabled:hover {
+  color: var(--backgroundColorDangerRGB);
+  font-size: 32px;
+  animation: tada 1s;
+}
+
+.bxDisabledToEnabled {
+  color: var(--backgroundColorDangerRGB);
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxDisabledToEnabled:hover {
+  color: var(--backgroundColorSuccess);
+  font-size: 32px;
+  animation: tada 1s;
+}
+
+.bxInactiveToActive {
+  color: var(--backgroundColorE);
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxInactiveToActive:hover {
+  color: var(--ColorA);
+  font-size: 32px;
+  animation: tada 1s;
+  cursor: pointer;
+}
+
+.bxActive {
+  color: var(--ColorA);
+  font-size: 32px;
+  transition: color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.bxNormalColorE {
+  color: var(--backgroundColorE);
+  font-size: 32px;
+}
+
+
+html body {
+  padding: 0px;
+  font-family: 'Roboto', sans-serif, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue';
+  background-color: var(--backgroundColorA);
+  color: var(--txtColorA);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  height: 100%;
+  margin: 0;
+}
+
+h1 { font-size: 2.5rem; }
+p { font-size: 1rem; }
+/*span { font-size: 1rem; }*/
+
+.borderColorA {
+  border: 2px solid var(--ColorA);
+}
+
+.colorA {
+  color: var(--ColorA);
+}
+
+.bgcolorA {
+  background-color: var(--backgroundColorA);
+}
+
+.bgcolorB {
+  background-color: var(--backgroundColorB);
+}
+
+.bgcolorC {
+  background-color: var(--backgroundColorC);
+}
+
+.bgcolorD {
+  background-color: var(--backgroundColorD);
+}
+
+.bgcolorE {
+  background-color: var(--backgroundColorE);
+}
+
+.bgcolorF {
+  background-color: var(--backgroundColorE);
+}
+
+ /* Textes : Début */
+
+.txtColorWhite {
+  color: var(--txtColorWhite);
+}
+
+.txtColorA {
+  color: var(--ColorA);
+}
+
+.txtColorB {
+  color: var(--ColorB);
+}
+
+.txtColorC {
+  color: var(--ColorC);
+}
+
+.txtColorD {
+  color: var(--ColorD);
+} 
+
+.txtColorE {
+  color: var(--ColorE);
+}
+
+.txtColorDarkLight {
+  color: var(--txtColorDarkLight);
+  transition: color 0.2s ease;
+}
+
+.txtColorDarkLight:hover {
+  color: white;
+}
+
+.txtColorDarkLight:active {
+  color: var(--ColorE);
+}
+
+.txtColorDarkLight a {
+  color: var(--txtColorDarkLight);
+  transition: color 0.2s ease;
+}
+
+.txtColorDarkLight:hover a {
+  color: white;
+  transition: color 0.2s ease;
+}
+
+.txtColorDarkLight a:active {
+  color: white;
+  transition: color 0.2s ease;
+}
+
+.txtColorSuccessLight {
+  color: var(--backgroundColorSuccessLight);
+}
+
+.txtColorDangerLight {
+  color: var(--backgroundColorDangerLight);
+}
+
+.txtColorDarkBisLight {
+  color: var(--txtColorDarkBisLight);
+}
+
+.txtBold {
+  font-weight: bold;
+}
+
+.txtNormal {
+  font-weight: normal;
+}
+
+.txtColorWhiteToTxtColorB {
+  color: var(--txtColorWhite);
+  transition: color 0.2s ease;
+}
+
+.txtColorWhiteToTxtColorB:hover {
+  color: var(--txtColorB);
+}
+
+.txtColorPlayerRed {
+  color: var(--txtColorPlayerRed);
+}
+
+.txtColorPlayerBlue {
+  color: var(--txtColorPlayerBlue);
+}
+
+.txtColorPlayerYellow {
+  color: var(--txtColorPlayerYellow);
+}
+
+.txtColorPlayerGreen {
+  color: var(--txtColorPlayerGreen);
+}
+
+.txtColorRed {
+  color: var(--txtColorPlayerRed);
+}
+
+.txtColorYellow {
+  color: var(--txtColorPlayerYellow);
+}
+
+.txtColorOrange {
+  color: var(--txtColorOrange);
+}
+
+.txtColorGreen {
+  color: var(--txtColorGreen);
+}
+
+.txtColorBlue {
+  color: var(--txtColorPlayerBlue);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.txtClignoteRed {
+  animation: ClignoteRed 1s infinite alternate;
+}
+
+@keyframes ClignoteRed {
+  from {
+    color: var(--txtColorDark);
+  }
+  to {
+    color: var(--txtColorPlayerRed);
+  }
+}
+
+.txtClignoteGreen {
+  animation: ClignoteGreen 1s infinite alternate;
+}
+
+@keyframes ClignoteGreen {
+  from {
+    color: var(--txtColorDark);
+  }
+  to {
+    color: var(--txtColorPlayerGreen);
+  }
+}
+
+
+ /* Textes : Fin  */
+
+.txt-xs {
+  font-size: var(--font-xs);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.txt-sm {
+  font-size: var(--font-sm);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.txt-base {
+  font-size: var(--font-base);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.txt-lg {
+  font-size: var(--font-lg);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+.txt-xl {
+  font-size: var(--font-xl);
+  font-weight: 600;
+  line-height: 1.8;
+}
+
+.txt-xxl {
+  font-size: var(--font-xxl);
+  font-weight: 700;
+  line-height: 1.9;
+}
+
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%); /* Change en blanc */
+}
+
+/* ongletAlerte */
+.ongletAlerteBGTtopStandard {
+  background-color: var(--backgroundColorB) !important;
+  border-bottom: 1px solid var(--ColorA) !important;
+  color: var(--txtColorB) !important;
+}
+
+.ongletAlerteBGTBottomStandard {
+  background-color: var(--backgroundColorB) !important;
+  color: var(--txtColorLight) !important;
+}
+
+.ongletAlerteBGTtopSuccess {
+  background-color: var(--backgroundColorSuccess) !important;
+  border-bottom: 1px solid var(--ColorA) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.ongletAlerteBGTBottomSuccess {
+  background-color: var(--backgroundColorSuccessLight) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.ongletAlerteBGTtopDanger {
+  background-color: var(--backgroundColorDanger) !important;
+  border-bottom: 1px solid var(--ColorA) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.ongletAlerteBGTBottomDanger {
+  background-color: var(--backgroundColorDangerLight) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.ongletAlerteBGTtopCaution {
+  background-color: var(--backgroundColorCaution) !important;
+  border-bottom: 1px solid var(--ColorA) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.ongletAlerteBGTBottomCaution {
+  background-color: var(--backgroundColorCautionLight) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+/* Bouton */
+
+.btn-ColorA {
+  background-color: var(--ColorA) !important;
+  border: 1px solid var(--ColorA) !important;
+  transition: background-color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.btn-ColorA:hover {
+  background-color: var(--ColorB) !important;
+  border: 1px solid var(--ColorB) !important;
+}
+
+.btn-ColorAFocused {
+  background-color: var(--ColorB) !important;
+  border: 1px solid var(--ColorB) !important;
+  transition: background-color 0.25s ease;  /* Transition de 0.5 seconde */
+  cursor: not-allowed !important;
+}
+
+.btn-ColorAFocused:hover {
+  background-color: var(--ColorB) !important;
+  border: 1px solid var(--ColorB) !important;
+  cursor: not-allowed !important;
+}
+
+.btn-ColorF {
+  background-color: var(--ColorF) !important;
+  border: 1px solid var(--ColorF) !important;
+  transition: background-color 0.25s ease;  /* Transition de 0.5 seconde */
+}
+
+.btn-ColorF:hover {
+  background-color: var(--ColorA) !important;
+  border: 1px solid var(--ColorA) !important;
+}
+
+.btn-ColorFFocused {
+  background-color: var(--ColorB) !important;
+  border: 1px solid var(--ColorB) !important;
+  transition: background-color 0.25s ease;  /* Transition de 0.5 seconde */
+  cursor: not-allowed !important;
+}
+
+.btn-ColorAFocused:hover {
+  background-color: var(--ColorB) !important;
+  border: 1px solid var(--ColorB) !important;
+  cursor: not-allowed !important;
+}
+
+.btn-ColorInactif {
+  background-color: var(--backgroundColorE) !important;
+  border: 1px solid var(--backgroundColorE) !important;
+  transition: background-color 0.25s ease;  /* Transition de 0.5 seconde */
+  cursor: not-allowed !important;
+}
+
+.btn-ColorInactif:hover {
+  background-color: var(--backgroundColorF) !important;
+  border: 1px solid var(--backgroundColorF) !important;
+  cursor: not-allowed !important;
+}
+
+.btn-ColorFinished {
+  background-color: var(--backgroundColorSuccessLight) !important;
+  border: 1px solid var(--backgroundColorSuccessLight) !important;
+  transition: background-color 0.25s ease;  /* Transition de 0.5 seconde */
+  cursor: not-allowed !important;
+}
+
+.btn-ColorFinished:hover {
+  background-color: var(--backgroundColorSuccessLight) !important;
+  border: 1px solid var(--backgroundColorSuccessLight) !important;
+  cursor: not-allowed !important;
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) { 
+  .container-global {
+    background-color: grey;
+    margin: auto;
+    width: 100%;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .container-global {
+    background-color: grey;
+    margin: auto;
+    width: 100%;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .container-global {
+    background-color: grey;
+    margin: auto;
+    width: 90%;
+  }
+}
+
+/* X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) { 
+  .container-global {
+    background-color: grey;
+    margin: auto;
+    width: 80%;
+  }
+}
+
+/* XX-Large devices (larger desktops, 1400px and up) */
+@media (min-width: 1400px) { 
+  .container-global {
+    background-color: grey;
+    margin: auto;
+    width: 70%;
+  }
+}
+
+/* Borders : début */
+
+.borderLeft1pxColE {
+  border-left: solid 1px var(--backgroundColorE);
+}
+
+/* Borders : fin */
+
+/* List-group-item : début */
+
+.list-group-item {
+  background-color: var(--backgroundColorD) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorLight) !important;
+}
+
+.list-group-item:hover {
+  background-color: var(--backgroundColorE) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorLight) !important;
+}
+
+.list-group-item.active {
+  background-color: var(--backgroundColorF) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.list-group-item.disabled {
+  background-color: var(--backgroundColorA) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorDark) !important;
+}
+
+.list-group-item.static {
+  background-color: var(--backgroundColorA) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorWhite) !important;
+}
+
+.list-group-item.staticHeader {
+  background-color: var(--backgroundColorC) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorWhite) !important;
+  font-weight: bold;
+}
+
+.list-group-item.staticHeaderTxtPlayerRed {
+  background-color: var(--backgroundColorC) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorPlayerRed) !important;
+  font-weight: bold;
+}
+
+.list-group-item.staticHeaderTxtPlayerBlue {
+  background-color: var(--backgroundColorC) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorPlayerBlue) !important;
+  font-weight: bold;
+}
+
+.list-group-item.staticHeaderTxtPlayerYellow {
+  background-color: var(--backgroundColorC) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorPlayerYellow) !important;
+  font-weight: bold;
+}
+
+.list-group-item.staticHeaderTxtPlayerGreen {
+  background-color: var(--backgroundColorC) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorPlayerGreen) !important;
+  font-weight: bold;
+}
+
+.list-group-item.staticGreen {
+  background-color: var(--backgroundColorSuccessDark) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorPlayerGreenLight) !important;
+}
+
+.list-group-item.staticRed {
+  background-color: var(--backgroundColorDangerDark) !important;
+  border-color: var(--backgroundColorF) !important;
+  color: var(--txtColorPlayerRedLight) !important;
+}
+
+/* List-group-item : fin */
+
+.colXXX {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 20px;
+  text-align: center;
+}
+
+.red {
+  background-color: red;
+}
+
+.pink {
+  background-color: pink;
+}
+
+/* Icones : début */
+
+
+/* Icones : fin */
+
+/* Badges : Début */
+.badge-custom {
+  background-color: #6B4FA3;
+  color: white;
+}
+
+.badge-customOff {
+  background-color: var(--backgroundColorE);
+  color: white;
+  transition: background-color 0.25s ease;
+}
+
+.badge-customOn {
+  background-color: var(--ColorA);
+  color: white;
+  transition: background-color 0.25s ease;
+}
+/* Badges : Fin */
+
+/* Autres */
+
+.topMinus3 {
+  margin-top: -3px;
+}
+
+/* Pointers : début */
+
+.cPointer {
+  cursor: pointer;
+}
+
+/* Pointers : fin */
+
+/* Pagination : début */
+
+.pagination .page-link {
+  background-color: #212529; /* gris sombre */
+  color: #f8f9fa; /* texte clair */
+  border-color: #495057; /* bordure */
+}
+
+.pagination .page-link:hover {
+  background-color: #343a40;
+  color: #fff;
+}
+
+/* Pagination : Fin */
+
+/* TipTap : Début */
+
+.ProseMirror img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%; /* évite qu’elle dépasse */
+}
+
+.article-box {
+  border: 2px solid #888;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+  background: var(--backgroundColorB);
+}
+
+/* TipTap : Fin */
+
+/* Pill : Début */
+.pillColorA {
+  background-color: #6B4FA3 !important;
+}
+/* Pill : Fin */
+
+/* Button list group (les interpreter comme des a list group : début */
+
+button.list-group-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(0,0,0,.125);
+  border-radius: 0;
+  background-color: #fff;
+}
+
+button.list-group-item:first-child {
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+button.list-group-item:last-child {
+  border-bottom-left-radius: .25rem;
+  border-bottom-right-radius: .25rem;
+}
+
+button.list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Button list group : Fin */
+
+a {
+  color: var(--ColorA);
+}
+
+/* Bloc article : Début */
+
+.blocArticleShow h2,
+.blocArticleShow h3,
+.blocArticleShow h4,
+.blocArticleShow h5 {
+  color: white;
+}
+
+/* Bloc article : Fin */
+
+/* Border animé : debut */
+
+.borderAnimGreen {
+  animation: AnimGreen 1s infinite alternate;
+}
+
+@keyframes AnimGreen {
+  from {
+    border: 3px solid var(--backgroundColorA);
+    border-radius: 6px;
+  }
+  to {
+    border: 3px solid var(--backgroundColorSuccessLight);
+    border-radius: 6px;
+  }
+}
+
+.borderAnimGreenSmooth {
+  animation: AnimGreenSmooth 1s infinite alternate;
+}
+
+@keyframes AnimGreenSmooth {
+  from {
+    border: 3px solid var(--backgroundColorSuccess);
+    border-radius: 6px;
+  }
+  to {
+    border: 3px solid var(--backgroundColorSuccessLight);
+    border-radius: 6px;
+  }
+}
+
+.borderAnimRed {
+  animation: AnimRed 1s infinite alternate;
+}
+
+@keyframes AnimRed {
+  from {
+    border: 3px solid var(--backgroundColorDanger);
+    border-radius: 6px;
+  }
+  to {
+    border: 3px solid var(--backgroundColorDangerSmoothLight);
+    border-radius: 6px;
+  }
+}
+
+/* Border animé : fin */
+
+/* Background : debut */
+
+.backgroundGreen {
+  background-color: var(--backgroundColorSuccess);
+}
+
+/* Background : fin */
+
+/* Background animé : debut */
+
+.backgroundAnimGreen {
+  animation: bgAnimGreen 1s infinite alternate;
+}
+
+@keyframes bgAnimGreen {
+  from {
+    background-color: var(--backgroundColorA);
+  }
+  to {
+    background-color: var(--backgroundColorSuccessLight);
+  }
+}
+
+.backgroundAnimGreenSmooth {
+  animation: bgAnimGreenSmooth 1s infinite alternate;
+}
+
+@keyframes bgAnimGreenSmooth {
+  from {
+    background-color: var(--backgroundColorSuccess);
+  }
+  to {
+    background-color:  var(--backgroundColorSuccessLight);
+  }
+}
+
+.backgroundAnimRed {
+  animation: bgAnimRed 1s infinite alternate;
+}
+
+@keyframes bgAnimRed {
+  from {
+    background-color: var(--backgroundColorDanger);
+  }
+  to {
+    background-color: var(--backgroundColorDangerSmoothLight);
+  }
+}
+
+.backgroundAnimFocus {
+  animation: bgAnimFocus 1s infinite alternate;
+}
+
+@keyframes bgAnimFocus {
+  from {
+    background-color: var(--ColorA);
+  }
+  to {
+    background-color: var(--ColorB);
+  }
+}
+
+.backgroundAnimSurvol:hover {
+  animation: bgAnimSurvol 2s infinite alternate;
+}
+
+@keyframes bgAnimSurvol {
+  from {
+    background-color: var(--backgroundColorD);
+  }
+  to {
+    background-color: var(--ColorB);
+  }
+}
+
+/* Background animé : fin */
+
+/* Border radius : Début */
+.borderRadius6 {
+  border-radius: 6px;
+}
+
+/* Border radius : Fin */
