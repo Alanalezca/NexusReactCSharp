@@ -142,13 +142,35 @@ var app = builder.Build();
 //→ Authorization vérifie les droits / policies
 //→ Controller exécuté
 // -----------------------------------
+// -----------------------------------
+// FICHIERS STATIQUES REACT
+// -----------------------------------
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
+// -----------------------------------
+// CORS
+// Utile surtout en dev local quand React tourne sur localhost:5173
+// En production, front et API auront le même domaine
+// -----------------------------------
 app.UseCors("AllowFrontend");
+
+// -----------------------------------
+// AUTH
+// -----------------------------------
 app.UseAuthentication();
 app.UseAuthorization();
 
 // -----------------------------------
-// CONTROLLERS
+// API CONTROLLERS
 // -----------------------------------
 app.MapControllers();
+
+// -----------------------------------
+// FALLBACK REACT ROUTER
+// Si l'URL n'est pas une API, on renvoie index.html
+// Exemple : /login, /articles, /draft/keyforge
+// -----------------------------------
+app.MapFallbackToFile("index.html");
 
 app.Run();
