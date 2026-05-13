@@ -1,7 +1,8 @@
+// Entrée frontend des appels API
 
-// Entree frontend des appels API
-
-const API_URL = "http://localhost:5284";
+const API_URL = import.meta.env.DEV
+  ? "http://localhost:5284"
+  : "";
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
   const response = await fetch(`${API_URL}${endpoint}`, {
