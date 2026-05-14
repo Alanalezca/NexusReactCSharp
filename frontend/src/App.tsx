@@ -5,6 +5,7 @@ import PrivateRoute from "./components/PrivateRoute";
 
 import MenuHeader from "./layouts/MenuHeader";
 import Dashboard from "./pages/Dashboard";
+import Articles from "./pages/articles/articles"
 
 function App() {
   return (
@@ -16,18 +17,15 @@ function App() {
 
         <Routes>
 
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-
-          <Route path="/dashbord" element={<Dashboard />} />
-
-          <Route
-            path="/dashboard"
+          <Route path="/" element={<Articles />} />
+          <Route path="/dashboard"
             element={
               <PrivateRoute>
                 <Dashboard />
               </PrivateRoute>
             }
           />
+
         </Routes>
       </BrowserRouter>
     </SessionUserContextProvider>

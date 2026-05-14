@@ -5,6 +5,7 @@ const API_URL = import.meta.env.DEV
   : "";
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
+
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     credentials: "include",

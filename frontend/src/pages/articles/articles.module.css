@@ -1,0 +1,31 @@
+.inputSearch {
+    background-color: var(--backgroundColorD);
+    color: var(--txtColorWhite)
+}
+
+.inputSearch:focus {
+  box-shadow: 0 0 0.25rem 0.25rem var(--backgroundColorHaloRGB); /* bleu clair */
+  border-color: var(--backgroundColorHaloRGB);
+}
+
+.shadow {
+  box-shadow:
+    5px 5px 10px rgba(0, 0, 0, 0.5),
+   -5px -5px 10px rgba(255, 255, 255, 0.03);
+}
+
+.bandeauTag {
+
+}
+
+.bandeauTag:hover {
+  background-color: var(--backgroundColorCaution) !important;
+}
+
+.bandeauTagFocus {
+  background-color: var(--backgroundColorHalo) !important;
+}
+
+.bandeauTagFocus:hover {
+  background-color: var(--backgroundColorHalo) !important;
+}

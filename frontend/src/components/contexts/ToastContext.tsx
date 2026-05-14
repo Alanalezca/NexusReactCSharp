@@ -23,6 +23,25 @@ const ongletAlerteContext = createContext<OngletAlerteContextType>({
   showOngletAlerte: async () => {}
 });
 
+const toastStyles = {
+  success: {
+    top: "ongletAlerteBGTtopSuccess",
+    bottom: "ongletAlerteBGTBottomSuccess"
+  },
+  error: {
+    top: "ongletAlerteBGTtopDanger",
+    bottom: "ongletAlerteBGTBottomDanger"
+  },
+  caution: {
+    top: "ongletAlerteBGTtopCaution",
+    bottom: "ongletAlerteBGTBottomCaution"
+  },
+  standard: {
+    top: "ongletAlerteBGTtopStandard",
+    bottom: "ongletAlerteBGTBottomStandard"
+  }
+};
+
 export const OngletAlerteProvider = ({ children }: { children: ReactNode }) => {
   const [ongletAlerte, setOngletAlerte] = useState<OngletAlerteType>({
     strClassBGBlocTop: "bgcolorA",
@@ -58,47 +77,18 @@ export const OngletAlerteProvider = ({ children }: { children: ReactNode }) => {
     textTopRight: string,
     mainText: string
   ) => {
-    switch (type) {
-      case "success":
-        setOngletAlerte({
-          strClassBGBlocTop: "ongletAlerteBGTtopSuccess",
-          strClassBGBlocBottom: "ongletAlerteBGTBottomSuccess",
-          strTextTopLeft: textTopLeft,
-          strTextTopRight: textTopRight,
-          strTextBlocBottom: mainText
-        });
-        break;
+      const style =
+      toastStyles[type as keyof typeof toastStyles] ||
+      toastStyles.standard;
 
-      case "error":
-        setOngletAlerte({
-          strClassBGBlocTop: "ongletAlerteBGTtopDanger",
-          strClassBGBlocBottom: "ongletAlerteBGTBottomDanger",
-          strTextTopLeft: textTopLeft,
-          strTextTopRight: textTopRight,
-          strTextBlocBottom: mainText
-        });
-        break;
-
-      case "caution":
-        setOngletAlerte({
-          strClassBGBlocTop: "ongletAlerteBGTtopCaution",
-          strClassBGBlocBottom: "ongletAlerteBGTBottomCaution",
-          strTextTopLeft: textTopLeft,
-          strTextTopRight: textTopRight,
-          strTextBlocBottom: mainText
-        });
-        break;
-
-      default:
-        setOngletAlerte({
-          strClassBGBlocTop: "ongletAlerteBGTtopStandard",
-          strClassBGBlocBottom: "ongletAlerteBGTBottomStandard",
-          strTextTopLeft: textTopLeft,
-          strTextTopRight: textTopRight,
-          strTextBlocBottom: mainText
-        });
-    }
-  };
+      setOngletAlerte({
+        strClassBGBlocTop: style.top,
+        strClassBGBlocBottom: style.bottom,
+        strTextTopLeft: textTopLeft,
+        strTextTopRight: textTopRight,
+        strTextBlocBottom: mainText
+      });
+    };
 
   return (
     <ongletAlerteContext.Provider value={{ showOngletAlerte }}>
