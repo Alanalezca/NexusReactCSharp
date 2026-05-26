@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useRef, useEffect } from "react";
 import type { ReactNode } from "react";
+import { flushSync } from "react-dom";
 import * as bootstrap from "bootstrap";
 
 type OngletAlerteType = {
@@ -19,9 +20,7 @@ type OngletAlerteContextType = {
   ) => Promise<void>;
 };
 
-const ongletAlerteContext = createContext<OngletAlerteContextType>({
-  showOngletAlerte: async () => {}
-});
+const ongletAlerteContext = createContext<OngletAlerteContextType | null>(null);
 
 const toastStyles = {
   success: {
@@ -56,20 +55,9 @@ export const OngletAlerteProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (ongletAlerteRef.current) {
-      bsOngletAlerteRef.current = new bootstrap.Toast(ongletAlerteRef.current);
+      bsOngletAlerteRef.current = bootstrap.Toast.getOrCreateInstance(ongletAlerteRef.current);
     }
   }, []);
-
-  useEffect(() => {
-    if (!ongletAlerteRef.current) return;
-
-    bsOngletAlerteRef.current?.dispose();
-    bsOngletAlerteRef.current = new bootstrap.Toast(ongletAlerteRef.current);
-
-    if (ongletAlerte.strTextBlocBottom !== "") {
-      bsOngletAlerteRef.current.show();
-    }
-  }, [ongletAlerte]);
 
   const showOngletAlerte = async (
     type: string,
@@ -77,10 +65,11 @@ export const OngletAlerteProvider = ({ children }: { children: ReactNode }) => {
     textTopRight: string,
     mainText: string
   ) => {
-      const style =
+    const style =
       toastStyles[type as keyof typeof toastStyles] ||
       toastStyles.standard;
 
+    flushSync(() => {
       setOngletAlerte({
         strClassBGBlocTop: style.top,
         strClassBGBlocBottom: style.bottom,
@@ -88,13 +77,19 @@ export const OngletAlerteProvider = ({ children }: { children: ReactNode }) => {
         strTextTopRight: textTopRight,
         strTextBlocBottom: mainText
       });
-    };
+    });
+
+    if (!ongletAlerteRef.current) return;
+
+    bsOngletAlerteRef.current = bootstrap.Toast.getOrCreateInstance(ongletAlerteRef.current);
+    bsOngletAlerteRef.current.show();
+  };
 
   return (
     <ongletAlerteContext.Provider value={{ showOngletAlerte }}>
       {children}
 
-      <div className="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container">
+      <div className="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container" style={{ zIndex: 2000 }}>
         <div
           className={`toast ${ongletAlerte.strClassBGBlocBottom}`}
           ref={ongletAlerteRef}
@@ -117,4 +112,12 @@ export const OngletAlerteProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useOngletAlerteContext = () => useContext(ongletAlerteContext);
+export const useOngletAlerteContext = () => {
+  const context = useContext(ongletAlerteContext);
+
+  if (!context) {
+    throw new Error("useOngletAlerteContext doit être utilisé dans OngletAlerteProvider");
+  }
+
+  return context;
+};

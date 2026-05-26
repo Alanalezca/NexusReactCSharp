@@ -1,0 +1,74 @@
+button {
+  background-color: #333439;
+;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #70757b;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.input {
+  width: 100%;
+  background-color: #333439;
+  color: white;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #70757b;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.breakerTitre {
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--ColorA) 40%,
+    var(--ColorA) 60%,
+    transparent 100%
+  );
+}
+
+.customUploadButton {
+  background-color: #FF9901;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.customUploadButton:hover {
+  background-color: #FFB300;
+}
+
+.resetImageButton {
+  background-color: #FF9901;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.resetImageButton:hover {
+  background-color: #FFB300 !important;
+}

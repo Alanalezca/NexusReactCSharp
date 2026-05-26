@@ -1,0 +1,46 @@
+import styles from './CardLoading.module.css';
+
+type CardLoadingProps = {
+    classCSSColorBackground: string;
+    tailleCol?: number;
+};
+
+const CardLoading = ({
+    classCSSColorBackground,
+    tailleCol = 12
+}: CardLoadingProps) => {
+
+    return (
+        <div className={`col-${tailleCol}`}>
+            <div className={`card h-100 ${classCSSColorBackground} ${styles.cardLoading} ${styles.shadow}`}>
+                <img
+                    src="/images/fontLoad.png"
+                    className={`card-img-top ${styles.cardImg}`}
+                    alt=""
+                />
+
+                <div className="card-body">
+                    <h5 className="card-title placeholder-glow">
+                        <span className="placeholder col-12"></span>
+                    </h5>
+
+                    <p className="card-text placeholder-glow">
+                        <span className="placeholder col-7"></span>
+                        <span className="placeholder col-4"></span>
+                        <span className="placeholder col-4"></span>
+                        <span className="placeholder col-6"></span>
+                        <span className="placeholder col-8"></span>
+                    </p>
+                </div>
+
+                <div className="card-footer">
+                    <small className="text-body-secondary">
+                        <span className="placeholder col-8"></span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default CardLoading;

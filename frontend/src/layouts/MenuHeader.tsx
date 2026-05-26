@@ -103,7 +103,7 @@ import Subscribe from '../components/modals/Subscribe';
                     {sessionUser.pseudo}
                   </span>
                     <div className={styles.btnDisconnect}>
-                      <button className={`bx bxs-exit ${styles.bxNormalOrange} bxNormalOrange`} 
+                      <button className={`bx bxs-exit bxNormalOrange`} 
                         aria-label="Déconnexion" 
                         onClick={async () => {await logout(); showOngletAlerte('success', '(Déconnexion)', '', 'Vous êtes à présent déconnecté.');}}>
                       </button>

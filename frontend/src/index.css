@@ -167,6 +167,8 @@ main {
 .bxNormalOrangeWithoutHover {
   color: #FF9901;
   font-size: 32px;
+  background-color: transparent;
+  border: 0px;
 }
 
 .bxNormalOrange {
@@ -175,12 +177,20 @@ main {
   transition: color 0.25s ease;  /* Transition de 0.5 seconde */
   background-color: transparent;
   border: 0px;
+  padding: 0px;
 }
 
 .bxNormalOrange:hover {
   color: #FFB300;
   font-size: 32px;
   animation: tada 1s;
+  border: 0px;
+  padding: 0px;
+}
+
+button.bx.bxNormalOrange:hover {
+  background-color: transparent;
+  padding: 0px;
 }
 
 .bxNormalGrey {
@@ -189,12 +199,19 @@ main {
   transition: color 0.25s ease;  /* Transition de 0.5 seconde */
   background-color: transparent;
   border: 0px;
+  padding: 0px;
 }
 
 .bxNormalGrey:hover {
   color: var(--backgroundColorF);
   font-size: 32px;
   animation: tada 1s;
+  padding: 0px;
+}
+
+button.bx.bxNormalGrey:hover {
+  background-color: transparent;
+  padding: 0px;
 }
 
 .bxSmallGrey {
@@ -1067,3 +1084,37 @@ a {
 }
 
 /* Border radius : Fin */
+
+/* TinyMCE : Début */
+
+.tox .tox-editor-header {
+    background-color: #2b2b2b !important;
+}
+
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary {
+    background-color: #2b2b2b !important;
+}
+
+.tox .tox-tbtn svg {
+    fill: #f1f1f1 !important;
+}
+
+.tox .tox-edit-area__iframe {
+    background-color: #1e1e1e !important;
+}
+
+.tox .tox-menubar {
+  background-color: var(--backgroundColorD) !important;
+}
+
+.tox .tox-toolbar__primary {
+  background-color: var(--backgroundColorD) !important;
+}
+
+.tox .tox-tbtn {
+  background-color: transparent;
+}
+
+
+/* TinyMCE : Fin */

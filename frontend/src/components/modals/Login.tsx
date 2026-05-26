@@ -2,6 +2,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { useSessionUserContext } from '../contexts/sessionUserContext';
+import { useOngletAlerteContext } from '../contexts/ToastContext';
 import styles from './Login.module.css';
 import FloatingInput from '../inputs/FloatingInput';
 import { useNavigate } from "react-router-dom";
@@ -13,6 +14,7 @@ type LoginFormProps = {
 };
 
 const LoginModal = ({ handleClose, show, handleShowSubscribe}: LoginFormProps) => {
+  const { showOngletAlerte } = useOngletAlerteContext();
   const [logOrEmail, setLogOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useSessionUserContext();
@@ -26,8 +28,9 @@ const LoginModal = ({ handleClose, show, handleShowSubscribe}: LoginFormProps) =
     const success = await login(loginOrEmail.trim(), password);
 
     if (success) {
-      navigate("/dashboard");
+      navigate("/");
       handleClose(false);
+      showOngletAlerte('success', '(Connexion)', '', 'Vous êtes à présent connecté.');
     } else {
       setError("Identifiant ou mot de passe incorrect");
     }

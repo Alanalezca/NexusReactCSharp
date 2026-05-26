@@ -25,7 +25,7 @@ export function SessionUserContextProvider({ children }: { children: ReactNode }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch("/api/auth/me")
+    apiFetch<User>("/api/auth/me")
       .then((me) => setSessionUser(me))
       .catch(() => setSessionUser(null))
       .finally(() => setLoading(false));
@@ -38,7 +38,7 @@ export function SessionUserContextProvider({ children }: { children: ReactNode }
         body: JSON.stringify({ loginOrEmail, password }),
       });
 
-      const me = await apiFetch("/api/auth/me");
+      const me = await apiFetch<User>("/api/auth/me");
       setSessionUser(me);
 
       return true;

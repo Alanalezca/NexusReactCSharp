@@ -1,0 +1,69 @@
+.cadreTitre {
+  border-radius: 8px;
+  border: 1px solid var(--backgroundColorE);
+}
+
+.articleImage {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px 8px 0 0;
+  max-height: 400px; /* à adapter si besoin */
+}
+
+.shadow {
+  box-shadow:
+    5px 5px 10px rgba(0, 0, 0, 0.5),
+   -5px -5px 10px rgba(255, 255, 255, 0.03);
+}
+
+.ancrageOverlayCommandesAdmin {
+  position: relative;
+  height: 20px;
+}
+
+.overlayCommandesAdmin {
+  top: -20px;
+  background-color: var(--backgroundColorERGBTrans);
+  position: absolute;
+  border: 1px solid white;
+  border-radius: 6px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#btnGoTop {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 2vh;
+  right: 2vw;
+  background-color: var(--ColorA);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+#btnGoTop:hover {
+  background-color: var(--ColorA);
+}
+
+.articleInsered {
+  color: var(--backgroundColorF);
+}
+
+.articleInsered img {
+  display: block;
+  margin: 0 auto;
+  max-width: 90%;
+  height: auto;
+  box-shadow:
+    5px 5px 10px rgba(0, 0, 0, 0.5),
+   -5px -5px 10px rgba(255, 255, 255, 0.03);
+}

@@ -22,7 +22,7 @@ export function AuthProviderContext({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    apiFetch("/api/auth/me")
+    apiFetch<User>("/api/auth/me")
       .then((me) => setUser(me))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
@@ -35,7 +35,7 @@ export function AuthProviderContext({ children }: { children: ReactNode }) {
         body: JSON.stringify({ loginOrEmail, password }),
       });
 
-      const me = await apiFetch("/api/auth/me");
+      const me = await apiFetch<User>("/api/auth/me");
       setUser(me);
 
       return true;

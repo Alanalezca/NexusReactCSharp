@@ -6,29 +6,36 @@ import PrivateRoute from "./components/PrivateRoute";
 import MenuHeader from "./layouts/MenuHeader";
 import Dashboard from "./pages/Dashboard";
 import Articles from "./pages/articles/articles"
+import ArticleAdminPage from "./pages/articles/adminArticles"
+import ArticlePage from "./pages/articles/articlePage"
+import CreateArticle from "./pages/articles/createArticle"
 
 function App() {
   return (
-    <SessionUserContextProvider>
-      <BrowserRouter>
-        <OngletAlerteProvider>
+    <BrowserRouter>
+      <OngletAlerteProvider>
+        <SessionUserContextProvider>
           <MenuHeader />
-        </OngletAlerteProvider>
 
-        <Routes>
+          <Routes>
 
-          <Route path="/" element={<Articles />} />
-          <Route path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
+            <Route path="/" element={<Articles />} />
+            <Route path="/article/admin" element={<ArticleAdminPage/>} />
+            <Route path="/article/view/:slug" element={<ArticlePage />} />
+            <Route path="/article/create" element={<CreateArticle />} />
+            <Route path="/article/create/:slug" element={<CreateArticle />} />
+            <Route path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
 
-        </Routes>
-      </BrowserRouter>
-    </SessionUserContextProvider>
+          </Routes>
+        </SessionUserContextProvider>
+      </OngletAlerteProvider>
+    </BrowserRouter>
   );
 }
 

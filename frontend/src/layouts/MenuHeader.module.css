@@ -148,6 +148,10 @@
 @media (max-width: 768px) {
     .burger {
         display: inline-block;
+        background-color: transparent;
+        border: 0px;
+        color: #FF9901;
+        margin-left: 5px;
     }
 
     .MenuHeader {

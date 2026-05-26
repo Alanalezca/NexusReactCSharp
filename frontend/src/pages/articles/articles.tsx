@@ -5,193 +5,81 @@ import CardLargeLoading from '../../components/others/CardLargeLoading';
 import Pagination from '../../components/others/Pagination';
 import styles from './articles.module.css';
 import { useState, useEffect } from 'react';
-import { apiFetch } from "../../api/client";
+import { useArticlesFilters } from './useArticlesFilters';
+import { getImageUrl } from "../../functions/helpers/getImageUrl";
+
+const NB_ELEMENTS_PAR_PAGE = 10;
 
 const Articles = () => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [tagsArticlesActifs, setTagsArticlesActifs] = useState([]);
-    const [tagsSelectForFilter, setTagsSelectForFilter] = useState([]);
-    const [articles, setArticles] = useState([]);
-    const [articlesFiltered, setArticlesFiltered] = useState([]);
     const [isLargeScreen, setIsLargeScreen] = useState(false);
-    const [inputRecherche, setInputRecherche] = useState("");
     const [activeGridTags, setActiveGridTag] = useState(false);
-
-    // Pagination : Début //
-    const nbElementsParPage = 10;
     const [numCurrentPagePaginationActive, setNumCurrentPagePaginationActive] = useState(1);
-    // Pagination : Fin //
 
-    const indiceFirstArticlePartA = (nbElementsParPage * numCurrentPagePaginationActive) - nbElementsParPage;
+    const {
+        isLoading,
+        articlesFiltered,
+        tagsArticlesActifs,
+        updateSearch,
+        toggleTagFilter
+    } = useArticlesFilters();
+
+    const indiceFirstArticlePartA =
+        (NB_ELEMENTS_PAR_PAGE * numCurrentPagePaginationActive) - NB_ELEMENTS_PAR_PAGE;
+
     const indiceLastArticlePartA = indiceFirstArticlePartA + 3;
     const indiceFirstArticlePartB = indiceLastArticlePartA;
-    const indiceLastArticlePartB = indiceFirstArticlePartA + nbElementsParPage;
+    const indiceLastArticlePartB = indiceFirstArticlePartA + NB_ELEMENTS_PAR_PAGE;
 
-    useEffect(() => {
-        apiFetch("/api/articles")
-            .then(data => {
-                console.log('resultat', data);
+    const articlesPartA = articlesFiltered.slice(
+        indiceFirstArticlePartA,
+        indiceLastArticlePartA
+    );
 
-                setArticles(data);
-                setArticlesFiltered(data);
-                setIsLoading(false);
-            })
-            .catch(error => {
-                console.error("Erreur fetch articles:", error);
-                setIsLoading(false);
-            });
-    }, []);
+    const articlesPartB = articlesFiltered.slice(
+        indiceFirstArticlePartB,
+        indiceLastArticlePartB
+    );
 
     useEffect(() => {
         const checkScreenSize = () => setIsLargeScreen(window.innerWidth >= 992);
 
         checkScreenSize();
-
         window.addEventListener('resize', checkScreenSize);
 
         return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
-    // Comptage des tags //
-    const splitTags = (tagsString) => {
-        if (typeof tagsString === 'string' && tagsString.trim() !== '') {
-            return tagsString.split(',').map(tag => tag.trim());
-        }
+    useEffect(() => {
+        setNumCurrentPagePaginationActive(1);
+    }, [articlesFiltered.length]);
 
-        return [];
+    const handleSearch = (value: string) => {
+        updateSearch(value);
+        setNumCurrentPagePaginationActive(1);
     };
 
-    // Récupération des tags associés aux articles actifs
-    useEffect(() => {
-        if (articles[0]?.codeArticle) {
-
-            const tempAllTagsArticles = [];
-
-            articles.forEach((currentArticle) => {
-                tempAllTagsArticles.push(...splitTags(currentArticle.tags));
-            });
-
-            let allTagsArticlesWithCount = tempAllTagsArticles.reduce((acc, tag) => {
-                acc[tag] = (acc[tag] || 0) + 1;
-                return acc;
-            }, {});
-
-            allTagsArticlesWithCount = Object.entries(allTagsArticlesWithCount);
-
-            const allTags = [];
-
-            allTagsArticlesWithCount.forEach((current) => {
-                allTags.push({
-                    tag: current[0],
-                    nb: current[1],
-                    filtreActif: false
-                });
-            });
-
-            setTagsArticlesActifs(allTags);
-        }
-    }, [articles]);
-
-    // Activation / Désactivation du filtre sur les tags
-    const handleClickFilterTagOnOff = (e) => {
-
-        const tagAlreadySelected = tagsSelectForFilter.includes(e.tag);
-
-        // Si le tag n'est pas encore sélectionné
-        if (!tagAlreadySelected) {
-
-            const tagsArticlesActifsModified = tagsArticlesActifs.map(current =>
-                current.tag === e.tag
-                    ? { ...current, filtreActif: !current.filtreActif }
-                    : current
-            );
-
-            setTagsArticlesActifs(tagsArticlesActifsModified);
-
-            setTagsSelectForFilter(prev => {
-
-                if (!prev.includes(e.tag)) {
-                    return [...prev, e.tag];
-                }
-
-                return prev;
-            });
-
-        // Si le tag est déjà sélectionné
-        } else {
-
-            const tagsArticlesActifsModified = tagsArticlesActifs.map(current =>
-                current.tag === e.tag
-                    ? { ...current, filtreActif: !current.filtreActif }
-                    : current
-            );
-
-            setTagsArticlesActifs(tagsArticlesActifsModified);
-
-            const tagsSelectForFilterModified = tagsSelectForFilter.filter(
-                current => current !== e.tag
-            );
-
-            setTagsSelectForFilter(tagsSelectForFilterModified);
-        }
+    const handleToggleTag = (tag: string) => {
+        toggleTagFilter(tag);
+        setNumCurrentPagePaginationActive(1);
     };
-
-    // Application des tags + recherche texte
-    useEffect(() => {
-
-        const tempoArticlesFiltered = articles.filter(currentArticle => {
-
-            const articleTagsArray = currentArticle?.tags
-                ?.split(',')
-                .map(tag => tag.trim().toLowerCase());
-
-            if (tagsSelectForFilter.length > 0) {
-
-                return tagsSelectForFilter.every(currentTag =>
-                    articleTagsArray?.includes(currentTag.toLowerCase()) &&
-                    (
-                        currentArticle.titre?.includes(inputRecherche) ||
-                        currentArticle.resume?.includes(inputRecherche)
-                    )
-                );
-
-            } else {
-
-                return (
-                    currentArticle.titre?.includes(inputRecherche) ||
-                    currentArticle.resume?.includes(inputRecherche)
-                );
-            }
-        });
-
-        setArticlesFiltered(tempoArticlesFiltered);
-
-    }, [articles, tagsSelectForFilter, inputRecherche]);
 
     return (
         <div className="container-xl mt-4">
-
             <div className="row">
 
                 {!isLargeScreen && (
                     <div className="d-flex justify-content-end">
                         <i
                             className={`bx bx-filter ${activeGridTags ? "bxNormalGrey" : "bxNormalOrange"}`}
-                            onClick={() =>
-                                activeGridTags
-                                    ? setActiveGridTag(false)
-                                    : setActiveGridTag(true)
-                            }
+                            onClick={() => setActiveGridTag(prev => !prev)}
                         />
                     </div>
                 )}
 
                 <div className="col-12 col-lg-9 order-2 order-lg-1">
-
                     <div className="p-3">
 
                         <div className="row row-cols-12 g-4">
-
                             {isLoading ? (
                                 <>
                                     <CardLoading classCSSColorBackground="bgcolorC" tailleCol={isLargeScreen ? 4 : 12} />
@@ -200,45 +88,41 @@ const Articles = () => {
                                 </>
                             ) : (
                                 <>
-                                    {!articles[0] && (
+                                    {articlesFiltered.length === 0 && (
                                         <h2 className="mt-4 text-center txtColorWhite">
                                             Aucun article ne correspond à vos critères
                                         </h2>
                                     )}
 
-                                    {articlesFiltered
-                                        .slice(indiceFirstArticlePartA, indiceLastArticlePartA)
-                                        .map((currentArticles) => (
-
-                                            <Card
-                                                tailleCol={isLargeScreen ? 4 : 12}
-                                                classCSSColorBackground="bgcolorC"
-                                                cheminImg={currentArticles.lienImg}
-                                                classCSSColorTxtTitre="txtColorA"
-                                                titre={currentArticles.titre}
-                                                classCSSColorTxtContenu="txtColorWhite"
-                                                texteContenu={
-                                                    currentArticles.resume?.length >= 170
-                                                        ? currentArticles.resume.substring(0, 170) + "..."
-                                                        : currentArticles.resume
-                                                }
-                                                classCSSColorTxtBottom="txtColorD"
-                                                texteBottom={
-                                                    currentArticles.dateCreation > currentArticles.dateMaj
-                                                        ? new Date(currentArticles.dateCreation).toLocaleDateString('fr-FR')
-                                                        : new Date(currentArticles.dateMaj).toLocaleDateString('fr-FR')
-                                                }
-                                                key={currentArticles.codeArticle}
-                                                slugArticle={currentArticles.slug}
-                                                tags={currentArticles.tags}
-                                            />
-                                        ))}
+                                    {articlesPartA.map(currentArticle => (
+                                        <Card
+                                            key={currentArticle.codeArticle}
+                                            tailleCol={isLargeScreen ? 4 : 12}
+                                            classCSSColorBackground="bgcolorC"
+                                            cheminImg={getImageUrl(currentArticle.lienImg)}
+                                            classCSSColorTxtTitre="txtColorA"
+                                            titre={currentArticle.titre}
+                                            classCSSColorTxtContenu="txtColorWhite"
+                                            texteContenu={
+                                                currentArticle.resume?.length >= 170
+                                                    ? currentArticle.resume.substring(0, 170) + "..."
+                                                    : currentArticle.resume
+                                            }
+                                            classCSSColorTxtBottom="txtColorD"
+                                            texteBottom={
+                                                currentArticle.dateCreation > currentArticle.dateMaj
+                                                    ? new Date(currentArticle.dateCreation).toLocaleDateString('fr-FR')
+                                                    : new Date(currentArticle.dateMaj).toLocaleDateString('fr-FR')
+                                            }
+                                            slugArticle={currentArticle.slug}
+                                            tags={currentArticle.tags}
+                                        />
+                                    ))}
                                 </>
                             )}
                         </div>
 
                         <div className="row row-cols-12 g-4 mt-1">
-
                             {isLoading ? (
                                 isLargeScreen ? (
                                     <>
@@ -251,68 +135,62 @@ const Articles = () => {
                                 )
                             ) : (
                                 <>
-                                    {articlesFiltered
-                                        .slice(indiceFirstArticlePartB, indiceLastArticlePartB)
-                                        .map((currentArticles) => (
-
-                                            isLargeScreen ? (
-
-                                                <CardLarge
-                                                    classCSSColorBackground="bgcolorC"
-                                                    cheminImg={currentArticles.lienImg}
-                                                    classCSSColorTxtTitre="txtColorA"
-                                                    titre={currentArticles.titre}
-                                                    classCSSColorTxtContenu="txtColorWhite"
-                                                    texteContenu={
-                                                        currentArticles.resume?.length >= 270
-                                                            ? currentArticles.resume.substring(0, 270) + "..."
-                                                            : currentArticles.resume
-                                                    }
-                                                    classCSSColorTxtBottom="txtColorD"
-                                                    texteBottom={
-                                                        currentArticles.dateCreation > currentArticles.dateMaj
-                                                            ? new Date(currentArticles.dateCreation).toLocaleDateString('fr-FR')
-                                                            : new Date(currentArticles.dateMaj).toLocaleDateString('fr-FR')
-                                                    }
-                                                    key={currentArticles.codeArticle}
-                                                    slugArticle={currentArticles.slug}
-                                                    tags={currentArticles.tags}
-                                                />
-
-                                            ) : (
-
-                                                <Card
-                                                    classCSSColorBackground="bgcolorC"
-                                                    cheminImg={currentArticles.lienImg}
-                                                    classCSSColorTxtTitre="txtColorA"
-                                                    titre={currentArticles.titre}
-                                                    classCSSColorTxtContenu="txtColorWhite"
-                                                    texteContenu={
-                                                        currentArticles.resume?.length >= 170
-                                                            ? currentArticles.resume.substring(0, 170) + "..."
-                                                            : currentArticles.resume
-                                                    }
-                                                    classCSSColorTxtBottom="txtColorD"
-                                                    texteBottom={
-                                                        currentArticles.dateCreation > currentArticles.dateMaj
-                                                            ? new Date(currentArticles.dateCreation).toLocaleDateString('fr-FR')
-                                                            : new Date(currentArticles.dateMaj).toLocaleDateString('fr-FR')
-                                                    }
-                                                    key={currentArticles.codeArticle}
-                                                    slugArticle={currentArticles.slug}
-                                                    tags={currentArticles.tags}
-                                                />
-                                            )
-                                        ))}
+                                    {articlesPartB.map(currentArticle => (
+                                        isLargeScreen ? (
+                                            <CardLarge
+                                                key={currentArticle.codeArticle}
+                                                classCSSColorBackground="bgcolorC"
+                                                cheminImg={getImageUrl(currentArticle.lienImg)}
+                                                classCSSColorTxtTitre="txtColorA"
+                                                titre={currentArticle.titre}
+                                                classCSSColorTxtContenu="txtColorWhite"
+                                                texteContenu={
+                                                    currentArticle.resume?.length >= 270
+                                                        ? currentArticle.resume.substring(0, 270) + "..."
+                                                        : currentArticle.resume
+                                                }
+                                                classCSSColorTxtBottom="txtColorD"
+                                                texteBottom={
+                                                    currentArticle.dateCreation > currentArticle.dateMaj
+                                                        ? new Date(currentArticle.dateCreation).toLocaleDateString('fr-FR')
+                                                        : new Date(currentArticle.dateMaj).toLocaleDateString('fr-FR')
+                                                }
+                                                slugArticle={currentArticle.slug}
+                                                tags={currentArticle.tags}
+                                            />
+                                        ) : (
+                                            <Card
+                                                key={currentArticle.codeArticle}
+                                                classCSSColorBackground="bgcolorC"
+                                                cheminImg={currentArticle.lienImg}
+                                                classCSSColorTxtTitre="txtColorA"
+                                                titre={currentArticle.titre}
+                                                classCSSColorTxtContenu="txtColorWhite"
+                                                texteContenu={
+                                                    currentArticle.resume?.length >= 170
+                                                        ? currentArticle.resume.substring(0, 170) + "..."
+                                                        : currentArticle.resume
+                                                }
+                                                classCSSColorTxtBottom="txtColorD"
+                                                texteBottom={
+                                                    currentArticle.dateCreation > currentArticle.dateMaj
+                                                        ? new Date(currentArticle.dateCreation).toLocaleDateString('fr-FR')
+                                                        : new Date(currentArticle.dateMaj).toLocaleDateString('fr-FR')
+                                                }
+                                                slugArticle={currentArticle.slug}
+                                                tags={currentArticle.tags}
+                                            />
+                                        )
+                                    ))}
                                 </>
                             )}
                         </div>
 
                         <div className="row row-cols-12 g-4 mt-1">
                             <Pagination
-                                centrer="true"
+                                centrer={true}
                                 totalNbElement={articlesFiltered.length}
-                                nbElementParPage={nbElementsParPage}
+                                nbElementParPage={NB_ELEMENTS_PAR_PAGE}
                                 numCurrentPageActive={numCurrentPagePaginationActive}
                                 setterCurrentNumPageActive={setNumCurrentPagePaginationActive}
                             />
@@ -322,9 +200,7 @@ const Articles = () => {
                 </div>
 
                 <div className={`${activeGridTags ? "col-12" : "col-3"} ${activeGridTags ? "d-block" : "d-none"} d-lg-block order-1 order-lg-2`}>
-
                     <div className="input-group mt-2 mb-1 px-3">
-
                         <span
                             className={`${styles.inputSearch} input-group-text ${styles.shadow}`}
                             id="libelleInputSearchArticles"
@@ -337,42 +213,40 @@ const Articles = () => {
                             className={`${styles.inputSearch} form-control ${styles.shadow}`}
                             placeholder="Recherche..."
                             aria-label="rechercheArticles"
-                            aria-describedby="basic-addon1"
-
-                            onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-                                setInputRecherche(e.target.value)
-                            }
-
-                            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                            aria-describedby="libelleInputSearchArticles"
+                            onBlur={(e) => handleSearch(e.currentTarget.value)}
+                            onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    setInputRecherche(e.target.value);
+                                    handleSearch(e.currentTarget.value);
                                 }
                             }}
                         />
                     </div>
 
                     <div className="p-3">
-
                         <div className={`list-group ${styles.shadow}`}>
-
-                            {tagsArticlesActifs?.map((currentTags, index) => (
-
+                            {tagsArticlesActifs.map(currentTag => (
                                 <button
                                     type="button"
-                                    key={index}
-                                    className={`list-group-item list-group-item-action ${!currentTags.filtreActif ? styles.bandeauTag : styles.bandeauTagFocus}`}
-                                    onClick={() => handleClickFilterTagOnOff(currentTags)}
+                                    key={currentTag.tag}
+                                    className={`list-group-item list-group-item-action ${
+                                        !currentTag.filtreActif
+                                            ? styles.bandeauTag
+                                            : styles.bandeauTagFocus
+                                    }`}
+                                    onClick={() => handleToggleTag(currentTag.tag)}
                                 >
-                                    {currentTags.tag}
+                                    {currentTag.tag}
 
                                     <span className="badge pillColorA rounded-pill ms-2 bgcolorA">
-                                        {currentTags.nb}
+                                        {currentTag.nb}
                                     </span>
                                 </button>
                             ))}
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     );
