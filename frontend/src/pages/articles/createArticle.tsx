@@ -70,6 +70,7 @@ const CreateArticle = () => {
   });
 
   const btnResetActif = lienImgCree && (lienImgCree == inputForm.lienImg);
+  const btnUploadActif = inputForm.slug && inputForm.slug !== "";
 
   const splitTags = (tagsString?: string | string[]) => {
     if (Array.isArray(tagsString)) return tagsString;
@@ -258,8 +259,9 @@ const CreateArticle = () => {
     if (!file) return;
 
     const formData = new FormData();
+    const formSlug = inputForm.slug;
     formData.append("image", file);
-
+    formData.append("slug", formSlug);
     const result = await callApiFetch<{ imageUrl: string }>(
       "/api/uploads/article-image",
       "Erreur lors de l'upload de l'image",
@@ -353,7 +355,7 @@ const CreateArticle = () => {
               >
                 Reset
               </button>
-              <label className={`mt-2 ${styles.customUploadButton}`}>
+              <label className={`mt-2 ${styles.customUploadButton} ${!btnUploadActif && styles.btnOff}`}>
                 Uploader
                 <input
                 className={styles.inputAsButton}
@@ -361,6 +363,7 @@ const CreateArticle = () => {
                   accept="image/*"
                   onChange={handleUploadImage}
                   hidden
+                  disabled={!btnUploadActif}
                 />
               </label>
             </div>

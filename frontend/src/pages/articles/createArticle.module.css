@@ -72,3 +72,15 @@ button:disabled {
 .resetImageButton:hover {
   background-color: #FFB300 !important;
 }
+
+.btnOff {
+  background-color: var(--ColorBtnOff);
+  color: var(--txtColorDarkTer);
+  transition: background-color 0.3s ease;
+}
+
+.btnOff:hover {
+  background-color: var(--ColorBtnOffHover);
+  color: var(--txtColorDarkTer);
+  cursor: not-allowed;
+}

@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import styles from './MenuHeader.module.css';
 import Login from '../components/modals/Login';
 import Subscribe from '../components/modals/Subscribe';
+import ManagerImg from '../components/modals/ManagerImg';
   
   const MenuHeader = () => {
     const { showOngletAlerte } = useOngletAlerteContext();
@@ -14,6 +15,7 @@ import Subscribe from '../components/modals/Subscribe';
     const [menuOpen, setMenuOpen] = useState(false);
     const [showModalLogin, setShowModalLogin] = useState(false);
     const [showModalSubscribe, setShowModalSubscribe] = useState(false);
+    const [showModalManagerImg, setShowModalManagerImg] = useState(false);
 
     // Détection du clic hors menu mini pour déclencher sa close
     useEffect(() => {
@@ -45,6 +47,10 @@ import Subscribe from '../components/modals/Subscribe';
       <Login show={showModalLogin} 
             handleClose={setShowModalLogin} 
             handleShowSubscribe={setShowModalSubscribe}
+      />
+      <ManagerImg show={showModalManagerImg} 
+            handleClose={setShowModalManagerImg} 
+            handleShowManagerImg={setShowModalManagerImg}
       />
       <nav className={`txt-base ${styles.navbar}`}>
             {/* bouton burger */}
@@ -83,16 +89,22 @@ import Subscribe from '../components/modals/Subscribe';
                   {sessionUser["grade"] === "Administrateur" ?
                   <>
                     <Link to={`/article/admin`}>
-                      <div className={styles.btnDisconnect}>
+                      <div className={styles.btnLogo}>
                         <button className={`bx bx-list-ul bxNormalOrange`}></button>
                       </div>
                     </Link>
                     <Link to={`/article/create`}>
-                      <div className={styles.btnDisconnect}>
+                      <div className={styles.btnLogo}>
                         <button className={`bx bx-list-plus bxNormalOrange`}></button>
                       </div>
                     </Link>
-                    <div className={styles.btnDisconnect}>
+                    <div className={styles.btnLogo}>
+                      <button className={`bx bx-image bxNormalOrange`}
+                      onClick={() => setShowModalManagerImg(true)}
+                      >
+                      </button>
+                    </div>
+                    <div className={styles.btnLogo}>
                       <button className={`bx bxs-cog bxNormalGrey`}></button>
                     </div>
                   </>: null}
@@ -102,7 +114,7 @@ import Subscribe from '../components/modals/Subscribe';
                   >
                     {sessionUser.pseudo}
                   </span>
-                    <div className={styles.btnDisconnect}>
+                    <div className={styles.btnLogo}>
                       <button className={`bx bxs-exit bxNormalOrange`} 
                         aria-label="Déconnexion" 
                         onClick={async () => {await logout(); showOngletAlerte('success', '(Déconnexion)', '', 'Vous êtes à présent déconnecté.');}}>
