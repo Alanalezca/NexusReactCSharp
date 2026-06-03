@@ -17,6 +17,8 @@
 .borderMid {
   border-left: 2px solid var(--ColorC);
   border-right: 2px solid var(--ColorC);
+  height: 80vh;
+  overflow-y: auto;
 }
 
 .borderBottom {
@@ -36,6 +38,26 @@
   background: #1f1f1f;
   border-radius: 12px;
   padding: 8px;
+}
+
+.imageName {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  text-align: center;
+
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 
 .miniImg {
@@ -104,4 +126,33 @@
 .copyUrlButton:hover {
   background: rgba(255, 0, 0, 0.85);
   transform: scale(1.1);
+}
+
+.customUploadButton {
+  background-color: #FF9901;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.customUploadButton:hover {
+  background-color: #FFB300;
+}
+
+.btnOff {
+  background-color: var(--ColorBtnOff);
+  color: var(--txtColorDarkTer);
+  transition: background-color 0.3s ease;
+}
+
+.btnOff:hover {
+  background-color: var(--ColorBtnOffHover);
+  color: var(--txtColorDarkTer);
+  cursor: not-allowed;
 }

@@ -202,12 +202,26 @@ button.bx.bxNormalOrange:hover {
   padding: 0px;
 }
 
+.bxNormalOrangeNoTada {
+  color: var(--ColorA);
+  font-size: 32px;
+  border: 0px;
+  padding: 0px;
+  background-color: transparent;
+  transition: color 0.25s ease;
+}
+
+.bxNormalOrangeNoTada:hover {
+  background-color: transparent;
+}
+
 .bxNormalGreyNoTada {
   color: var(--backgroundColorF);
   font-size: 32px;
   border: 0px;
   padding: 0px;
   background-color: transparent;
+  transition: color 0.25s ease;
 }
 
 .bxNormalGreyNoTada:hover {
@@ -228,6 +242,18 @@ button.bx.bxNormalOrange:hover {
   font-size: 32px;
   animation: tada 1s;
   padding: 0px;
+}
+
+.bxNormalGreenNoTada {
+  color: var(--txtColorGreen);
+  font-size: 32px;
+  border: 0px;
+  padding: 0px;
+  background-color: transparent;
+}
+
+.bxNormalGreenNoTada:hover {
+  background-color: transparent;
 }
 
 button.bx.bxNormalGrey:hover {

@@ -10,6 +10,7 @@ import convertDateToDateLong from "../../functions/getDateLong";
 import { apiFetch } from "../../api/client";
 import TinyEditor from "./tinyMCE";
 import useApiFetch from "../../api/useApiFetch";
+import { getImageUrl } from "../../functions/helpers/getImageUrl";
 
 type ArticleDb = {
   codeArticle: string;
@@ -101,7 +102,7 @@ const CreateArticle = () => {
       lienImg: currentArticle.lienImg,
     }));
 
-    setHtmlContent(currentArticle.contenu ?? "");
+    setHtmlContent(convertImagesSrcInHtml(currentArticle.contenu));
   };
 
   useEffect(() => {
@@ -186,30 +187,34 @@ const CreateArticle = () => {
 
     const dateNow = new Date();
     const tagsToInsert = tags.filter((currentTag) => currentTag.checked);
+    const contenuNormalise = normalizeImagesSrcForSave(htmlContent);
 
-    try {
-      await apiFetch("/api/articles/validationMaJ", {
-        method: "POST",
+    const updatedArticle = await callApiFetch<ArticleDb>(
+      "/api/articles/validationUpdate",
+      "Erreur lors de la mise à jour de l'article",
+      undefined,
+      {
+        method: "PATCH",
         body: JSON.stringify({
           parCodeArticle: article.codeArticle,
           parTitre: inputForm.titre,
           parResume: inputForm.resume,
           parSlug: inputForm.slug,
-          parContenu: htmlContent,
+          parContenu: contenuNormalise,
           parDateMaj: dateNow,
           parLienImg: inputForm.lienImg,
           parTags: tagsToInsert,
         }),
-      });
+      }
+    );
 
+    if (updatedArticle) {
       showOngletAlerte(
         "success",
         "(Modification article)",
         "",
         `L'article "${inputForm.titre}" a bien été modifié !`
       );
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'article :", error);
     }
   };
 
@@ -298,6 +303,48 @@ const CreateArticle = () => {
       ...prev,
       lienImg: "",
     }));
+  };
+
+  const convertImagesSrcInHtml = (html?: string): string => {
+    if (!html) return "";
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    doc.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+
+      if (src) {
+        img.setAttribute("src", getImageUrl(src));
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
+
+  const normalizeImagesSrcForSave = (html?: string): string => {
+    if (!html) return "";
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    doc.querySelectorAll("img").forEach((img) => {
+      const src = img.getAttribute("src");
+
+      if (!src) return;
+
+      try {
+        const url = new URL(src);
+
+        if (url.pathname.startsWith("/images/articles/")) {
+          img.setAttribute("src", url.pathname);
+        }
+      } catch {
+        // Si src est déjà relatif, on ne touche pas
+      }
+    });
+
+    return doc.body.innerHTML;
   };
 
   const isLoading = loadingSession || loadingArticleAEditer || loadingTags;
@@ -431,7 +478,7 @@ const CreateArticle = () => {
                   Mettre à jour l'article
                 </button>
 
-                <LinkToURL to={`/article/${slug}`}>
+                <LinkToURL to={`/article/view/${slug}`}>
                   <button
                     className="mb-5 ms-3"
                     type="button"
