@@ -9,6 +9,7 @@ import Articles from "./pages/articles/articles"
 import ArticleAdminPage from "./pages/articles/adminArticles"
 import ArticlePage from "./pages/articles/articlePage"
 import CreateArticle from "./pages/articles/createArticle"
+import Smashup from "./pages/smashup/smashup"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/article/view/:slug" element={<ArticlePage />} />
             <Route path="/article/create" element={<CreateArticle />} />
             <Route path="/article/create/:slug" element={<CreateArticle />} />
+            <Route path="/smashup" element={<Smashup />} />
             <Route path="/dashboard"
               element={
                 <PrivateRoute>

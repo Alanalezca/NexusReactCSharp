@@ -33,7 +33,7 @@ const ManagerImg = ({ handleClose, show, handleShowManagerImg}: ManagerImgProps)
   const [inputSearch, setInputSearch] = useState(""); 
   const [inputNameUpload, setInputNameUpload] = useState(""); 
   const btnUploadActif = inputNameUpload && inputNameUpload !== "";
-  console.log('btnUploadActif', btnUploadActif);
+
   useEffect(() => {
     const pullImages = async () => {
       const result = await callApiFetch<Images[]>(
@@ -167,7 +167,7 @@ const ManagerImg = ({ handleClose, show, handleShowManagerImg}: ManagerImgProps)
   };
 
   const filterUsed = !!inputSearch?.trim(); 
-  console.log('test', filterUsed);
+
   return (
     <Modal show={show} size="xl" onHide={() => handleClose(false)} centered>
       <Modal.Header closeButton className={`${styles.borderTop} bgcolorC modalTopBordBotTransparent`}>
