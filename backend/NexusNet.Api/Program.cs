@@ -1,4 +1,8 @@
 using NexusNet.Api.Data;
+using NexusNet.Api.Repositories.Articles;
+using NexusNet.Api.Services.Articles;
+using NexusNet.Api.Repositories.Smashup;
+using NexusNet.Api.Services.Smashup;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +21,14 @@ builder.Services.AddControllers();
 // -----------------------------------
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// -----------------------------------
+// DEPENDENCY INJECTION - SERVICES / REPOSITORIES
+// -----------------------------------
+builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
+builder.Services.AddScoped<IArticlesService, ArticlesService>();
+builder.Services.AddScoped<ISmashupRepository, SmashupRepository>();
+builder.Services.AddScoped<ISmashupService, SmashupService>();
 
 // -----------------------------------
 // CORS : Autorisation du front react à call l'API
@@ -43,7 +55,6 @@ if (string.IsNullOrEmpty(jwtKey))
 
 // -----------------------------------
 // AUTHENTICATION : Déclare l'utilisation de JWT via cookie
-// Go chercher le jwt comme token d'authentification/vérif de sa validité
 // -----------------------------------
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -63,7 +74,6 @@ builder.Services
 
         options.Events = new JwtBearerEvents
         {
-            // 🔐 JWT depuis cookie
             OnMessageReceived = context =>
             {
                 if (context.Request.Cookies.TryGetValue("jwt", out var token))
@@ -74,7 +84,6 @@ builder.Services
                 return Task.CompletedTask;
             },
 
-            // ❌ 401 propre
             OnChallenge = context =>
             {
                 context.HandleResponse();
@@ -85,7 +94,6 @@ builder.Services
                 return context.Response.WriteAsync("{\"error\":\"unauthorized\"}");
             },
 
-            // ❌ 403 propre
             OnForbidden = context =>
             {
                 context.Response.StatusCode = 403;
@@ -98,16 +106,12 @@ builder.Services
 
 // -----------------------------------
 // AUTHORIZATION (POLICIES)
-// Creation des niveaux de protection des routes 
-// selon la valeur du role (on rend utilisable dans un controller le [Authorize(Policy = "xxx")])
 // -----------------------------------
 builder.Services.AddAuthorization(options =>
 {
-    // 👤 utilisateur connecté
     options.AddPolicy("User", policy =>
         policy.RequireAuthenticatedUser());
 
-    // 🛠 Moderator (role >= 5)
     options.AddPolicy("Moderator", policy =>
         policy.RequireAssertion(context =>
         {
@@ -117,7 +121,6 @@ builder.Services.AddAuthorization(options =>
                    && role >= 5;
         }));
 
-    // 🔥 Admin (role >= 10)
     options.AddPolicy("Admin", policy =>
         policy.RequireAssertion(context =>
         {
@@ -134,15 +137,6 @@ builder.Services.AddAuthorization(options =>
 var app = builder.Build();
 
 // -----------------------------------
-// PIPELINE HTTP (IMPORTANT)
-// Ordre dans lequel chaque requête passe lors d'un call react vers API
-// Requête React
-//→ CORS vérifie si localhost:5173 est autorisé
-//→ Authentication lit le cookie jwt et valide le token
-//→ Authorization vérifie les droits / policies
-//→ Controller exécuté
-// -----------------------------------
-// -----------------------------------
 // FICHIERS STATIQUES REACT
 // -----------------------------------
 app.UseDefaultFiles();
@@ -150,8 +144,6 @@ app.UseStaticFiles();
 
 // -----------------------------------
 // CORS
-// Utile surtout en dev local quand React tourne sur localhost:5173
-// En production, front et API auront le même domaine
 // -----------------------------------
 app.UseCors("AllowFrontend");
 
@@ -168,8 +160,6 @@ app.MapControllers();
 
 // -----------------------------------
 // FALLBACK REACT ROUTER
-// Si l'URL n'est pas une API, on renvoie index.html
-// Exemple : /login, /articles, /draft/keyforge
 // -----------------------------------
 app.MapFallbackToFile("index.html");
 
