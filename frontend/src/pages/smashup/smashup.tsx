@@ -6,6 +6,7 @@ import ButtonPiano from '../../components/others/ButtonPiano';
 import InputStandard from '../../components/inputs/InputStandard';
 import getRandomUniqueNumbers from '../../functions/getRandomUniqueNumbers';
 import useApiFetch from "../../api/useApiFetch";
+import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
 
 type SmashupBoxApi = {
     codeBox: string;
@@ -50,7 +51,6 @@ type SmashupLoadMode = "Normal" | "Random";
 
 const Smashup = () => {
     const [isLoading, setIsLoading] = useState(true);
-    const [isOpen, setIsOpen] = useState(false);
     const contenuPianoNbJoueurs = ['2 joueurs', '3 joueurs', '4 joueurs'];
     const [currentEtapeDraft, setCurrentEtapeDraft] = useState(0);
     const [nbJoueursSelected, setNbJoueursSelected] = useState(0);
@@ -81,6 +81,8 @@ const Smashup = () => {
     const [modeSelectByDoubleClic, setModeSelectByDoubleClic] = useState(false);
     const [modeFactionsRandom, setModeFactionsRandom] = useState(false);
     const { callApiFetch } = useApiFetch();
+
+    const [drivenDraftSteps, setDrivenDraftSteps] = useState({});
 
     useEffect(() => {
         if (nbJoueursSelected === 0) {
@@ -216,380 +218,17 @@ const Smashup = () => {
         );
         
         
-        if(nbJoueursSelected == 0) {
-            switch (currentEtapeDraft) {
-                case 2:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 3:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 4:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 5:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 6:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 7:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 8:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 9:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    setDraftTermine(true);
-                    break;
-            }
-        } else if(nbJoueursSelected == 1) 
+        if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
         {
-            switch (currentEtapeDraft) {
-                case 2:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 3:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 4:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 5:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 6:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 7:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 8:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 9:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 10:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 11:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 12:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 13:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    setDraftTermine(true);
-                    break;
-                }
-        } else if(nbJoueursSelected == 2) 
-        {
-            switch (currentEtapeDraft) {
-                case 2:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 3:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 4:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 5:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 4
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 6:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 7:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 8:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 9:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 4
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickA: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 10:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 4
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 11:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 12:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 13:
-                    setTxtCurrentInstructionColor("txtClignoteRed");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionBanB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 14:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 4
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 15:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 3
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 16:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 2
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    break;
-                case 17:
-                    setTxtCurrentInstructionColor("txtClignoteGreen");
-                    setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                        prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                        draftFromCurrentPlayer.ID === 1
-                        ? {...draftFromCurrentPlayer, 
-                            FactionPickB: libelleFaction}
-                        : draftFromCurrentPlayer
-                    ));
-                    setDraftTermine(true);
-                    break;
-                }
+            setTxtCurrentInstructionColor(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].txtColor);
+            setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
+                prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
+                draftFromCurrentPlayer.ID === drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].idDraftFromCurrentPlayer
+                ? {...draftFromCurrentPlayer, 
+                    [drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].indiceToLoad]: libelleFaction}
+                : draftFromCurrentPlayer
+            ));
+            drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].etapeFinale && setDraftTermine(true);
         }
 
         setCurrentEtapeDraft(prev => prev + 1);
@@ -669,487 +308,104 @@ const Smashup = () => {
         handleLoadColorInstruction();
     }, [currentEtapeDraft])
 
+
     const handleLoadTxtCurrentInstruction = () => {
-        if(nbJoueursSelected == 0) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 3:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 4:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 5:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 6:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 7:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 8:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            case 9:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            }
-        } else if (nbJoueursSelected == 1) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 3:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 4:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 5:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 6:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 7:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 8:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 9:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 10:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 11:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            case 12:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            case 13:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            }
-        } else if (nbJoueursSelected == 2) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 3:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 4:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 5:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 6:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 7:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 8:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 9:
-                setTxtCurrentInstruction("doit SELECTIONNER sa première faction");
-                break;
-            case 10:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 11:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 12:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 13:
-                setTxtCurrentInstruction("doit BANNIR une faction");
-                break;
-            case 14:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            case 15:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            case 16:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
-            case 17:
-                setTxtCurrentInstruction("doit SELECTIONNER sa seconde faction");
-                break;
+        if(currentEtapeDraft > 0)
+        {
+            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
+            {
+                setTxtCurrentInstruction(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].txtInstruction);
             }
         }
     };
 
     const handleLoadTxtPlayer = () => {
-        if(nbJoueursSelected == 0) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 3:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 4:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 5:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 6:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 7:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 8:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 9:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            }
-        } else if (nbJoueursSelected == 1) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 3:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 4:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 5:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 6:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 7:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 8:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 9:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 10:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 11:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 12:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 13:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            }
-        } else if (nbJoueursSelected == 2) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 3:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 4:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 5:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D");
-                break;
-            case 6:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 7:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 8:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 9:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D");
-                break;
-            case 10:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D");
-                break;
-            case 11:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 12:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 13:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
-            case 14:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D");
-                break;
-            case 15:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C");
-                break;
-            case 16:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B");
-                break;
-            case 17:
-                setTxtCurrentPlayer(inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A");
-                break;
+        if(currentEtapeDraft > 0)
+        {
+            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
+            {
+                setTxtCurrentPlayer(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].txtCurrentPlayer);
             }
         }
     };
 
     const handleLoadColorPlayer = () => {
-        if(nbJoueursSelected == 0) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 3:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 4:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 5:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 6:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 7:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 8:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 9:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            }
-        } else if (nbJoueursSelected == 1) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 3:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 4:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 5:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 6:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 7:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 8:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 9:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 10:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 11:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 12:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 13:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            }
-        } else if (nbJoueursSelected == 2) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 3:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 4:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 5:
-                setTxtCurrentPlayerColor("txtColorPlayerGreen");
-                break;
-            case 6:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
-            case 7:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 8:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 9:
-                setTxtCurrentPlayerColor("txtColorPlayerGreen");
-                break;
-            case 10:
-                setTxtCurrentPlayerColor("txtColorPlayerGreen");
-                break;
-            case 11:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-                break;
-            case 12:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-                break;
-            case 13:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-            case 14:
-                setTxtCurrentPlayerColor("txtColorPlayerGreen");
-            case 15:
-                setTxtCurrentPlayerColor("txtColorPlayerYellow");
-            case 16:
-                setTxtCurrentPlayerColor("txtColorPlayerBlue");
-            case 17:
-                setTxtCurrentPlayerColor("txtColorPlayerRed");
-                break;
+        if(currentEtapeDraft > 0)
+        {
+            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
+            {
+                setTxtCurrentPlayerColor(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].colorTxtCurrentPlayer);
             }
         }
     };
 
     const handleLoadColorInstruction = () => {
-        if(nbJoueursSelected == 0) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 3:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 4:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 5:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 6:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 7:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 8:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 9:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            }
-        } else if (nbJoueursSelected == 1) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 3:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 4:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 5:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 6:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 7:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 8:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 9:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 10:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 11:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 12:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 13:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            }
-        } else if (nbJoueursSelected == 2) {
-            switch (currentEtapeDraft) {
-            case 2:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 3:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 4:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 5:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 6:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 7:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 8:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 9:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 10:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 11:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 12:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 13:
-                setTxtCurrentInstructionColor("txtClignoteRed");
-                break;
-            case 14:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 15:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 16:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break;
-            case 17:
-                setTxtCurrentInstructionColor("txtClignoteGreen");
-                break; 
+        if(currentEtapeDraft > 0)
+        {
+            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
+            {
+                setTxtCurrentInstructionColor(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].colorTxtCurrentInstructionColor);
             }
         }
     };
-    //console.log(lastFactionSaisieForRollback, currentEtapeDraft);
-    //console.log(factionsPickBanByPlayer);
+
+    const initArayForDataDriven = () => {
+        const drivenDraftStep2players = [
+            { limiteEtape: 9},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: true}
+        ];
+
+        const drivenDraftStep3players = [
+            { limiteEtape: 13},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: true}
+        ];
+
+
+        const drivenDraftStep4players = [
+            { limiteEtape: 17},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
+            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: true}
+        ];
+
+        setDrivenDraftSteps({
+            0: drivenDraftStep2players,
+            1: drivenDraftStep3players,
+            2: drivenDraftStep4players
+        })
+    }
+
     return (
         <>
             <div className="container-xl mt-3">
@@ -1218,7 +474,7 @@ const Smashup = () => {
                 {currentEtapeDraft == 0 &&
                 <div className="row">             
                     <div className="col-12 mt-5 mb-5 d-flex justify-content-center">
-                        <button type="button" className={`btn btn-primary btn-ColorA`} onClick={() => setCurrentEtapeDraft(1)}>Valider le nombre de joueurs</button>
+                        <button type="button" className={`btn btn-primary btn-ColorA`} onClick={() => {setCurrentEtapeDraft(1); initArayForDataDriven();}}>Valider le nombre de joueurs</button>
                     </div>
                 </div>
                 }

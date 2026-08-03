@@ -69,6 +69,42 @@ const ArticlePage = () => {
     return doc.body.innerHTML;
   };
 
+  const addAutoAnchorsFromArticleBox = (html: string): string => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+
+    const normalizeText = (text: string) =>
+      text
+        .replace(/\u00a0/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const indexLinks = doc.querySelectorAll('.article-box a[href^="#"]');
+
+    const targets = Array.from(
+      doc.body.querySelectorAll("h3, p > strong")
+    ).filter((element) => !element.closest(".article-box"));
+
+    indexLinks.forEach((link) => {
+      const href = link.getAttribute("href");
+
+      if (!href || href === "#") return;
+
+      const targetId = href.replace("#", "");
+      const indexLabel = normalizeText(link.textContent || "");
+
+      const matchingElement = targets.find((element) => {
+        return normalizeText(element.textContent || "") === indexLabel;
+      });
+
+      if (matchingElement) {
+        matchingElement.setAttribute("id", targetId);
+      }
+    });
+
+    return doc.body.innerHTML;
+  };
+
   useEffect(() => {
     if (!slug) return;
 
@@ -110,11 +146,12 @@ const ArticlePage = () => {
     }
 
     const htmlWithFixedImages = rewriteHtmlImageUrls(article.contenu);
+    const htmlWithAnchors = addAutoAnchorsFromArticleBox(htmlWithFixedImages);
 
     setSanitizedHtml(
-      DOMPurify.sanitize(htmlWithFixedImages, {
+      DOMPurify.sanitize(htmlWithAnchors, {
         ADD_TAGS: ["div"],
-        ADD_ATTR: ["class"],
+        ADD_ATTR: ["class", "id", "href", "style"],
       })
     );
   }, [article]);
