@@ -1,73 +1,178 @@
-# React + TypeScript + Vite
+# Parlons carton
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Présentation
 
-Currently, two official plugins are available:
+"Parlons carton" est un SaaS développé autour de **React** et **ASP.NET Core (.NET)**.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Le projet regroupe plusieurs briques complémentaires :
 
-## React Compiler
+* une application web destinée aux utilisateurs ;
+* une API REST sécurisée / CRUD ;
+* des services backend dédiés au traitement des données ;
+* des outils de reporting ;
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+L'objectif est de proposer une architecture moderne, performante et facilement maintenable reposant sur une séparation claire entre le frontend, le backend et la couche d'accès aux données.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+# Architecture
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+React (Frontend)
+        │
+        ▼
+ ASP.NET Core API
+        │
+        ▼
+ Business Services
+        │
+        ▼
+ Repositories
+        │
+        ▼
+ SQL Database
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Le projet suit une architecture en couches afin de séparer les responsabilités :
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+* **Frontend React** : interface utilisateur
+* **API ASP.NET Core** : exposition des services REST
+* **Services** : logique métier
+* **Repositories** : accès aux données
+* **Base SQL** : persistance
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+# Fonctionnalités
+
+* Authentification sécurisée (JWT)
+* Gestion des utilisateurs
+* API REST
+* Génération de rapports
+* Reporting PDF
+* Outils de traitement de données
+* Tableaux de bord
+* Gestion documentaire
+* Architecture modulaire
+
+---
+
+# Stack technique
+
+## Frontend
+
+* React
+* TypeScript
+* React Router
+* Context API
+* CSS
+
+## Backend
+
+* ASP.NET Core
+* C#
+* Entity Framework Core
+* JWT Authentication
+* Dependency Injection
+
+## Base de données
+
+* SQL
+* Entity Framework
+
+## Reporting
+
+* DevExpress Reporting
+
+---
+
+# Structure du projet
+
 ```
+Frontend/
+├── Components
+├── Context
+├── Hooks
+├── Pages
+├── Services
+└── Types
+
+Backend/
+├── Controllers
+├── DTO
+├── Services
+├── Repositories
+├── Models
+├── Middleware
+└── Utils
+```
+
+---
+
+# Principes de développement
+
+Le projet repose notamment sur les principes suivants :
+
+* séparation stricte des responsabilités ;
+* architecture orientée services ;
+* injection de dépendances ;
+* composants React réutilisables ;
+* typage fort avec TypeScript ;
+* DTO pour les échanges entre le frontend et le backend ;
+* développement orienté maintenabilité et évolutivité.
+
+---
+
+# Sécurité
+
+* Authentification JWT
+* Contrôle des autorisations
+* Validation des entrées
+* Gestion des erreurs
+* Protection des endpoints
+
+---
+
+# Installation
+
+## Prérequis
+
+* .NET SDK
+* Node.js
+* npm
+* SQL Server ou PostgreSQL (selon l'environnement)
+
+## Backend
+
+```bash
+dotnet restore
+dotnet build
+dotnet run
+```
+
+## Frontend
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
+# Objectifs du projet
+
+Ce projet constitue une plateforme de production permettant de centraliser plusieurs fonctionnalités métier autour :
+
+* de la gestion de données ;
+* des traitements backend ;
+* de la génération de rapports ;
+* de l'exposition de services REST ;
+* d'une interface web moderne développée avec React.
+
+L'architecture est pensée pour faciliter les évolutions futures et permettre l'ajout de nouveaux modules sans remettre en cause les composants existants.
+
+---
+
+# Auteur
+
+Développé par **Emmanuel Douillez**.
