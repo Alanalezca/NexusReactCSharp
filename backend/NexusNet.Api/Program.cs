@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Claims;
+using NexusNet.Api.Repositories.DiceThrone;
+using NexusNet.Api.Services.DiceThrone;
+using NexusNet.Api.Repositories.Keyforge;
+using NexusNet.Api.Services.Keyforge;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +33,10 @@ builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
 builder.Services.AddScoped<IArticlesService, ArticlesService>();
 builder.Services.AddScoped<ISmashupRepository, SmashupRepository>();
 builder.Services.AddScoped<ISmashupService, SmashupService>();
+builder.Services.AddScoped<IDiceThroneRepository, DiceThroneRepository>();
+builder.Services.AddScoped<IDiceThroneService, DiceThroneService>();
+builder.Services.AddScoped<IKeyforgeRepository, KeyforgeRepository>();
+builder.Services.AddScoped<IKeyforgeService, KeyforgeService>();
 
 // -----------------------------------
 // CORS : Autorisation du front react à call l'API
