@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import styles from './MenuHeader.module.css';
 import Login from '../components/modals/Login';
 import Subscribe from '../components/modals/Subscribe';
+import PasswordReinit from '../components/modals/PasswordReinit';
 import ManagerImg from '../components/modals/ManagerImg';
   
   const MenuHeader = () => {
@@ -15,6 +16,7 @@ import ManagerImg from '../components/modals/ManagerImg';
     const [menuOpen, setMenuOpen] = useState(false);
     const [showModalLogin, setShowModalLogin] = useState(false);
     const [showModalSubscribe, setShowModalSubscribe] = useState(false);
+    const [showModalReinitPassword, setShowModalReinitPassword] = useState(false);
     const [showModalManagerImg, setShowModalManagerImg] = useState(false);
 
     // Détection du clic hors menu mini pour déclencher sa close
@@ -43,10 +45,16 @@ import ManagerImg from '../components/modals/ManagerImg';
     <><Subscribe show={showModalSubscribe} 
           handleClose={setShowModalSubscribe} 
           handleShowLogin={setShowModalLogin}
+          handleShowReinitPassword={setShowModalReinitPassword}
       />
       <Login show={showModalLogin} 
             handleClose={setShowModalLogin} 
             handleShowSubscribe={setShowModalSubscribe}
+            handleShowReinitPassword={setShowModalReinitPassword}
+      />
+      <PasswordReinit show={showModalReinitPassword} 
+          handleClose={setShowModalReinitPassword} 
+          handleShowLogin={setShowModalLogin}
       />
       <ManagerImg show={showModalManagerImg} 
             handleClose={setShowModalManagerImg} 

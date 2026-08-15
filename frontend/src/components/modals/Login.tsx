@@ -11,9 +11,10 @@ type LoginFormProps = {
   handleClose: (show: boolean) => void;
   show: boolean;
   handleShowSubscribe: (show: boolean) => void;
+  handleShowReinitPassword: (show: boolean) => void;
 };
 
-const LoginModal = ({ handleClose, show, handleShowSubscribe}: LoginFormProps) => {
+const LoginModal = ({ handleClose, show, handleShowSubscribe, handleShowReinitPassword}: LoginFormProps) => {
   const { showOngletAlerte } = useOngletAlerteContext();
   const [logOrEmail, setLogOrEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,7 +50,7 @@ const LoginModal = ({ handleClose, show, handleShowSubscribe}: LoginFormProps) =
       </Modal.Body>
 
       <Modal.Footer className={`${styles.LoginModalBot} ${styles.borderBottom}`}>
-        <a className={styles.subscribe}>Mot de passe oublié</a>
+        <a className={styles.subscribe} onClick={() => {handleShowReinitPassword(true); handleClose(false);}}>Mot de passe oublié</a>
         <label> / </label>
         <a className={styles.subscribe} onClick={() => {handleShowSubscribe(true); handleClose(false);}}>S'enregistrer</a>
         <Button variant="primary" className={saisieOK ? 'btn-ColorA' : 'btn-ColorInactif'} onClick={() => handleLogin(logOrEmail, password)} disabled={!saisieOK}>

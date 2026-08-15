@@ -1,0 +1,38 @@
+.breakerTitre {
+  display: block;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--ColorA) 40%,
+    var(--ColorA) 60%,
+    transparent 100%
+  );
+}
+
+.logoFaction {
+  max-height: 25px;
+  margin-top: -4px;
+}
+
+.logoFactionBig {
+  max-height: 45px;
+  margin-left: 5px;
+}
+
+.bandeauTag {
+
+}
+
+.bandeauTag:hover {
+  background-color: var(--backgroundColorCaution) !important;
+}
+
+.bandeauTagFocus {
+  background-color: var(--backgroundColorHalo) !important;
+}
+
+.bandeauTagFocus:hover {
+  background-color: var(--backgroundColorHalo) !important;
+}

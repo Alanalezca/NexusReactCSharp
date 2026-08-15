@@ -7,6 +7,8 @@ import InputStandard from '../../components/inputs/InputStandard';
 import getRandomUniqueNumbers from '../../functions/getRandomUniqueNumbers';
 import useApiFetch from "../../api/useApiFetch";
 import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
+import { configDraftSteps } from './config/draftSteps';
+import { useDraftEngine } from "./hooks/useDraftEngine";
 
 type SmashupBoxApi = {
     codeBox: string;
@@ -68,11 +70,6 @@ const Smashup = () => {
         { ID: 4, FactionBanA: "-", FactionBanB: "-", FactionPickA: "-", FactionPickB: "-" }
     ]);
     const [showOverlayFactions, setShowOverlayFactions] = useState(false);
-    const [txtCurrentInstruction, setTxtCurrentInstruction] = useState("XXX");
-    const [txtCurrentInstructionColor, setTxtCurrentInstructionColor] = useState("XXX");
-    const [txtCurrentPlayer, setTxtCurrentPlayer] = useState("XXX");
-    const [txtCurrentPlayerColor, setTxtCurrentPlayerColor] = useState("XXX");
-    const [phasePickOrBan, setPhasePickOrBan] = useState("");
     const [draftTermine, setDraftTermine] = useState(false);
     const [lastFactionSaisieForRollback, setLastFactionSaisieForRollback] = useState<{
         codeFaction: string | null;
@@ -82,29 +79,23 @@ const Smashup = () => {
     const [modeFactionsRandom, setModeFactionsRandom] = useState(false);
     const { callApiFetch } = useApiFetch();
 
-    const [drivenDraftSteps, setDrivenDraftSteps] = useState({});
+    const currentDraftStep = configDraftSteps[nbJoueursSelected][currentEtapeDraft-1];
 
-    useEffect(() => {
-        if (nbJoueursSelected === 0) {
-            if ([2, 3, 6, 7].includes(currentEtapeDraft)) {
-                setPhasePickOrBan("Ban");
-            } else {
-                setPhasePickOrBan("Pick");
-            }
-        } else if (nbJoueursSelected === 1) {
-            if ([2, 3, 4, 8, 9, 10].includes(currentEtapeDraft)) {
-                setPhasePickOrBan("Ban");
-            } else {
-                setPhasePickOrBan("Pick");
-            }
-        } else if (nbJoueursSelected === 2) {
-            if ([2, 3, 4, 5, 10, 11, 12, 13].includes(currentEtapeDraft)) {
-                setPhasePickOrBan("Ban");
-            } else {
-                setPhasePickOrBan("Pick");
-            }
-        }
-    }, [currentEtapeDraft])
+    const {
+        selectFaction,
+        rollback
+    } = useDraftEngine({
+        currentEtapeDraft,
+        setCurrentEtapeDraft,
+        currentDraftStep,
+        nbJoueursSelected,
+        setListeFactions,
+        setFactionsPickBanByPlayer,
+        configDraftSteps,
+        lastFactionSaisieForRollback,
+        setLastFactionSaisieForRollback,
+        setDraftTermine
+    });
 
     useEffect(() => {
         setIsLoading(true);
@@ -198,99 +189,6 @@ const Smashup = () => {
             ))
     };
 
-    const handleClickOnFaction = (codeFaction: string, libelleFaction: string, selectedOrNot: boolean) => {
-        if (selectedOrNot) {
-            return;
-        }
-        setListeFactions(prevListeFactions => 
-            prevListeFactions?.map(prevFaction =>
-                prevFaction.CodeFaction === codeFaction
-                ? {...prevFaction, 
-                    Selected: true,
-                    TypeSelected: phasePickOrBan}
-                : prevFaction
-            ));
-        setLastFactionSaisieForRollback(prev => 
-            ({...prev,
-                codeFaction: codeFaction,
-                libelleFaction: libelleFaction
-            })
-        );
-        
-        
-        if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
-        {
-            setTxtCurrentInstructionColor(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].txtColor);
-            setFactionsPickBanByPlayer(prevFactionsPickBanByPlayer => 
-                prevFactionsPickBanByPlayer?.map(draftFromCurrentPlayer =>
-                draftFromCurrentPlayer.ID === drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].idDraftFromCurrentPlayer
-                ? {...draftFromCurrentPlayer, 
-                    [drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].indiceToLoad]: libelleFaction}
-                : draftFromCurrentPlayer
-            ));
-            drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].etapeFinale && setDraftTermine(true);
-        }
-
-        setCurrentEtapeDraft(prev => prev + 1);
-    };
-
-    const handleClickOnRollback = () => {
-        setCurrentEtapeDraft(prev => prev - 1);
-        setFactionsPickBanByPlayer(prev => 
-            prev?.map(prev =>
-                prev.FactionBanA === lastFactionSaisieForRollback.libelleFaction
-                ? {...prev, 
-                    FactionBanA: "-"
-                }
-                : prev
-            ));
-        
-        setFactionsPickBanByPlayer(prev => 
-            prev?.map(prev =>
-                prev.FactionBanB === lastFactionSaisieForRollback.libelleFaction
-                ? {...prev, 
-                    FactionBanB: "-"
-                }
-                : prev
-            ));
-
-                setFactionsPickBanByPlayer(prev => 
-            prev?.map(prev =>
-                prev.FactionPickA === lastFactionSaisieForRollback.libelleFaction
-                ? {...prev, 
-                    FactionPickA: "-"
-                }
-                : prev
-            ));
-
-        setFactionsPickBanByPlayer(prev => 
-            prev?.map(prev =>
-                prev.FactionPickB === lastFactionSaisieForRollback.libelleFaction
-                ? {...prev, 
-                    FactionPickB: "-"
-                }
-                : prev
-        ));
-
-        setListeFactions(prev =>
-            prev?.map(prevFaction => 
-                prevFaction.CodeFaction === lastFactionSaisieForRollback.codeFaction
-                ? {...prevFaction,
-                    Selected: false,
-                    TypeSelected: null}
-                : prevFaction
-        ));
-
-
-        setLastFactionSaisieForRollback(prev =>
-            ({ 
-                ...prev,
-                codeFaction: null,
-                libelleFaction: null
-            })
-        );
-    }
-
     const handleLoadNamePlayers = () => {
         setNamePlayers((prev) =>({
             ...prev,
@@ -300,111 +198,6 @@ const Smashup = () => {
             J4: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D"
         }));
     };
-
-    useEffect(() => {
-        handleLoadTxtCurrentInstruction();
-        handleLoadTxtPlayer();
-        handleLoadColorPlayer();
-        handleLoadColorInstruction();
-    }, [currentEtapeDraft])
-
-
-    const handleLoadTxtCurrentInstruction = () => {
-        if(currentEtapeDraft > 0)
-        {
-            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
-            {
-                setTxtCurrentInstruction(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].txtInstruction);
-            }
-        }
-    };
-
-    const handleLoadTxtPlayer = () => {
-        if(currentEtapeDraft > 0)
-        {
-            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
-            {
-                setTxtCurrentPlayer(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].txtCurrentPlayer);
-            }
-        }
-    };
-
-    const handleLoadColorPlayer = () => {
-        if(currentEtapeDraft > 0)
-        {
-            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
-            {
-                setTxtCurrentPlayerColor(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].colorTxtCurrentPlayer);
-            }
-        }
-    };
-
-    const handleLoadColorInstruction = () => {
-        if(currentEtapeDraft > 0)
-        {
-            if(currentEtapeDraft <= drivenDraftSteps[nbJoueursSelected][0].limiteEtape)
-            {
-                setTxtCurrentInstructionColor(drivenDraftSteps[nbJoueursSelected][currentEtapeDraft-1].colorTxtCurrentInstructionColor);
-            }
-        }
-    };
-
-    const initArayForDataDriven = () => {
-        const drivenDraftStep2players = [
-            { limiteEtape: 9},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: true}
-        ];
-
-        const drivenDraftStep3players = [
-            { limiteEtape: 13},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: true}
-        ];
-
-
-        const drivenDraftStep4players = [
-            { limiteEtape: 17},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionBanA", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionPickA", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteRed", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionBanB", txtInstruction: "doit BANNIR une faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteRed", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 4, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerD"]?.value || "Joueur D", colorTxtCurrentPlayer: "txtColorPlayerGreen", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 3, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerC"]?.value || "Joueur C", colorTxtCurrentPlayer: "txtColorPlayerYellow", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 2, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerB"]?.value || "Joueur B", colorTxtCurrentPlayer: "txtColorPlayerBlue", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: false},
-            { txtColor: "txtClignoteGreen", idDraftFromCurrentPlayer: 1, indiceToLoad: "FactionPickB", txtInstruction: "doit SELECTIONNER sa première faction", txtCurrentPlayer: inputsRef?.current["pseudoPlayerA"]?.value || "Joueur A", colorTxtCurrentPlayer: "txtColorPlayerRed", colorTxtCurrentInstructionColor: "txtClignoteGreen", etapeFinale: true}
-        ];
-
-        setDrivenDraftSteps({
-            0: drivenDraftStep2players,
-            1: drivenDraftStep3players,
-            2: drivenDraftStep4players
-        })
-    }
 
     return (
         <>
@@ -474,7 +267,7 @@ const Smashup = () => {
                 {currentEtapeDraft == 0 &&
                 <div className="row">             
                     <div className="col-12 mt-5 mb-5 d-flex justify-content-center">
-                        <button type="button" className={`btn btn-primary btn-ColorA`} onClick={() => {setCurrentEtapeDraft(1); initArayForDataDriven();}}>Valider le nombre de joueurs</button>
+                        <button type="button" className={`btn btn-primary btn-ColorA`} onClick={() => {setCurrentEtapeDraft(1)}}>Valider le nombre de joueurs</button>
                     </div>
                 </div>
                 }
@@ -580,11 +373,11 @@ const Smashup = () => {
                             <div className="col-12 mt-4 d-flex flex-wrap justify-content-center">
                                 {listeFactions?.map((currentFaction, index) => (
                                     currentFaction?.Pickable == true && 
-                                        <div key={"faction-" + index} className={`${styles.conteneurImgX5} ${phasePickOrBan == "Pick" && styles.toPick} ${phasePickOrBan == "Ban" && styles.toBan} ${currentFaction.TypeSelected == "Pick" ? styles.factionPicked : (currentFaction.TypeSelected == "Ban" ? styles.factionBanned : "")} me-3 mb-3`}>
+                                        <div key={"faction-" + index} className={`${styles.conteneurImgX5} ${currentDraftStep.phase == "Pick" && styles.toPick} ${currentDraftStep.phase == "Ban" && styles.toBan} ${currentFaction.TypeSelected == "Pick" ? styles.factionPicked : (currentFaction.TypeSelected == "Ban" ? styles.factionBanned : "")} me-3 mb-3`}>
                                             <div className={`${styles.blocFaction} ${currentFaction?.Selected && styles.grayscale}`}>
-                                                <img src={currentFaction.LienImg} className={`rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnFaction(currentFaction?.CodeFaction, currentFaction?.Libelle, currentFaction?.Selected)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnFaction(currentFaction?.CodeFaction, currentFaction?.Libelle, currentFaction?.Selected)} alt="..."></img>
+                                                <img src={currentFaction.LienImg} className={`rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && selectFaction(currentFaction.CodeFaction, currentFaction.Libelle, currentFaction.Selected)} onDoubleClick={() => modeSelectByDoubleClic && selectFaction(currentFaction?.CodeFaction, currentFaction?.Libelle, currentFaction?.Selected)} alt="..."></img>
                                             </div>
-                                            <div className={`${styles.overlayText} ${showOverlayFactions && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnFaction(currentFaction?.CodeFaction, currentFaction?.Libelle, currentFaction?.Selected)} onDoubleClick={() => handleClickOnFaction(currentFaction?.CodeFaction, currentFaction?.Libelle, currentFaction?.Selected)}>
+                                            <div className={`${styles.overlayText} ${showOverlayFactions && styles.show}`} onClick={() => !modeSelectByDoubleClic && selectFaction(currentFaction.CodeFaction, currentFaction.Libelle, currentFaction.Selected)} onDoubleClick={() => selectFaction(currentFaction.CodeFaction, currentFaction.Libelle, currentFaction.Selected)}>
                                                 {currentFaction.Libelle}
                                             </div>
                                         </div>
@@ -646,7 +439,7 @@ const Smashup = () => {
                             <div
                             id={styles.btnRollBack}
                             className={lastFactionSaisieForRollback?.codeFaction ? "btn-ColorA" : "btn-ColorInactif"}
-                            onClick={lastFactionSaisieForRollback?.codeFaction ? handleClickOnRollback : undefined}
+                            onClick={lastFactionSaisieForRollback?.codeFaction ? rollback : undefined}
                             >
                             <i className="bx bxs-eraser bx-sm"></i>
                             </div>
@@ -659,7 +452,7 @@ const Smashup = () => {
                 <div className={styles.bandeauInstructionDraft}>
                     <div className="col-12 d-flex justify-content-center">
                         {!draftTermine ?
-                            <h5 className="text-center"><span className={`${txtCurrentPlayerColor}`}><b>{txtCurrentPlayer}</b></span>&nbsp;<span className={`${txtCurrentInstructionColor}`}>{txtCurrentInstruction}</span></h5>
+                            <h5 className="text-center"><span className={`${currentDraftStep.colorTxtCurrentPlayer}`}><b>{namePlayers[currentDraftStep.txtCurrentPlayer]}</b></span>&nbsp;<span className={`${currentDraftStep.colorTxtCurrentInstructionColor}`}>{currentDraftStep.txtInstruction}</span></h5>
                                 :
                             <h5 className={`text-center txtColorWhite`}>Le draft est à présent terminé !</h5>
                         }

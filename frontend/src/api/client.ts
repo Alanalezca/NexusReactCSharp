@@ -1,6 +1,7 @@
 // Entrée frontend des appels API
 
 const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = "";   Si chez CB
 
 function getDefaultErrorMessage(status: number) {
   switch (status) {

@@ -4,7 +4,7 @@ import FloatingLabel from '../inputs/FloatingInput';
 import { useOngletAlerteContext } from '../contexts/ToastContext';
 import styles from './Subscribe.module.css';
 
-const SubscribeFormV2 = ({handleClose, show, handleShowLogin}) => {
+const SubscribeFormV2 = ({handleClose, show, handleShowLogin, handleShowReinitPassword}) => {
   const { showOngletAlerte } = useOngletAlerteContext();
   const [pseudo, setPseudo] = useState('');
   const [email, setEmail] = useState('');
@@ -53,9 +53,8 @@ const SubscribeFormV2 = ({handleClose, show, handleShowLogin}) => {
             return;
           }
       
-          //console.log('Utilisateur créé:', data.user);
+
           showOngletAlerte('success', '(Enregistrement)', '', 'Votre compte a bien été créé. Vous pouvez à présent vous connecter.');
-          // Ici, tu peux fermer le modal et afficher une notification si tu veux
       
         } catch (err) {
           console.error('Erreur fetch:', err);
@@ -105,7 +104,7 @@ const SubscribeFormV2 = ({handleClose, show, handleShowLogin}) => {
       <Modal.Footer className={styles.SubscribeModalBot}>
         <label className={styles.login} onClick={() => {handleShowLogin(true); handleClose(false);}} >Se connecter</label>
         <label> / </label>
-        <label className={styles.login} onClick={() => {handleClose(false);}}>S'enregistrer</label>
+        <label className={styles.login} onClick={() => {handleShowReinitPassword(true); handleClose(false);}}>Mot de passe oublié</label>
         <Button
           id="btnValiderCreationCompte"
           variant="primary"
