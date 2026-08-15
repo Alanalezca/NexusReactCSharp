@@ -5,8 +5,8 @@
     import { Button } from 'react-bootstrap';
 
     const DraftKeyforgeResume = ({ currentDraftKeyforge, focusSurJoueurAouBforStats, focusSurStat }) => {
-        const {draftEnCoursParJoueurAouB, setDraftEnCoursParJoueurAouB} = useKeyforgeContext(null);
-        const {draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC} = useKeyforgeContext(null);
+        const {draftEnCoursParJoueurAouB, setDraftEnCoursParJoueurAouB} = useKeyforgeContext();
+        const {draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC} = useKeyforgeContext();
 
         const currentEtape = useMemo(() => {
             return currentDraftKeyforge?.[0].Etat;

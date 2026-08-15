@@ -6,23 +6,78 @@ import Accordeon from '../../components/others/Accordeon';
 import InputStandard from '../../components/inputs/InputStandard';
 import getRandomUniqueNumbers from '../../functions/getRandomUniqueNumbers';
 
+interface DiceThroneBox {
+    codeBox: string;
+    libelle: string;
+    lienImg: string;
+    classement: number;
+    nbHeros: number;
+    vague: string;
+    Selected?: boolean;
+}
+
+interface DiceThroneSet {
+    Numero: string;
+    Selected?: boolean;
+}
+
+interface DiceThroneHero {
+    codeHeros: string;
+    codeBox: string;
+    libelle: string;
+    lienImg: string;
+    classement: number;
+    vague: string;
+    pickable: boolean;
+    Selected?: boolean | null;
+    TypeSelected?: string | null;
+}
+
+interface LastHeroRollback {
+    lastPlayer: number | "";
+    lastHero: string;
+    indiceHerosPickBanByPlayerImg: string;
+    indiceHerosPickBanByPlayer: string;
+    lastTxtCurrentPlayer: string;
+    lastTxtCurrentPlayerColor: string;
+    lastTxtCurrentInstruction: string;
+    lastTxtCurrentInstructionColor: string;
+}
+
+interface PlayersNames {
+    J1: string;
+    J2: string;
+    J3?: string;
+    J4?: string;
+}
+
 const DiceThroneDrafter = () => {
     const [flip, setFlip] = useState(false);
-    const [lastHeroSaisiForRollback, setLastHeroSaisiForRollback] = useState({lastPlayer: "", lastHero: "", indiceHerosPickBanByPlayerImg: "", indiceHerosPickBanByPlayer: "", lastTxtCurrentPlayer: "", lastTxtCurrentPlayerColor: "", lastTxtCurrentInstruction: "", lastTxtCurrentInstructionColor: ""});
+    const [lastHeroSaisiForRollback, setLastHeroSaisiForRollback] = useState<LastHeroRollback>({
+        lastPlayer: "",
+        lastHero: "",
+        indiceHerosPickBanByPlayerImg: "",
+        indiceHerosPickBanByPlayer: "",
+        lastTxtCurrentPlayer: "",
+        lastTxtCurrentPlayerColor: "",
+        lastTxtCurrentInstruction: "",
+        lastTxtCurrentInstructionColor: ""
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [currentEtapeDraft, setCurrentEtapeDraft] = useState(0);
     const inputsRef = useRef({});
-    const [listeBoites, setListeBoite] = useState();
-    const [listeSets, setListeSets] = useState();
-    const [listeHeros, setListeHeros] = useState();
+    const [listeBoites, setListeBoite] = useState<DiceThroneBox[]>([]);
+    const [listeSets, setListeSets] = useState<DiceThroneSet[]>([]);
+    const [listeHeros, setListeHeros] = useState<DiceThroneHero[]>([]);
     const [modeSelectByDoubleClic, setModeSelectByDoubleClic] = useState(false);
     const [phasePickOrBan, setPhasePickOrBan] = useState("Pick");
     const [showOverlayHeros, setShowOverlayHeros] = useState(false);
     const [draftTermine, setDraftTermine] = useState(false);
     const [filtreOnAllBoxes, setFiltreOnAllBoxes] = useState(true);
-    const [namePlayers, setNamePlayers] = useState([
-        { J1: "Joueur A", J2: "Joueur B"}
-    ]);
+    const [namePlayers, setNamePlayers] = useState<PlayersNames>({
+        J1: "Joueur A",
+        J2: "Joueur B"
+    });
     const [herosPickBanByPlayer, setHerosPickBanByPlayer] = useState([
         { ID: 1, HerosPickA: null, LibelleHerosPickA: "", HerosPickB: null, LibelleHerosPickB: "", HerosPickC: null, LibelleHerosPickC: "", IndiceHerosBan: null, IndiceHerosSelectedFinal: null },
         { ID: 2, HerosPickA: null, LibelleHerosPickA: "", HerosPickB: null, LibelleHerosPickB: "", HerosPickC: null, LibelleHerosPickC: "", IndiceHerosBan: null, IndiceHerosSelectedFinal: null }
@@ -38,17 +93,25 @@ const DiceThroneDrafter = () => {
     const [modeHerosRandom, setModeHerosRandom] = useState(false);
 
     useEffect(() => {
-    document.querySelectorAll('.noFocus').forEach(el => el.blur());
+        document
+            .querySelectorAll<HTMLElement>('.noFocus')
+            .forEach(el => el.blur());
     }, []);
 
     useEffect(() => {
         fetch('/api/dicethrone/boites')
         .then(response => response.json())
-        .then(data => {
-          setListeBoite(data);
-          setIsLoading(false);
-          const vaguesGroup = [...new Set(data.map(item => item.vague))];
-          setListeSets(vaguesGroup.map(v => ({ Numero: v })));
+        .then((data: DiceThroneBox[]) => {
+            setListeBoite(data);
+            setIsLoading(false);
+
+            const vaguesGroup = [...new Set(data.map(item => item.vague))];
+
+            setListeSets(
+                vaguesGroup.map(v => ({
+                    Numero: v
+                }))
+            );
         })
         .catch(error => console.error('Erreur fetch dice throne boites:', error));
     }, [])
@@ -78,7 +141,7 @@ const DiceThroneDrafter = () => {
 
     const handleClickOnBox = (codeBoite, numWave) => {
         setListeBoite(prevListeBoites => 
-            prevListeBoites?.map(prevBoite =>
+            prevListeBoites.map(prevBoite =>
                 prevBoite.codeBox === codeBoite
                 ? {...prevBoite, 
                     Selected: !prevBoite?.Selected}
@@ -86,7 +149,7 @@ const DiceThroneDrafter = () => {
             ));
         //console.log(numWave);
         setListeSets(prevListeSets => 
-            prevListeSets?.map(prevSet =>
+            prevListeSets.map(prevSet =>
                 prevSet.Numero === numWave
                 ? {...prevSet,
                     Selected: false}
@@ -103,7 +166,7 @@ const DiceThroneDrafter = () => {
         const newSelectedValue = !currentSet?.Selected;
 
         setListeBoite(prevListeBoites => 
-            prevListeBoites?.map(prevBoite =>
+            prevListeBoites.map(prevBoite =>
                 prevBoite.vague === numWave
                     ? {
                         ...prevBoite, 
@@ -114,7 +177,7 @@ const DiceThroneDrafter = () => {
         );
 
         setListeSets(prevListeSets => 
-            prevListeSets?.map(prevSet =>
+            prevListeSets.map(prevSet =>
                 prevSet.Numero === numWave
                     ? {
                         ...prevSet,
@@ -168,12 +231,18 @@ const DiceThroneDrafter = () => {
         setListeHeros(newData);
     };
 
-    const handleClickOnHeros = (codeHeros, libelleHeros, LienImg, selectedOrNot, indiceIfBan) => {
+    const handleClickOnHeros = (
+        codeHeros: string,
+        libelleHeros: string,
+        LienImg: string,
+        selectedOrNot: boolean | null | undefined,
+        indiceIfBan?: number
+    ) => {
         if (selectedOrNot) {
             return;
         }
         setListeHeros(prevListeHeros => 
-            prevListeHeros?.map(prevHeros =>
+            prevListeHeros.map(prevHeros =>
                 prevHeros.codeHeros === codeHeros
                 ? {...prevHeros, 
                     Selected: true,
@@ -181,7 +250,7 @@ const DiceThroneDrafter = () => {
                 : prevHeros
             ));
         
-        let indiceLastPlayer = "";
+        let indiceLastPlayer: number | "" = "";
         let indiceHerosPickBanByPlayerImg ="";
         let indiceHerosPickBanByPlayer = "";
         let lastTxtCurrentPlayer = "";
@@ -450,14 +519,14 @@ const DiceThroneDrafter = () => {
         }
 
         setListeHeros(prevListeHeros => 
-        prevListeHeros?.map(prevHeros =>
+        prevListeHeros.map(prevHeros =>
             prevHeros.codeHeros === codeHerosPickBanByPlayerToReinit
             ? {...prevHeros, 
                 Selected: null,
                 TypeSelected: null}
             : prevHeros
         ));
-        setLastHeroSaisiForRollback({lastPlayer: "", lastHero: ""});
+        setLastHeroSaisiForRollback(prev => ({...prev, lastPlayer: "", lastHero: ""}));
         setTxtCurrentPlayer(lastHeroSaisiForRollback.lastTxtCurrentPlayer);
         setTxtCurrentPlayerColor(lastHeroSaisiForRollback.lastTxtCurrentPlayerColor);
         setTxtCurrentInstructionColor(lastHeroSaisiForRollback.lastTxtCurrentInstructionColor);
@@ -507,12 +576,12 @@ const DiceThroneDrafter = () => {
                 </div>
                 <div className="row">             
                     <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerRed)"} intMaxLength={50} strPlaceholder={"Joueur A"} strValeurByDef={""} strID={"pseudoJoueurA"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => (inputsRef.current["pseudoPlayerA"] = e)}/>
+                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerRed)"} intMaxLength={50} strPlaceholder={"Joueur A"} strValeurByDef={""} strID={"pseudoJoueurA"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => {inputsRef.current["pseudoPlayerA"] = e;}}/>
                     </div>
                 </div>
                 <div className="row">             
                     <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerBlue)"} intMaxLength={50} strPlaceholder={"Joueur B"} strValeurByDef={""} strID={"pseudoJoueurB"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => (inputsRef.current["pseudoPlayerB"] = e)}/>
+                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerBlue)"} intMaxLength={50} strPlaceholder={"Joueur B"} strValeurByDef={""} strID={"pseudoJoueurB"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => {inputsRef.current["pseudoPlayerB"] = e;}}/>
                     </div>
                 </div>
                 {currentEtapeDraft === 0 &&
@@ -526,7 +595,7 @@ const DiceThroneDrafter = () => {
                         <div className="col-12 d-flex justify-content-center">
                             <div className="p-3">
                                 <div className={`list-group ${styles.shadow}`}>
-                                    {listeSets?.map((current, index) => (
+                                    {listeSets.map((current, index) => (
                                         <button type="button" key={index} className={`list-group-item list-group-item-action text-center ${!current.Selected ? styles.bandeauTag : styles.bandeauTagFocus}`} onClick={() => handleClickOnSet(current.Numero)}>{current.Numero}</button>
                                     ))}
                                 </div>
@@ -669,9 +738,9 @@ const DiceThroneDrafter = () => {
                             {herosPickBanByPlayer[indiceJoueurViewedPourBan].IndiceHerosBan !== 1 &&
                                 <div className={`noFocus ${styles.conteneurImgX6} ${styles.toBan} me-3 mb-3`}>
                                     <div className={`noFocus ${styles.blocFaction}`}>
-                                        <img src={herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA} className={`noFocus rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, "", 1)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, "", 1)} alt="..."></img>
+                                        <img src={herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA} className={`noFocus rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, false, 1)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, false, 1)} alt="..."></img>
                                     </div>
-                                    <div className={`${styles.overlayText} ${showOverlayHeros && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, "", 1)} onDoubleClick={() => handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, "", 1)}>
+                                    <div className={`${styles.overlayText} ${showOverlayHeros && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, false, 1)} onDoubleClick={() => handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickA, false, 1)}>
                                             {herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickA}
                                     </div>
                                 </div>
@@ -679,9 +748,9 @@ const DiceThroneDrafter = () => {
                             {herosPickBanByPlayer[indiceJoueurViewedPourBan].IndiceHerosBan !== 2 &&
                             <div className={`noFocus ${styles.conteneurImgX6} ${styles.toBan} me-3 mb-3`}>
                                 <div className={`noFocus ${styles.blocFaction}`}>
-                                    <img src={herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB} className={`noFocus rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, "", 2)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, "", 2)} alt="..."></img>
+                                    <img src={herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB} className={`noFocus rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, false, 2)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, false, 2)} alt="..."></img>
                                 </div>
-                                <div className={`${styles.overlayText} ${showOverlayHeros && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, "", 2)} onDoubleClick={() => handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, "", 2)}>
+                                <div className={`${styles.overlayText} ${showOverlayHeros && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, false, 2)} onDoubleClick={() => handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickB, false, 2)}>
                                     {herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickB}
                                 </div>
                             </div>
@@ -689,9 +758,9 @@ const DiceThroneDrafter = () => {
                             {herosPickBanByPlayer[indiceJoueurViewedPourBan].IndiceHerosBan !== 3 &&
                             <div className={`noFocus ${styles.conteneurImgX6} ${styles.toBan} me-3 mb-3`}>
                                 <div className={`noFocus ${styles.blocFaction}`}>
-                                    <img src={herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC} className={`noFocus rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, "", 3)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, "", 3)} alt="..."></img>
+                                    <img src={herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC} className={`noFocus rounded float-start ${styles.responsiveImgFaction}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, false, 3)} onDoubleClick={() => modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, false, 3)} alt="..."></img>
                                 </div>
-                                <div className={`${styles.overlayText} ${showOverlayHeros && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, "", 3)} onDoubleClick={() => handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, "", 3)}>
+                                <div className={`${styles.overlayText} ${showOverlayHeros && styles.show}`} onClick={() => !modeSelectByDoubleClic && handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, false, 3)} onDoubleClick={() => handleClickOnHeros("", herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC, herosPickBanByPlayer[indiceJoueurViewedPourBan].HerosPickC, false, 3)}>
                                     {herosPickBanByPlayer[indiceJoueurViewedPourBan].LibelleHerosPickC}
                                 </div>
                             </div>

@@ -9,6 +9,7 @@ import useApiFetch from "../../api/useApiFetch";
 import { ThemeConsumer } from 'react-bootstrap/esm/ThemeProvider';
 import { configDraftSteps } from './config/draftSteps';
 import { useDraftEngine } from "./hooks/useDraftEngine";
+import type { DraftStep } from "./hooks/useDraftEngine";
 
 type SmashupBoxApi = {
     codeBox: string;
@@ -60,9 +61,9 @@ const Smashup = () => {
     const [listeBoites, setListeBoite] = useState<SmashupBox[]>([]);
     const [listeFactions, setListeFactions] = useState<SmashupFaction[]>([]);
     const [compteurNbFactionsSelonBoitesSelected, setCompteurNbFactionsSelonBoitesSelected] = useState(0);
-    const [namePlayers, setNamePlayers] = useState([
+    const [namePlayers, setNamePlayers] = useState(
         { J1: "Joueur A", J2: "Joueur B", J3: "Joueur C", J4: "Joueur D" }
-    ]);
+    );
     const [factionsPickBanByPlayer, setFactionsPickBanByPlayer] = useState([
         { ID: 1, FactionBanA: "-", FactionBanB: "-", FactionPickA: "-", FactionPickB: "-" },
         { ID: 2, FactionBanA: "-", FactionBanB: "-", FactionPickA: "-", FactionPickB: "-" },
@@ -79,7 +80,7 @@ const Smashup = () => {
     const [modeFactionsRandom, setModeFactionsRandom] = useState(false);
     const { callApiFetch } = useApiFetch();
 
-    const currentDraftStep = configDraftSteps[nbJoueursSelected][currentEtapeDraft-1];
+    const currentDraftStep = configDraftSteps[nbJoueursSelected][currentEtapeDraft - 1] as DraftStep;
 
     const {
         selectFaction,
@@ -242,25 +243,25 @@ const Smashup = () => {
                 </div>
                 <div className="row">             
                     <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerRed)"} intMaxLength={50} strPlaceholder={"Joueur A"} strValeurByDef={""} strID={"pseudoJoueurA"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => (inputsRef.current["pseudoPlayerA"] = e)}/>
+                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerRed)"} intMaxLength={50} strPlaceholder={"Joueur A"} strValeurByDef={""} strID={"pseudoJoueurA"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => {inputsRef.current["pseudoPlayerA"] = e;}}/>
                     </div>
                 </div>
                 <div className="row">             
                     <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerBlue)"} intMaxLength={50} strPlaceholder={"Joueur B"} strValeurByDef={""} strID={"pseudoJoueurB"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => (inputsRef.current["pseudoPlayerB"] = e)}/>
+                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerBlue)"} intMaxLength={50} strPlaceholder={"Joueur B"} strValeurByDef={""} strID={"pseudoJoueurB"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => {inputsRef.current["pseudoPlayerB"] = e;}}/>
                     </div>
                 </div>
                 {nbJoueursSelected > 0 &&
                     <div className="row">             
                         <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                            <InputStandard strType={"text"} strColor={"var(--txtColorPlayerYellow)"} intMaxLength={50} strPlaceholder={"Joueur C"} strValeurByDef={""} strID={"pseudoJoueurC"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => (inputsRef.current["pseudoPlayerC"] = e)}/>
+                            <InputStandard strType={"text"} strColor={"var(--txtColorPlayerYellow)"} intMaxLength={50} strPlaceholder={"Joueur C"} strValeurByDef={""} strID={"pseudoJoueurC"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => {inputsRef.current["pseudoPlayerC"] = e;}}/>
                         </div>
                     </div>
                 }
                 {nbJoueursSelected > 1 &&
                     <div className="row">             
                         <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                            <InputStandard strType={"text"} strColor={"var(--txtColorPlayerGreen)"} intMaxLength={50} strPlaceholder={"Joueur D"} strValeurByDef={""} strID={"pseudoJoueurD"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => (inputsRef.current["pseudoPlayerD"] = e)}/>
+                            <InputStandard strType={"text"} strColor={"var(--txtColorPlayerGreen)"} intMaxLength={50} strPlaceholder={"Joueur D"} strValeurByDef={""} strID={"pseudoJoueurD"} strTxtAlign="center" disabled={currentEtapeDraft > 0 && true} ref={(e) => {inputsRef.current["pseudoPlayerD"] = e;}}/>
                         </div>
                     </div>
                 }
@@ -288,7 +289,7 @@ const Smashup = () => {
                     <div className="row">             
                         <div className="col-12 mt-1 justify-content-center">
                                 <h6 className="text-center txtColorDarkBisLight">{modeSelectByDoubleClic ? "(sélection par double clic)" : <>&nbsp;</>}</h6>
-                                <h5 className={`mt-2 mb-4 text-center ${compteurNbFactionsSelonBoitesSelected >= ((parseInt(nbJoueursSelected) +2) *4 +4) ? "txtColorSuccessLight" : "txtColorDangerLight"}`}>{compteurNbFactionsSelonBoitesSelected} factions sélectionnées (sur {(parseInt(nbJoueursSelected) +2) *4 +4} minimum)</h5>
+                                <h5 className={`mt-2 mb-4 text-center ${compteurNbFactionsSelonBoitesSelected >= ((nbJoueursSelected +2) *4 +4) ? "txtColorSuccessLight" : "txtColorDangerLight"}`}>{compteurNbFactionsSelonBoitesSelected} factions sélectionnées (sur {(nbJoueursSelected +2) *4 +4} minimum)</h5>
                         </div>
                     </div>
                     <div className="row">             
@@ -303,10 +304,10 @@ const Smashup = () => {
                     
                     <div className="row mb-5">           
                         <div className="col-12 mt-4 d-flex justify-content-center">
-                            <button type="button" disabled={compteurNbFactionsSelonBoitesSelected < ((parseInt(nbJoueursSelected) +2) *4 +4)} className={`btn btn-primary ${compteurNbFactionsSelonBoitesSelected >= ((parseInt(nbJoueursSelected) +2) *4 +4) ? "btn-ColorA" : "btn-ColorInactif"}`} onClick={() => {handleBuildFiltreFactions(listeBoites, "Normal"); setCurrentEtapeDraft(2); handleLoadNamePlayers();}}>Valider la sélection</button>
+                            <button type="button" disabled={compteurNbFactionsSelonBoitesSelected < ((nbJoueursSelected +2) *4 +4)} className={`btn btn-primary ${compteurNbFactionsSelonBoitesSelected >= ((nbJoueursSelected +2) *4 +4) ? "btn-ColorA" : "btn-ColorInactif"}`} onClick={() => {handleBuildFiltreFactions(listeBoites, "Normal"); setCurrentEtapeDraft(2); handleLoadNamePlayers();}}>Valider la sélection</button>
                         </div>
                         <div className="col-12 mt-3 mb-5 d-flex justify-content-center">
-                            <button type="button" disabled={compteurNbFactionsSelonBoitesSelected < ((parseInt(nbJoueursSelected) +2) *4 +5)} className={`btn btn-primary ${compteurNbFactionsSelonBoitesSelected > ((parseInt(nbJoueursSelected) +2) *4 +4) ? "btn-ColorA" : "btn-ColorInactif"}`} onClick={() => {handleBuildFiltreFactions(listeBoites, "Random"); setCurrentEtapeDraft(2); handleLoadNamePlayers();}}>Valider et randomiser</button>
+                            <button type="button" disabled={compteurNbFactionsSelonBoitesSelected < ((nbJoueursSelected +2) *4 +5)} className={`btn btn-primary ${compteurNbFactionsSelonBoitesSelected > ((nbJoueursSelected +2) *4 +4) ? "btn-ColorA" : "btn-ColorInactif"}`} onClick={() => {handleBuildFiltreFactions(listeBoites, "Random"); setCurrentEtapeDraft(2); handleLoadNamePlayers();}}>Valider et randomiser</button>
                         </div>
                     </div>
                 </>

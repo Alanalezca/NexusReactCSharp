@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 
-type DraftStep = {
+export type DraftStep = {
     phase: string;
     idDraftFromCurrentPlayer: number;
     indiceToLoad: string;
@@ -9,6 +9,7 @@ type DraftStep = {
     colorTxtCurrentInstructionColor: string;
     txtCurrentPlayer: string;
     txtInstruction: string;
+    txtColor: string;
 };
 
 type SmashupFaction = {
@@ -36,7 +37,7 @@ type LastFactionRollback = {
     libelleFaction: string | null;
 };
 
-type DraftEngineProps  = {
+type DraftEngineProps = {
     currentEtapeDraft: number;
     setCurrentEtapeDraft: Dispatch<SetStateAction<number>>;
 
@@ -50,7 +51,7 @@ type DraftEngineProps  = {
         SetStateAction<DraftPlayer[]>
     >;
 
-    configDraftSteps: DraftStep[][];
+    configDraftSteps: Record<number, DraftStepsConfig>;
 
     lastFactionSaisieForRollback: LastFactionRollback;
 
@@ -60,6 +61,15 @@ type DraftEngineProps  = {
 
     setDraftTermine: Dispatch<SetStateAction<boolean>>;
 };
+
+type DraftConfig = {
+    limiteEtape: number;
+};
+
+export type DraftStepsConfig = [
+    DraftConfig,
+    ...DraftStep[]
+];
 
 export function useDraftEngine({
     currentEtapeDraft,

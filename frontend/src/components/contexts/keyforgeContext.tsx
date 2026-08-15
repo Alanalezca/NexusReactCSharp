@@ -1,22 +1,76 @@
-// Imports nécessaires
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext } from "react";
+import type { ReactNode } from "react";
 
-// Création du contexte vide en vue d'accueillir le Provider
-const KeyforgeContext = createContext();
+interface KeyforgeContextType {
+    poolCartesGlobal: any;
+    setPoolCartesGlobal: React.Dispatch<React.SetStateAction<any>>;
 
-// Hook personnalisé permettant d'y accéder
-export const useKeyforgeContext = () => useContext(KeyforgeContext);
+    cartesValidees: any[];
+    setCartesValidees: React.Dispatch<React.SetStateAction<any[]>>;
 
-// Composant Provider
-export const KeyforgeContextProvider = ({ children }) => {
-  const [poolCartesGlobal, setPoolCartesGlobal] = useState(null);
-  const [cartesValidees, setCartesValidees] = useState([]);
-  const [draftEnCoursParJoueurAouB, setDraftEnCoursParJoueurAouB] = useState(null);
-  const [draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC] = useState(null);
+    draftEnCoursParJoueurAouB: number | null;
+    setDraftEnCoursParJoueurAouB: React.Dispatch<
+        React.SetStateAction<number | null>
+    >;
 
-  return (
-    <KeyforgeContext.Provider value={{ poolCartesGlobal, setPoolCartesGlobal, cartesValidees, setCartesValidees, draftEnCoursParJoueurAouB, setDraftEnCoursParJoueurAouB, draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC }}>
-      {children}
-    </KeyforgeContext.Provider>
-  );
+    draftEnCoursSurFactionAouBouC: string | null;
+    setDraftEnCoursSurFactionAouBouC: React.Dispatch<
+        React.SetStateAction<string | null>
+    >;
+}
+
+interface KeyforgeContextProviderProps {
+    children: ReactNode;
+}
+
+const KeyforgeContext = createContext<KeyforgeContextType | undefined>(
+    undefined
+);
+
+export const useKeyforgeContext = () => {
+    const context = useContext(KeyforgeContext);
+
+    if (context === undefined) {
+        throw new Error(
+            "useKeyforgeContext doit être utilisé dans un KeyforgeContextProvider"
+        );
+    }
+
+    return context;
+};
+
+export const KeyforgeContextProvider = ({
+    children
+}: KeyforgeContextProviderProps) => {
+
+    const [poolCartesGlobal, setPoolCartesGlobal] = useState<any>(null);
+
+    const [cartesValidees, setCartesValidees] = useState<any[]>([]);
+
+    const [
+        draftEnCoursParJoueurAouB,
+        setDraftEnCoursParJoueurAouB
+    ] = useState<number | null>(null);
+
+    const [
+        draftEnCoursSurFactionAouBouC,
+        setDraftEnCoursSurFactionAouBouC
+    ] = useState<string | null>(null);
+
+    return (
+        <KeyforgeContext.Provider
+            value={{
+                poolCartesGlobal,
+                setPoolCartesGlobal,
+                cartesValidees,
+                setCartesValidees,
+                draftEnCoursParJoueurAouB,
+                setDraftEnCoursParJoueurAouB,
+                draftEnCoursSurFactionAouBouC,
+                setDraftEnCoursSurFactionAouBouC
+            }}
+        >
+            {children}
+        </KeyforgeContext.Provider>
+    );
 };

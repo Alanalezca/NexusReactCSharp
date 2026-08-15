@@ -85,7 +85,7 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
                                 focusStats: focusAouBforStats
                                 })} 
                             btn-lg`} 
-                        disabled={draftEnCoursParJoueurAouB == 1} 
+                        disabled={draftEnCoursParJoueurAouB === 1} 
                         onClick={() =>
                             handleClickBoutonJoueur({
                                 isDraftFinished: draftTermine,

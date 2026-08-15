@@ -230,10 +230,6 @@
                             <div className={`col-4 d-flex justify-content-center`} key={current.IDCarte + current.Classement}>
                                 <TCGCard 
                                 nomCarte={current.NomCarte} 
-                                idDraft={current.IDDraftSession} 
-                                idCarte={current.IDCarte} 
-                                classement={current.Classement} 
-                                parJAorB={current.JoueurAouB} 
                                 imageCarte={current.CheminImgCarte} 
                                 rareteCarte={current.Rarete} 
                                 handleClicValiderCarte={() => {!loaderCardisPicking && handleClicValiderCard(currentTrinomeCards, current)}} 

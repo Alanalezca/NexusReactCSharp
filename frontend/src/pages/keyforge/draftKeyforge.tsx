@@ -22,7 +22,7 @@
     const DraftKeyforge = () => {
         const { slug } = useParams();
         console.log('slug', slug);
-        const {sessionUser, setSessionUser} = useSessionUserContext();
+        const { sessionUser } = useSessionUserContext();
         const {
             setDraftEnCoursParJoueurAouB, 
             setDraftEnCoursSurFactionAouBouC, 
@@ -190,7 +190,8 @@
                 </div>
                 <DraftKeyforgeResume 
                     currentDraftKeyforge={currentDraftKeyforge} 
-                    cusSurJoueurAouBforStats={focusSurJoueurAouBforStats}
+                    focusSurJoueurAouBforStats={focusSurJoueurAouBforStats}
+                    focusSurStat={""}
                 />
                 
                 {/* Bouton lancement phase picks/bans factions */}

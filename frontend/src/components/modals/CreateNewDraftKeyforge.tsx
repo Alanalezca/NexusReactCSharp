@@ -3,18 +3,24 @@ import { useState, useEffect, useRef } from 'react';
 import { useSessionUserContext } from '../contexts/sessionUserContext';
 import { useOngletAlerteContext } from '../contexts/ToastContext';
 import styles from './CreateNewDraftKeyforge.module.css';
-import FloatingLabel from '../inputs/FloatingInput';
 import convertDateToDateLong from '../../functions/getDateLong';
 import InputStandard from '../../components/inputs/InputStandard';
 
+interface KeyforgeSet {
+    id: number;
+    numero: number;
+    libelle: string;
+    selected?: boolean;
+}
+
   const FormNewDraftKeyforge = ({ handleClose, show, handleRefresh}) => {
     const { showOngletAlerte } = useOngletAlerteContext();
-    const {sessionUser, setSessionUser} = useSessionUserContext();
+    const {sessionUser} = useSessionUserContext();
     const inputsRef = useRef({});
-    const [idSetSelected, setIDSetSelected] = useState();
+    const [IDSetSelected, setIDSetSelected] = useState<number | null>(null);
     const [unlockBtnValiderCreateNewDraft, setUnlockBtnValiderCreateNewDraft] = useState(false);
 
-    const [listeSets, setListeSets] = useState();
+    const [listeSets, setListeSets] = useState<KeyforgeSet[]>([]);
         useEffect(() => {
         fetch('/api/keyforge/sets')
         .then(response => response.json())
@@ -23,20 +29,21 @@ import InputStandard from '../../components/inputs/InputStandard';
         }).catch(error => console.error('Erreur fetch dice throne sets:', error));
     }, []);
 
-    const handleClickOnSet = (codeSet) => {
+    const handleClickOnSet = (codeSet: number) => {
         setListeSets(prevListeSets =>
-            prevListeSets?.map(currentSet =>
-                currentSet.ID === codeSet
-                    ? { 
+            prevListeSets.map(currentSet =>
+                currentSet.id === codeSet
+                    ? {
                         ...currentSet,
-                        Selected: true
+                        selected: true
                     }
-                    :   {                    
+                    : {
                         ...currentSet,
-                        Selected: false
+                        selected: false
                     }
             )
         );
+
         setIDSetSelected(codeSet);
         setUnlockBtnValiderCreateNewDraft(true);
     };
@@ -50,7 +57,7 @@ import InputStandard from '../../components/inputs/InputStandard';
             headers: {
             "Content-Type": "application/json"
             },
-            body: JSON.stringify({ parID: (sessionUser.id.toString() + "-" + dateFormated), parJoueurA: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A", parJoueurB: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B", parPresenceAnomalies: inputsRef?.current["checkAvecAnomalies"]?.value, parSet: idSetSelected, parDateCreation: dateNow, parDateMaj: dateNow, parTitreDraft: inputsRef?.current["titreDraft"]?.value || "(sans nom)", parEtat: 0})
+            body: JSON.stringify({ parID: (sessionUser.id.toString() + "-" + dateFormated), parJoueurA: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A", parJoueurB: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B", parPresenceAnomalies: inputsRef?.current["checkAvecAnomalies"]?.value, parSet: IDSetSelected, parDateCreation: dateNow, parDateMaj: dateNow, parTitreDraft: inputsRef?.current["titreDraft"]?.value || "(sans nom)", parEtat: 0})
         });
 
         if (!response.ok) {
@@ -62,7 +69,7 @@ import InputStandard from '../../components/inputs/InputStandard';
         showOngletAlerte('success', '(Création draft)', '', `Le nouveau draft KeyForge "` + (inputsRef?.current["titreDraft"]?.value || "(sans nom)") + `" a bien été créé !`);
         handleClose(false);
         setListeSets(prevListeSets =>
-            prevListeSets?.map(currentSet => ({
+            prevListeSets.map(currentSet => ({
                 ...currentSet,
                 Selected: false
             }))
@@ -78,12 +85,12 @@ import InputStandard from '../../components/inputs/InputStandard';
                 DateDerModif: dateNow,
                 Etat: 0,
                 PseudoJ1: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
-                PseudoJ2: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur B",
-                SetID: idSetSelected,
-                IDSet: idSetSelected
+                PseudoJ2: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
+                SetID: IDSetSelected,
+                IDSet: IDSetSelected
             }
         ]);
-        setIDSetSelected();
+        setIDSetSelected(null);
         } catch (err) {
         console.error("Erreur lors de la création du draft KeyForge :", err);
         }
@@ -104,7 +111,7 @@ import InputStandard from '../../components/inputs/InputStandard';
                 </div>
                 <div className="row">             
                     <div className="col-12 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} intMaxLength={40} strPlaceholder={"Nom du draft"} strValeurByDef={""} strID={"titreDraft"} strTxtAlign="center" ref={(e) => (inputsRef.current["titreDraft"] = e)}/>
+                        <InputStandard strType={"text"} intMaxLength={40} strPlaceholder={"Nom du draft"} strValeurByDef={""} strID={"titreDraft"} strTxtAlign="center" ref={(e) => {inputsRef.current["titreDraft"] = e;}}/>
                     </div>
                 </div>
                 <div className="row">             
@@ -114,12 +121,12 @@ import InputStandard from '../../components/inputs/InputStandard';
                 </div>
                 <div className="row">             
                     <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerRed)"} intMaxLength={50} strPlaceholder={"Joueur A"} strValeurByDef={""} strID={"pseudoJoueurA"} strTxtAlign="center" ref={(e) => (inputsRef.current["pseudoJoueurA"] = e)}/>
+                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerRed)"} intMaxLength={50} strPlaceholder={"Joueur A"} strValeurByDef={""} strID={"pseudoJoueurA"} strTxtAlign="center" ref={(e) => {inputsRef.current["pseudoJoueurA"] = e;}}/>
                     </div>
                 </div>
                 <div className="row">             
                     <div className="col-12 col-lg-6 offset-lg-3 mt-2 d-flex justify-content-center">
-                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerBlue)"} intMaxLength={50} strPlaceholder={"Joueur B"} strValeurByDef={""} strID={"pseudoJoueurB"} strTxtAlign="center" ref={(e) => (inputsRef.current["pseudoJoueurB"] = e)}/>
+                        <InputStandard strType={"text"} strColor={"var(--txtColorPlayerBlue)"} intMaxLength={50} strPlaceholder={"Joueur B"} strValeurByDef={""} strID={"pseudoJoueurB"} strTxtAlign="center" ref={(e) => {inputsRef.current["pseudoJoueurB"] = e;}}/>
                     </div>
                 </div>
                 <div className="row">             
@@ -132,7 +139,7 @@ import InputStandard from '../../components/inputs/InputStandard';
                         <div className="p-3">
                             <div className={`list-group ${styles.shadow}`}>
                                 {listeSets?.map((current, index) => (
-                                    <button type="button" key={index} className={`list-group-item list-group-item-action text-center ${!current.Selected ? styles.bandeauTag : styles.bandeauTagFocus}`} onClick={() => handleClickOnSet(current.id)}>Set {current.numero} : {current.libelle}</button>
+                                    <button type="button" key={index} className={`list-group-item list-group-item-action text-center ${!current.selected ? styles.bandeauTag : styles.bandeauTagFocus}`} onClick={() => handleClickOnSet(current.id)}>Set {current.numero} : {current.libelle}</button>
                                 ))}
                             </div>
                         </div>
@@ -141,7 +148,7 @@ import InputStandard from '../../components/inputs/InputStandard';
                 <div className="row">             
                     <div className="col-12 mt-3 d-flex justify-content-center">
                         <div className="mb-3 form-check">
-                            <input type="checkbox" className="form-check-input" id="checkAvecAnomalies" ref={(e) => (inputsRef.current["checkAvecAnomalies"] = e)}></input>
+                            <input type="checkbox" className="form-check-input" id="checkAvecAnomalies" ref={(e) => {inputsRef.current["checkAvecAnomalies"] = e;}}></input>
                             <label className="form-check-label txtColorWhite" htmlFor="checkAvecAnomalies">Inclure la possibilité d'anomalies</label>
                         </div>
                     </div>
