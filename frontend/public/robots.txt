@@ -1,0 +1,6 @@
+# robots.txt - alanalezca.fr
+
+User-agent: *
+Allow: /
+
+Sitemap: https://alanalezca.fr/sitemap.xml

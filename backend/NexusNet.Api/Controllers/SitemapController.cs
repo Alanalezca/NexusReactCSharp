@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using NexusNet.Api.Repositories;
+using NexusNet.Api.Repositories.Sitemap;
 using System.Text;
 using System.Xml;
 
