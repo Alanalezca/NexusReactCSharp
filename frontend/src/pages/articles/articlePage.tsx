@@ -82,7 +82,7 @@ const ArticlePage = () => {
     const indexLinks = doc.querySelectorAll('.article-box a[href^="#"]');
 
     const targets = Array.from(
-      doc.body.querySelectorAll("h3, p > strong")
+      doc.body.querySelectorAll("h3, h5, p > strong")
     ).filter((element) => !element.closest(".article-box"));
 
     indexLinks.forEach((link) => {
@@ -138,6 +138,53 @@ const ArticlePage = () => {
 
     fetchArticle();
   }, [slug, forceRefresh]);
+
+  // useEffect dédié aux métadonnées SEO de l'article
+  useEffect(() => {
+    if (!article) return;
+
+    // -------------------------
+    // TITLE
+    // -------------------------
+    document.title = `${article.titre} | Parlons Carton`;
+
+    // -------------------------
+    // META DESCRIPTION
+    // -------------------------
+    let metaDescription = document.querySelector<HTMLMetaElement>(
+      'meta[name="description"]'
+    );
+
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta");
+      metaDescription.name = "description";
+      document.head.appendChild(metaDescription);
+    }
+
+    metaDescription.content = article.resume || "Parlons Carton";
+
+    // -------------------------
+    // CANONICAL
+    // -------------------------
+    let canonical = document.querySelector<HTMLLinkElement>(
+      'link[rel="canonical"]'
+    );
+
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+
+    canonical.href = `https://alanalezca.fr/article/view/${article.slug}`;
+
+  return () => {
+    document.title = "Parlons Carton";
+    metaDescription.content = "Parlons Carton";
+    canonical?.remove();
+  };
+
+  }, [article]);
 
   useEffect(() => {
     if (!article?.contenu) {

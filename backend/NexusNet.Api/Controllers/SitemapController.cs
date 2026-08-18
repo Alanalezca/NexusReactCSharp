@@ -51,7 +51,7 @@ namespace NexusNet.Api.Controllers
                 {
                     WriteUrl(
                         writer,
-                        $"{baseUrl}/article/{article.Slug}",
+                        $"{baseUrl}/article/view/{article.Slug}",
                         article.DateMaj
                     );
                 }
