@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        if (dto.password.Length < 8)
+        if (dto.password.Length < 6)
         {
             return BadRequest(new
             {
