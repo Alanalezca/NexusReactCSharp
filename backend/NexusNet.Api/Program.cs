@@ -77,6 +77,9 @@ builder.Services.AddScoped<IKeyforgeService, KeyforgeService>();
 // Sitemap
 builder.Services.AddScoped<ISitemapRepository, SitemapRepository>();
 
+// Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // -----------------------------------
 // CORS
@@ -239,6 +242,13 @@ app.MapControllers();
 // app.MapControllers()
 // -----------------------------------
 app.MapFallbackToFile("index.html");
+
+// -----------------------------------
+// SWAGGER
+//
+// -----------------------------------
+app.UseSwagger();
+app.UseSwaggerUI();
 
 
 app.Run();
