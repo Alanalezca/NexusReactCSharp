@@ -261,8 +261,5 @@ if (swaggerEnabled)
     app.UseSwaggerUI();
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
 
 app.Run();
