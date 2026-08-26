@@ -52,6 +52,14 @@ builder.Services.AddSingleton(sp =>
     return NpgsqlDataSource.Create(connectionString);
 });
 
+// -----------------------------------
+// SWAGGER : Controle
+// Parametre render pour rendre ou non
+// swagger actif
+// -----------------------------------
+var swaggerEnabled =
+    builder.Configuration.GetValue<bool>("Swagger:Enabled");
+
 
 // -----------------------------------
 // DEPENDENCY INJECTION
@@ -247,6 +255,12 @@ app.MapFallbackToFile("index.html");
 // SWAGGER
 //
 // -----------------------------------
+if (swaggerEnabled)
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseSwagger();
 app.UseSwaggerUI();
 
