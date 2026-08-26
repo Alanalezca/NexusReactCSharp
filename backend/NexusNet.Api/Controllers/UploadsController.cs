@@ -153,4 +153,79 @@ public class UploadsController : ControllerBase
 
         return Ok(images);
     }
+
+    [Authorize(Policy = "Admin")]
+    [HttpPost("restore-article-images")]
+    public async Task<IActionResult> RestoreArticleImages(
+        [FromForm] List<IFormFile> images
+    )
+    {
+        if (images == null || images.Count == 0)
+        {
+            return BadRequest(new
+            {
+                message = "Aucune image reçue."
+            });
+        }
+
+        var allowedExtensions = new[]
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        };
+
+        var uploadFolder = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "wwwroot",
+            "images",
+            "articles"
+        );
+
+        Directory.CreateDirectory(uploadFolder);
+
+        var restoredFiles = new List<string>();
+        var rejectedFiles = new List<string>();
+
+        foreach (var image in images)
+        {
+            if (image == null || image.Length == 0)
+            {
+                continue;
+            }
+
+            // Supprime tout éventuel chemin fourni par le client
+            var fileName = Path.GetFileName(image.FileName);
+
+            var extension = Path
+                .GetExtension(fileName)
+                .ToLowerInvariant();
+
+            if (string.IsNullOrWhiteSpace(fileName) ||
+                !allowedExtensions.Contains(extension))
+            {
+                rejectedFiles.Add(image.FileName);
+                continue;
+            }
+
+            var filePath = Path.Combine(uploadFolder, fileName);
+
+            await using var stream = new FileStream(
+                filePath,
+                FileMode.Create
+            );
+
+            await image.CopyToAsync(stream);
+
+            restoredFiles.Add(fileName);
+        }
+
+        return Ok(new
+        {
+            restoredCount = restoredFiles.Count,
+            restoredFiles,
+            rejectedFiles
+        });
+    }
 }

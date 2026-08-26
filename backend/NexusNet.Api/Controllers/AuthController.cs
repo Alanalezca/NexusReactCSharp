@@ -36,78 +36,52 @@ public class AuthController : ControllerBase
 
         var loginOrEmail = (dto.loginOrEmail ?? dto.email)?.Trim();
 
-        if (string.IsNullOrEmpty(loginOrEmail) || string.IsNullOrEmpty(dto.password))
+        if (string.IsNullOrEmpty(loginOrEmail) ||
+            string.IsNullOrEmpty(dto.password))
             return BadRequest("Invalid payload");
 
+        var normalizedLogin = loginOrEmail.ToLower();
+
         var user = await _db.Users
-            .FirstOrDefaultAsync(x => x.email == loginOrEmail || x.pseudo == loginOrEmail);
+            .FirstOrDefaultAsync(x =>
+                x.email.ToLower() == normalizedLogin ||
+                x.pseudo.ToLower() == normalizedLogin);
 
         if (user == null)
             return Unauthorized("Invalid credentials");
 
-        // BCrypt check
-        bool isValidPassword = BCrypt.Net.BCrypt.Verify(dto.password, user.password);
+        bool isValidPassword =
+            BCrypt.Net.BCrypt.Verify(dto.password, user.password);
 
         if (!isValidPassword)
             return Unauthorized("Invalid credentials");
 
-        // JWT KEY
-        var key = _configuration["Jwt:Key"];
-
-        if (string.IsNullOrEmpty(key))
-            return StatusCode(500, "JWT key not configured");
-
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-
-        var credentials = new SigningCredentials(
-            securityKey,
-            SecurityAlgorithms.HmacSha256
-        );
-
-        // -----------------------------------
-        // CLAIMS (role = int)
-        // -----------------------------------
-        var claims = new[]
+        if (user.accesblock == true)
         {
-            new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
-            new Claim(ClaimTypes.Email, user.email),
-            new Claim(ClaimTypes.Role, user.role?.ToString() ?? ""),
-            new Claim(ClaimTypes.Name, user.pseudo ?? ""),
-            new Claim("statut", user.statut ?? ""),
-            new Claim("grade", user.grade ?? "")
-        };
+            return StatusCode(403, new
+            {
+                message = "L'accès à ce compte a été bloqué."
+            });
+        }
 
-        var tokenDescriptor = new JwtSecurityToken(
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
-            signingCredentials: credentials
-        );
-
-        var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-
-        // -----------------------------------
-        // COOKIE JWT
-        // -----------------------------------
-        // Response.Cookies.Append("jwt", token, new CookieOptions
-        // {
-        //     HttpOnly = true,
-        //     Secure = true, // true en prod HTTPS
-        //     SameSite = SameSiteMode.None,
-        //     Expires = DateTime.UtcNow.AddHours(2)
-        // });
-
-        Response.Cookies.Append("jwt", token, new CookieOptions
+        if (user.suspendu == true)
         {
-            HttpOnly = true,
-            Secure = false, // 👈 OK en dev
-            SameSite = SameSiteMode.Lax, // 🔥 CHANGEMENT ICI
-            Expires = DateTime.UtcNow.AddHours(2)
-        });
+            return StatusCode(403, new
+            {
+                message = "Ce compte est suspendu."
+            });
+        }
 
-        return Ok(new
+        if (dto.password.Length < 8)
         {
-            message = "Login successful"
-        });
+            return BadRequest(new
+            {
+                field = "password",
+                message = "Le mot de passe doit contenir au moins 8 caractères."
+            });
+        }
+
+        return CreateAuthentication(user, "Login successful");
     }
 
     // -----------------------------------
@@ -142,7 +116,21 @@ public class AuthController : ControllerBase
         if (role < 10)
             return Forbid();
 
-        var users = await _db.Users.Take(5).ToListAsync();
+        var users = await _db.Users
+            .Take(5)
+            .Select(x => new
+            {
+                x.id,
+                x.email,
+                x.pseudo,
+                x.statut,
+                x.datecreation,
+                x.accesblock,
+                x.suspendu,
+                x.grade,
+                x.role
+            })
+            .ToListAsync();
 
         return Ok(users);
     }
@@ -161,4 +149,136 @@ public class AuthController : ControllerBase
             grade = User.FindFirst("grade")?.Value
         });
     }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+    {
+        if (dto == null)
+            return BadRequest(new
+            {
+                message = "Données invalides."
+            });
+
+        var email = dto.email?.Trim().ToLowerInvariant();
+        var pseudo = dto.pseudo?.Trim();
+
+        if (string.IsNullOrWhiteSpace(email) ||
+            string.IsNullOrWhiteSpace(pseudo) ||
+            string.IsNullOrWhiteSpace(dto.password))
+        {
+            return BadRequest(new
+            {
+                message = "Tous les champs sont obligatoires."
+            });
+        }
+
+        // -----------------------------
+        // EMAIL DÉJÀ UTILISÉ
+        // -----------------------------
+        var emailExists = await _db.Users
+            .AnyAsync(x => x.email == email);
+
+        if (emailExists)
+        {
+            return Conflict(new
+            {
+                field = "email",
+                message = "Cette adresse email est déjà utilisée."
+            });
+        }
+
+        // -----------------------------
+        // PSEUDO DÉJÀ UTILISÉ
+        // -----------------------------
+        var pseudoExists = await _db.Users
+            .AnyAsync(x => x.pseudo.ToLower() == pseudo.ToLower());
+
+        if (pseudoExists)
+        {
+            return Conflict(new
+            {
+                field = "pseudo",
+                message = "Ce pseudo est déjà utilisé."
+            });
+        }
+
+        // -----------------------------
+        // CRÉATION UTILISATEUR
+        // -----------------------------
+        var user = new User
+        {
+            email = email,
+            pseudo = pseudo,
+
+            password = BCrypt.Net.BCrypt.HashPassword(dto.password),
+
+            statut = "Utilisateur",
+            datecreation = DateTime.UtcNow,
+            accesblock = false,
+            suspendu = false,
+            grade = "",
+            role = 1
+        };
+
+        _db.Users.Add(user);
+
+        await _db.SaveChangesAsync();
+
+        // L'utilisateur est directement connecté
+        return CreateAuthentication(
+            user,
+            "Compte créé avec succès."
+        );
+    }
+
+    private IActionResult CreateAuthentication(User user, string message)
+    {
+        var key = _configuration["Jwt:Key"];
+
+        if (string.IsNullOrEmpty(key))
+            return StatusCode(500, "JWT key not configured");
+
+        var securityKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(key)
+        );
+
+        var credentials = new SigningCredentials(
+            securityKey,
+            SecurityAlgorithms.HmacSha256
+        );
+
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
+            new Claim(ClaimTypes.Email, user.email),
+            new Claim(ClaimTypes.Role, user.role?.ToString() ?? ""),
+            new Claim(ClaimTypes.Name, user.pseudo ?? ""),
+            new Claim("statut", user.statut ?? ""),
+            new Claim("grade", user.grade ?? "")
+        };
+
+        var tokenDescriptor = new JwtSecurityToken(
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(2),
+            signingCredentials: credentials
+        );
+
+        var token = new JwtSecurityTokenHandler()
+            .WriteToken(tokenDescriptor);
+
+        Response.Cookies.Append("jwt", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = false,
+            SameSite = SameSiteMode.Lax,
+            Expires = DateTime.UtcNow.AddHours(2)
+        });
+
+        return Ok(new
+        {
+            message
+        });
+    }
 }
+
+
