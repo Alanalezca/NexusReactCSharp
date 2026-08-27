@@ -3,7 +3,7 @@ import { Modal, Button } from 'react-bootstrap';
 import FloatingLabel from '../inputs/FloatingInput';
 import { useOngletAlerteContext } from '../contexts/ToastContext';
 import styles from './Subscribe.module.css';
-import { apiFetch } from "../../api/client";
+import { apiFetch, ApiError } from "../../api/client";
 
 const SubscribeFormV2 = ({handleClose, show, handleShowLogin, handleShowReinitPassword}) => {
   const { showOngletAlerte } = useOngletAlerteContext();
