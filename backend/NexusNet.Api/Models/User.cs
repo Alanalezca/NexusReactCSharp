@@ -19,4 +19,13 @@ public class User
     public string? grade { get; set; }
 
     public int? role { get; set; }
+
+
+    // Validation de l'adresse email
+
+    public bool emailverifie { get; set; } = false;
+
+    public string? hashtokenvalidationemail { get; set; }
+
+    public DateTime? expirationtokenvalidationemail { get; set; }
 }

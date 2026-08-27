@@ -8,6 +8,10 @@
     right: 16px;  /* Aligne à droite avec un léger espacement */
   }
 
+.LoginModalBot {
+    background-color: var(--backgroundColorC) !important;
+  }
+
 .login {
   color: var(--txtColorWhite);
   cursor: pointer;
@@ -16,4 +20,21 @@
 
 .login:hover {
   color: var(--ColorB);
+}
+
+.borderTop {
+  border-left: 2px solid var(--ColorC);
+  border-top: 2px solid var(--ColorC);
+  border-right: 2px solid var(--ColorC);
+}
+
+.borderMid {
+  border-left: 2px solid var(--ColorC);
+  border-right: 2px solid var(--ColorC);
+}
+
+.borderBottom {
+  border-left: 2px solid var(--ColorC);
+  border-bottom: 2px solid var(--ColorC);
+  border-right: 2px solid var(--ColorC);
 }

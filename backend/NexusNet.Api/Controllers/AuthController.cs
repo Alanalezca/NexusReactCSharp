@@ -9,6 +9,7 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using BCrypt.Net;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace NexusNet.Api.Controllers;
 
@@ -203,6 +204,19 @@ public class AuthController : ControllerBase
         }
 
         // -----------------------------
+        // TOKEN DE VALIDATION EMAIL
+        // -----------------------------
+        var verificationToken = Convert.ToHexString(
+            RandomNumberGenerator.GetBytes(32)
+        );
+
+        var verificationTokenHash = Convert.ToHexString(
+            SHA256.HashData(
+                Encoding.UTF8.GetBytes(verificationToken)
+            )
+        );
+
+        // -----------------------------
         // CRÉATION UTILISATEUR
         // -----------------------------
         var user = new User
@@ -217,18 +231,21 @@ public class AuthController : ControllerBase
             accesblock = false,
             suspendu = false,
             grade = "",
-            role = 1
+            role = 1,
+
+            emailverifie = false,
+            hashtokenvalidationemail = verificationTokenHash,
+            expirationtokenvalidationemail = DateTime.UtcNow.AddHours(24)
         };
 
         _db.Users.Add(user);
 
         await _db.SaveChangesAsync();
 
-        // L'utilisateur est directement connecté
-        return CreateAuthentication(
-            user,
-            "Compte créé avec succès."
-        );
+        return Ok(new
+        {
+            message = "Compte créé. Un email de validation vous a été envoyé."
+        });
     }
 
     private IActionResult CreateAuthentication(User user, string message)
