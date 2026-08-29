@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using BCrypt.Net;
 using System.Text;
 using System.Security.Cryptography;
+using NexusNet.Api.Services.Email;
 
 namespace NexusNet.Api.Controllers;
 
@@ -19,11 +20,16 @@ public class AuthController : ControllerBase
 {
     private readonly AppDbContext _db;
     private readonly IConfiguration _configuration;
+    private readonly IEmailService _emailService;
 
-    public AuthController(AppDbContext db, IConfiguration configuration)
+    public AuthController(
+        AppDbContext db,
+        IConfiguration configuration,
+        IEmailService emailService)
     {
         _db = db;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     // -----------------------------------
@@ -57,6 +63,14 @@ public class AuthController : ControllerBase
         if (!isValidPassword)
             return Unauthorized("Invalid credentials");
 
+        if (user.emailverifie == false)
+        {
+            return StatusCode(403, new
+            {
+                message = "Vous devez valider votre adresse email avant de pouvoir vous connecter."
+            });
+        }
+
         if (user.accesblock == true)
         {
             return StatusCode(403, new
@@ -70,15 +84,6 @@ public class AuthController : ControllerBase
             return StatusCode(403, new
             {
                 message = "Ce compte est suspendu."
-            });
-        }
-
-        if (dto.password.Length < 6)
-        {
-            return BadRequest(new
-            {
-                field = "password",
-                message = "Le mot de passe doit contenir au moins 8 caractères."
             });
         }
 
@@ -204,6 +209,18 @@ public class AuthController : ControllerBase
         }
 
         // -----------------------------
+        // LONGUEUR PASSWORD
+        // -----------------------------
+        if (dto.password.Length < 8)
+        {
+            return BadRequest(new
+            {
+                field = "password",
+                message = "Le mot de passe doit contenir au moins 8 caractères."
+            });
+        }
+
+        // -----------------------------
         // TOKEN DE VALIDATION EMAIL
         // -----------------------------
         var verificationToken = Convert.ToHexString(
@@ -241,6 +258,18 @@ public class AuthController : ControllerBase
         _db.Users.Add(user);
 
         await _db.SaveChangesAsync();
+
+        // -----------------------------
+        // ENVOI EMAIL DE VALIDATION
+        // -----------------------------
+        var verificationUrl =
+            $"https://alanalezca.fr/validation-email?token={verificationToken}";
+
+        await _emailService.SendEmailVerificationAsync(
+            user.email,
+            user.pseudo,
+            verificationUrl
+        );
 
         return Ok(new
         {

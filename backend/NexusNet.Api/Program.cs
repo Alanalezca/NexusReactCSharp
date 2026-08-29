@@ -11,9 +11,11 @@ using NexusNet.Api.Services.Articles;
 using NexusNet.Api.Services.DiceThrone;
 using NexusNet.Api.Services.Keyforge;
 using NexusNet.Api.Services.Smashup;
+using NexusNet.Api.Services.Email;
 using Npgsql;
 using System.Security.Claims;
 using System.Text;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -207,6 +209,10 @@ builder.Services.AddAuthorization(options =>
         }));
 });
 
+// -----------------------------------
+// SMTP / Envoi Email
+// -----------------------------------
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // -----------------------------------
 // BUILD
