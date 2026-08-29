@@ -27,7 +27,7 @@ public class EmailService : IEmailService
 
         message.To.Add(MailboxAddress.Parse(email));
 
-        message.Subject = "Validez votre compte NexusNet";
+        message.Subject = "Validez votre compte sur Alanalezca.fr";
 
         message.Body = new TextPart("html")
         {
@@ -35,7 +35,7 @@ public class EmailService : IEmailService
                 <h2>Bienvenue {pseudo} !</h2>
 
                 <p>
-                    Votre compte NexusNet a bien été créé.
+                    Votre compte a bien été créé.
                 </p>
 
                 <p>
@@ -54,7 +54,7 @@ public class EmailService : IEmailService
                 </p>
 
                 <p>
-                    À bientôt sur NexusNet !
+                    À bientôt sur Alanalezca.fr !
                 </p>
                 """
         };

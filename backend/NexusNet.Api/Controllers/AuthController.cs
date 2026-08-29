@@ -277,6 +277,74 @@ public class AuthController : ControllerBase
         });
     }
 
+    // -----------------------------------
+    // VALIDATION EMAIL
+    // -----------------------------------
+    [HttpPost("verify-email")]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto dto)
+    {
+        if (dto == null || string.IsNullOrWhiteSpace(dto.token))
+        {
+            return BadRequest(new
+            {
+                message = "Token de validation invalide."
+            });
+        }
+
+        // -----------------------------
+        // HASH DU TOKEN REÇU
+        // -----------------------------
+        var tokenHash = Convert.ToHexString(
+            SHA256.HashData(
+                Encoding.UTF8.GetBytes(dto.token)
+            )
+        );
+
+        // -----------------------------
+        // RECHERCHE UTILISATEUR
+        // -----------------------------
+        var user = await _db.Users
+            .FirstOrDefaultAsync(x =>
+                x.hashtokenvalidationemail == tokenHash
+            );
+
+        if (user == null)
+        {
+            return BadRequest(new
+            {
+                message = "Ce lien de validation est invalide."
+            });
+        }
+
+        // -----------------------------
+        // TOKEN EXPIRÉ
+        // -----------------------------
+        if (user.expirationtokenvalidationemail == null ||
+            user.expirationtokenvalidationemail < DateTime.UtcNow)
+        {
+            return BadRequest(new
+            {
+                message = "Ce lien de validation a expiré."
+            });
+        }
+
+        // -----------------------------
+        // VALIDATION DU COMPTE
+        // -----------------------------
+        user.emailverifie = true;
+
+        // Le token ne doit plus pouvoir être réutilisé
+        user.hashtokenvalidationemail = null;
+        user.expirationtokenvalidationemail = null;
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Votre adresse email a été validée avec succès."
+        });
+    }
+
     private IActionResult CreateAuthentication(User user, string message)
     {
         var key = _configuration["Jwt:Key"];
