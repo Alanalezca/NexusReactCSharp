@@ -40,14 +40,14 @@ const saisieOK =
         }),
       });
 
-      console.log('Utilisateur créé :', data);
-
       showOngletAlerte(
         'success',
         '(Enregistrement)',
         '',
         'Votre compte a bien été créé. Vous pouvez à présent vous connecter.'
       );
+
+      handleClose(false);
 
     } catch (err) {
       console.error('Erreur création compte :', err);
