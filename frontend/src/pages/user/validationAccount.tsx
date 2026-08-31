@@ -5,12 +5,17 @@ import Loader from '../../components/others/Loader';
 import { useOngletAlerteContext } from '../../components/contexts/ToastContext';
 
 const ValidationAccount = () => { 
-  const [messageToShow, setMessageToShow] = useState("");
   const [loadingVerifAccount, setLoadingVerifAccount] = useState(false);
   const slug = useParams<{ token: string }>();
   const [verifOK, setVerifOK] = useState(false);
-const { showOngletAlerte } = useOngletAlerteContext();
+  const { showOngletAlerte } = useOngletAlerteContext();
+  const messageResultatVerif = {
+    messVerifOK: `L'adresse email de votre compte a été vérifiée. Vous pouvez à présent vous connecter.`, 
+    messVerifError: `Votre adresse email n'a pas pu être vérifiée.`
+  };
   
+  const messageToShow = verifOK ? messageResultatVerif['messVerifOK'] : messageResultatVerif['messVerifError'];
+
   const submitTokenValidAccountUser = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
@@ -31,7 +36,7 @@ const { showOngletAlerte } = useOngletAlerteContext();
         '',
         'Votre adresse email a bien été vérifiée. Vous pouvez à présent vous connecter.'
       );
-
+      setLoadingVerifAccount(false);
       setVerifOK(true);
 
     } catch (err) {
@@ -62,8 +67,8 @@ const { showOngletAlerte } = useOngletAlerteContext();
                 </div>
                 <div className="row">
                     <div className="col-12 mt-4">
-                        {!verifOK ? <Loader/>
-                        : <p className="text-center">L'adresse email de votre compte a été vérifiée.<br/>Vous pouvez à présent vous connecter.</p>
+                        {loadingVerifAccount ? <Loader/>
+                        : <p className="text-center">${messageToShow}</p>
                         }
                     </div>
                 </div>
