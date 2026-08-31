@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react';
 import { useParams } from 'react-router-dom';
 import { apiFetch, ApiError } from "../../api/client";
 import Loader from '../../components/others/Loader';
-import { useOngletAlerteContext } from '../../components/contexts/ToastContext';
+import { useOngletAlerteContext } from '../../components/contexts/ToastContext'; 
 
 const ValidationAccount = () => { 
   const [messageToShow, setMessageToShow] = useState("");
