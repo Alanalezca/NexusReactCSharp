@@ -14,7 +14,7 @@ import Smashup from "./pages/smashup/smashup";
 import DiceThrone from '../src/pages/dicethrone/dicethrone';
 import Keyforge from "./pages/keyforge/keyforge";
 import Patchnotes from '../src/pages/others/patchnotes';
-import ValidationAccount from '../src/pages/users/validationAccount'; 
+import ValidationAccount from './pages/user/validationAccount'; 
 
 function App() {
   return (
