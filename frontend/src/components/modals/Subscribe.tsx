@@ -11,6 +11,8 @@ const SubscribeFormV2 = ({handleClose, show, handleShowLogin, handleShowReinitPa
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loadingSubscribe, setLoadingSubscribe] = useState(false);
+
 
 const saisieOK =
   pseudo.trim() !== '' &&
@@ -25,7 +27,7 @@ const saisieOK =
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-
+    setLoadingSubscribe(true);
     if (!saisieOK) return;
 
     setError('');
@@ -47,17 +49,24 @@ const saisieOK =
         'Votre compte a bien été créé. Vous pouvez à présent vous connecter.'
       );
 
-      handleClose(false);
-
     } catch (err) {
       console.error('Erreur création compte :', err);
 
       if (err instanceof ApiError) {
         setError(err.message);
       } else {
-        setError("Une erreur s'est produite.");
+        showOngletAlerte(
+          'error',
+          '(Enregistrement)',
+          '',
+          `Votre compte n'a pas été créé. Une erreur est survenue.`
+        );
       }
+    } finally {
+      setLoadingSubscribe(false);
+      handleClose(false);
     }
+
   };
 
   return (
@@ -103,7 +112,7 @@ const saisieOK =
           type="submit"
           variant="primary"
           className={saisieOK ? 'btn-ColorA' : 'btn-ColorInactif'}
-          disabled={!saisieOK}
+          disabled={!saisieOK || loadingSubscribe}
         >
           Valider l'enregistrement
         </Button>

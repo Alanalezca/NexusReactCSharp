@@ -21,11 +21,13 @@ const LoginModal = ({ handleClose, show, handleShowSubscribe, handleShowReinitPa
   const { login } = useSessionUserContext();
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [loadingLogin, setLoadingLogin] = useState(false);
 
   const saisieOK = logOrEmail.trim() !== '' && password !== '';
 
 
   const handleLogin = async (loginOrEmail: string, password: string): Promise<void> => {
+    setLoadingLogin(true);
     const success = await login(loginOrEmail.trim(), password);
 
     if (success) {
@@ -35,6 +37,7 @@ const LoginModal = ({ handleClose, show, handleShowSubscribe, handleShowReinitPa
     } else {
       setError("Identifiant ou mot de passe incorrect");
     }
+    setLoadingLogin(false);
   };
 
   return (
@@ -53,7 +56,7 @@ const LoginModal = ({ handleClose, show, handleShowSubscribe, handleShowReinitPa
         <a className={styles.subscribe} onClick={() => {handleShowReinitPassword(true); handleClose(false);}}>Mot de passe oublié</a>
         <label> / </label>
         <a className={styles.subscribe} onClick={() => {handleShowSubscribe(true); handleClose(false);}}>S'enregistrer</a>
-        <Button variant="primary" className={saisieOK ? 'btn-ColorA' : 'btn-ColorInactif'} onClick={() => handleLogin(logOrEmail, password)} disabled={!saisieOK}>
+        <Button variant="primary" className={saisieOK && !loadingLogin ? 'btn-ColorA' : 'btn-ColorInactif'} onClick={() => handleLogin(logOrEmail, password)} disabled={!saisieOK}>
           Connexion
         </Button>
       </Modal.Footer>

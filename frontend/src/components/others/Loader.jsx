@@ -9,7 +9,7 @@ const Loader = ({ taille = 'lg', mt = '5' }) => {
 };
 
 Loader.propTypes = {
-  taille: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
+  taille: PropTypes.oneOf(['xs', 'sm', 'base', 'md', 'lg', 'xl']),
   mt: PropTypes.oneOf(['0', '1', '2', '3', '4', '5'])
 };
 
