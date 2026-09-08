@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using NexusNet.Api.Services.Keyforge;
+using NexusNet.Api.Dtos.Keyforge;
 
 namespace NexusNet.Api.Controllers;
 
@@ -251,6 +252,111 @@ public class KeyforgeController : ControllerBase
             );
 
             return StatusCode(500, new { error = "Erreur serveur" });
+        }
+    }
+
+    // ============================================================
+    // CRÉATION D'UN DRAFT
+    // ============================================================
+
+    [Authorize]
+    [HttpPost("creationNewDraft")]
+    public async Task<IActionResult> CreateDraft(
+        [FromBody] CreateKeyforgeDraftDto dto)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.CreateDraftAsync(
+                dto,
+                userId
+            );
+
+            if (!success)
+            {
+                return StatusCode(
+                    500,
+                    new { message = "Création du nouveau draft échouée" }
+                );
+            }
+
+            return Ok(
+                new { message = "Draft créé avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la création du draft KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
+
+    // ============================================================
+    // SUPPRESSION D'UN DRAFT
+    // ============================================================
+
+    [Authorize]
+    [HttpDelete("draft/{idDraft}")]
+    public async Task<IActionResult> DeleteDraft(string idDraft)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(idDraft))
+            {
+                return BadRequest(
+                    new { message = "Identifiant du draft manquant" }
+                );
+            }
+
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.DeleteDraftAsync(
+                idDraft,
+                userId
+            );
+
+            if (!success)
+            {
+                return NotFound(
+                    new { message = "Draft introuvable ou non autorisé" }
+                );
+            }
+
+            return Ok(
+                new { message = "Draft supprimé avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la suppression du draft KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
         }
     }
 }

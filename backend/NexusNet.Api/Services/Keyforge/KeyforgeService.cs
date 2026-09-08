@@ -31,6 +31,15 @@ public interface IKeyforgeService
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(
         string idDraft
     );
+    Task<bool> CreateDraftAsync(
+        CreateKeyforgeDraftDto dto,
+        int userId
+    );
+
+    Task<bool> DeleteDraftAsync(
+        string idDraft,
+        int userId
+    );
 }
 
 public class KeyforgeService : IKeyforgeService
@@ -80,5 +89,22 @@ public class KeyforgeService : IKeyforgeService
         string idDraft)
     {
         return await _keyforgeRepository.GetPoolCartesValideesAsync(idDraft);
+    }
+
+    public async Task<bool> CreateDraftAsync(
+        CreateKeyforgeDraftDto dto,
+        int userId)
+    {
+        return await _keyforgeRepository.CreateDraftAsync(dto, userId);
+    }
+
+    public async Task<bool> DeleteDraftAsync(
+    string idDraft,
+    int userId)
+    {
+        return await _keyforgeRepository.DeleteDraftAsync(
+            idDraft,
+            userId
+        );
     }
 }

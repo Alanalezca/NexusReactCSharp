@@ -46,7 +46,7 @@ const saisieOK =
         'success',
         '(Enregistrement)',
         '',
-        'Votre compte a bien été créé. Vous pouvez à présent vous connecter.'
+        `Votre compte a bien été créé. Finalisez via l'email de confirmation. (pensez à vérifier vos courriers indésirables).`
       );
 
     } catch (err) {

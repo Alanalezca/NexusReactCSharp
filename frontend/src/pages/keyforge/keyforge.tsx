@@ -7,7 +7,7 @@ import Pagination from '../../components/others/Pagination';
 import { useSessionUserContext } from '../../components/contexts/sessionUserContext';
 import { useOngletAlerteContext } from '../../components/contexts/ToastContext';
 import Loader from '../../components/others/Loader';
-import { apiFetch } from '../../api/client';
+import useApiFetch from "../../api/useApiFetch";
 
 type KeyforgeDraftSummary = {
     id: string;
@@ -23,6 +23,7 @@ type KeyforgeDraftSummary = {
 };
 
 const Keyforge = () => {
+    const { callApiFetch } = useApiFetch();
     const { showOngletAlerte } = useOngletAlerteContext();
     const [isLoading, setIsLoading] = useState(true);
     const [listeMyDrafts, setListeMyDrafts] = useState<KeyforgeDraftSummary[]>([]);
@@ -39,49 +40,51 @@ const Keyforge = () => {
 
     useEffect(() => {
         if (!sessionUser?.id) return;
-        const fetchMyDrafts = async () => {
-            setIsLoading(true);
 
-            try {
-                const data = await apiFetch<KeyforgeDraftSummary[]>('/api/keyforge/my-drafts');
+        const fetchMyDrafts = async () => {
+            const data = await callApiFetch<KeyforgeDraftSummary[]>(
+                '/api/keyforge/my-drafts',
+                'Erreur lors du chargement de vos drafts KeyForge',
+                setIsLoading
+            );
+
+            if (data) {
                 setListeMyDrafts(data);
-            } catch (error) {
-                console.error('Erreur fetch keyforge drafts:', error);
-                showOngletAlerte(
-                    'error',
-                    '(Chargement drafts)',
-                    '',
-                    'Impossible de charger vos drafts KeyForge.'
-                );
-            } finally {
-                setIsLoading(false);
             }
         };
 
         fetchMyDrafts();
     }, [sessionUser?.id]);
 
-    const handleDeleteDraft = async (codeDraft: string, titreDraft: string) => {
-    try {
-        const response = await fetch("/api/keyforge/delete", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ parCodeDraft: codeDraft})
-        });
+    const handleDeleteDraft = async (
+        codeDraft: string,
+        titreDraft: string
+    ) => {
+        const result = await callApiFetch(
+            `/api/keyforge/draft/${encodeURIComponent(codeDraft)}`,
+            'Erreur lors de la suppression du draft KeyForge',
+            undefined,
+            {
+                method: 'DELETE'
+            }
+        );
 
-        if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Erreur HTTP ${response.status} : ${errText}`);
+        if (!result) {
+            return;
         }
 
-        showOngletAlerte('success', '(Suppression draft)', '', `Le draft KeyForge "` + titreDraft + `" a bien été supprimé.`);
-        setListeMyDrafts(prev => prev.filter(current => current.id !== codeDraft));
-    } catch (err) {
-        console.error("Erreur lors de la suppression de l'article :", err);
-    }
+        showOngletAlerte(
+            'success',
+            '(Suppression draft)',
+            '',
+            `Le draft KeyForge "${titreDraft}" a bien été supprimé.`
+        );
+
+        setListeMyDrafts(prev =>
+            prev.filter(current => current.id !== codeDraft)
+        );
     };
+
     return (
             <div className="container-xl mt-3">
                     <div className="row mb-4">

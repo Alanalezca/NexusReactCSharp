@@ -5,9 +5,10 @@ import { useOngletAlerteContext } from '../contexts/ToastContext';
 import styles from './CreateNewDraftKeyforge.module.css';
 import convertDateToDateLong from '../../functions/getDateLong';
 import InputStandard from '../../components/inputs/InputStandard';
+import useApiFetch from "../../api/useApiFetch";
 
 interface KeyforgeSet {
-    id: number;
+    id: string;
     numero: number;
     libelle: string;
     selected?: boolean;
@@ -17,19 +18,31 @@ interface KeyforgeSet {
     const { showOngletAlerte } = useOngletAlerteContext();
     const {sessionUser} = useSessionUserContext();
     const inputsRef = useRef({});
-    const [IDSetSelected, setIDSetSelected] = useState<number | null>(null);
+    const [IDSetSelected, setIDSetSelected] = useState<string | null>(null);
     const [unlockBtnValiderCreateNewDraft, setUnlockBtnValiderCreateNewDraft] = useState(false);
-
+    const [loadingSet, setLoadingSet] = useState(false);
+    const { callApiFetch } = useApiFetch();
     const [listeSets, setListeSets] = useState<KeyforgeSet[]>([]);
-        useEffect(() => {
-        fetch('/api/keyforge/sets')
-        .then(response => response.json())
-        .then(data => {
-          setListeSets(data);
-        }).catch(error => console.error('Erreur fetch dice throne sets:', error));
+
+    useEffect(() => {
+        const fetchSets = async () => {
+            const data = await callApiFetch<KeyforgeSet[]>(
+                '/api/keyforge/sets',
+                'Erreur récupération de la liste des sets',
+                setLoadingSet,
+                { method: 'GET' }
+            );
+
+            if (data) {
+                setListeSets(data);
+            }
+        };
+
+        fetchSets();
     }, []);
 
-    const handleClickOnSet = (codeSet: number) => {
+
+    const handleClickOnSet = (codeSet: string) => {
         setListeSets(prevListeSets =>
             prevListeSets.map(currentSet =>
                 currentSet.id === codeSet
@@ -51,49 +64,67 @@ interface KeyforgeSet {
     const handleCreateNewDraft = async () => {
         const dateNow = new Date();
         const dateFormated = convertDateToDateLong(dateNow);
-        try {
-        const response = await fetch("/api/keyforge/creationNewDraft", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ parID: (sessionUser.id.toString() + "-" + dateFormated), parJoueurA: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A", parJoueurB: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B", parPresenceAnomalies: inputsRef?.current["checkAvecAnomalies"]?.value, parSet: IDSetSelected, parDateCreation: dateNow, parDateMaj: dateNow, parTitreDraft: inputsRef?.current["titreDraft"]?.value || "(sans nom)", parEtat: 0})
-        });
+        const result = await callApiFetch(
+            '/api/keyforge/creationNewDraft',
+            'Erreur lors de la création du draft KeyForge',
+            undefined,
+            {
+                method: 'POST',
+                body: JSON.stringify({
+                    parID: sessionUser.id.toString() + "-" + dateFormated,
+                    parJoueurA: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
+                    parJoueurB: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
 
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Erreur HTTP ${response.status} : ${errText}`);
+                    parPresenceAnomalies:
+                        inputsRef?.current["checkAvecAnomalies"]?.checked ?? false,
+
+                    parSet: IDSetSelected,
+                    parDateCreation: dateNow,
+                    parDateMaj: dateNow,
+                    parTitreDraft: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
+                    parEtat: 0
+                })
+            }
+        );
+
+        if (!result) {
+            return;
         }
 
-        const result = await response.json();
-        showOngletAlerte('success', '(Création draft)', '', `Le nouveau draft KeyForge "` + (inputsRef?.current["titreDraft"]?.value || "(sans nom)") + `" a bien été créé !`);
+        showOngletAlerte(
+            'success',
+            '(Création draft)',
+            '',
+            `Le nouveau draft KeyForge "${inputsRef?.current["titreDraft"]?.value || "(sans nom)"}" a bien été créé !`
+        );
+
         handleClose(false);
+
         setListeSets(prevListeSets =>
             prevListeSets.map(currentSet => ({
                 ...currentSet,
-                Selected: false
+                selected: false
             }))
         );
+
         setUnlockBtnValiderCreateNewDraft(false);
         handleRefresh(prev => [
             ...prev,
             {
-                ID: (sessionUser.id.toString() + "-" + dateFormated),
-                Titre: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
-                AvecAnomalies: inputsRef?.current["checkAvecAnomalies"]?.value,
-                DateCreation: dateNow,
-                DateDerModif: dateNow,
-                Etat: 0,
-                PseudoJ1: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
-                PseudoJ2: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
-                SetID: IDSetSelected,
-                IDSet: IDSetSelected
+                id: sessionUser.id.toString() + "-" + dateFormated,
+                titre: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
+                avecAnomalies: inputsRef?.current["checkAvecAnomalies"]?.checked,
+                dateCreation: dateNow,
+                dateDerModif: dateNow,
+                etat: 0,
+                pseudoJ1: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
+                pseudoJ2: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
+                setID: IDSetSelected,
+                idSet: IDSetSelected
             }
         ]);
+
         setIDSetSelected(null);
-        } catch (err) {
-        console.error("Erreur lors de la création du draft KeyForge :", err);
-        }
     };
 
     return (

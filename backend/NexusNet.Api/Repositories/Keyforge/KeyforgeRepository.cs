@@ -21,6 +21,8 @@ public interface IKeyforgeRepository
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(string idDraft);
 
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(string idDraft);
+    Task<bool> CreateDraftAsync(CreateKeyforgeDraftDto dto,int userId);
+    Task<bool> DeleteDraftAsync(string idDraft, int userId);
 }
 
 public class KeyforgeRepository : IKeyforgeRepository
@@ -337,6 +339,115 @@ public class KeyforgeRepository : IKeyforgeRepository
             idDraft)
             .ToListAsync();
     }
+
+    public async Task<bool> CreateDraftAsync(
+        CreateKeyforgeDraftDto dto,
+        int userId)
+    {
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
+            INSERT INTO tab_keyforge_draftsessions
+            (
+                ""ID"",
+                ""PseudoJ1"",
+                ""PseudoJ2"",
+                ""AvecAnomalies"",
+                ""IDSet"",
+                ""DateCreation"",
+                ""DateDerModif"",
+                ""CreePar"",
+                ""Titre"",
+                ""Etat""
+            )
+            VALUES
+            (
+                {0},
+                {1},
+                {2},
+                {3},
+                {4},
+                {5},
+                {6},
+                {7},
+                {8},
+                {9}
+            );
+        ",
+            dto.ParID,
+            dto.ParJoueurA,
+            dto.ParJoueurB,
+            dto.ParPresenceAnomalies,
+            dto.ParSet,
+            dto.ParDateCreation,
+            dto.ParDateMaj,
+            userId,
+            dto.ParTitreDraft,
+            dto.ParEtat
+        );
+
+        return rowsAffected > 0;
+    }
+
+    public async Task<bool> DeleteDraftAsync(
+    string idDraft,
+    int userId)
+    {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            // Vérifie que le draft existe et appartient à l'utilisateur
+            var draftExists = await _context.Database
+                .SqlQueryRaw<int>(@"
+                    SELECT 1 AS ""Value""
+                    FROM tab_keyforge_draftsessions
+                    WHERE ""ID"" = {0}
+                    AND ""CreePar"" = {1}
+                ",
+                idDraft,
+                userId)
+                .AnyAsync();
+
+            if (!draftExists)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            // Suppression des cartes du pool
+            await _context.Database.ExecuteSqlRawAsync(@"
+                DELETE FROM tab_affectations_keyforge_draftpool_cartes
+                WHERE ""IDDraftSession"" = {0}
+            ",
+            idDraft);
+
+            // Suppression des cartes validées
+            await _context.Database.ExecuteSqlRawAsync(@"
+                DELETE FROM tab_affectations_keyforge_draftpool_cartes_validees
+                WHERE ""IDDraftSession"" = {0}
+            ",
+            idDraft);
+
+            // Suppression du draft
+            var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
+                DELETE FROM tab_keyforge_draftsessions
+                WHERE ""ID"" = {0}
+                AND ""CreePar"" = {1}
+            ",
+            idDraft,
+            userId);
+
+            await transaction.CommitAsync();
+
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    
 }
 
 
