@@ -5,23 +5,22 @@
     import { Button } from 'react-bootstrap';
     import creationPoolCartes from '../../functions/keyforge/creationPoolCartes';
     import recupKeyforgeTxtCurrentInstruction from '../../functions/keyforge/recupKeyforgeTxtCurrentInstruction';
-    import pullDraftKeyforge from '../../functions/callAPIx/keyforgePullDraftKeyforge';
-    import pullCurrentFactionsFromSet from '../../functions/callAPIx/keyforgePullFactionsFromSet';
     import updateFactionsCurrentDraft from '../../functions/callAPIx/keyforgeUpdateFactionsSpecificDraft';
     import DraftKeyforgePartCardsSelection from './draftKeyforgePartCardsSelection';
     import pullCurrentDraftPoolCards from '../../functions/callAPIx/keyforgePullCurrentDraftPoolCards';
     import pullCurrentDraftCardsSelected from '../../functions/callAPIx/keyforgePullCurrentDraftCardsSelected';
     import DraftKeyforgeResume from '../../pages/keyforge/draftKeyforgeResume';
-    import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeContext';
+    import { useKeyforgeContext } from '../../components/contexts/keyforgeContext';
     import { useSessionUserContext } from '../../components/contexts/sessionUserContext';
     import Tooltip from '../../components/others/Tooltip';
     import DraftKeyforgePartBoutonsJ1J2 from '../../pages/keyforge/draftKeyforgePartBoutonsJ1J2';
     import { useDraftFactions } from '../../functions/hooks/useDraftFactions';
+    import useApiFetch from "../../api/useApiFetch";
+    import type { KeyforgeDraft, KeyforgeFaction } from '../../types/keyforge';
 
     {/* Composant parent du module de draft Keyforge */}
     const DraftKeyforge = () => {
         const { slug } = useParams();
-        console.log('slug', slug);
         const { sessionUser } = useSessionUserContext();
         const {
             setDraftEnCoursParJoueurAouB, 
@@ -39,6 +38,7 @@
         const [focusSurJoueurAouBforStats, setFocuSsurJoueurAouBforStats] = useState(null);
         const [factionsJA, setFactionsJA] = useState(null);
         const [factionsJB, setFactionsJB] = useState(null);
+        const { callApiFetch } = useApiFetch();
 
         const txtInstructionDraft = useMemo(() => {
             return recupKeyforgeTxtCurrentInstruction(etapeDraft, currentDraftKeyforge);
@@ -65,10 +65,22 @@
             if (!slug) return;
             setIsLoading(true);
             try {
-                const draftData = await pullDraftKeyforge(slug);
+                const draftData = await callApiFetch<KeyforgeDraft[]>(
+                    `/api/keyforge/draft/${encodeURIComponent(slug)}`,
+                    'Erreur lors du chargement du draft KeyForge'
+                );
+
                 if (draftData?.length > 0) {
                     const draft = draftData[0];
-                    const factionsList = await pullCurrentFactionsFromSet(draft.IDSet);
+                    const factionsList = await callApiFetch<KeyforgeFaction[]>(
+                        `/api/keyforge/factions?setId=${encodeURIComponent(draft.idSet ?? '')}`,
+                        'Erreur lors du chargement des factions KeyForge'
+                    );
+
+                    if (!factionsList) {
+                        setError("Impossible de charger les factions");
+                        return;
+                    }
 
                     // Chargement anticipé des données du pool si le draft a commencé (Etat >= 10)
                     let poolData = [];
@@ -88,8 +100,8 @@
 
                     const syncedFactions = factionsList.map(current => ({
                         ...current,
-                        Picked: pickedIDs.includes(current.ID),
-                        Banned: bannedIFactions.includes(current.ID)
+                        Picked: pickedIDs.includes(current.id),
+                        Banned: bannedIFactions.includes(current.id)
                     }));
 
                     // Regroupement des mises à jour d'état
@@ -127,7 +139,6 @@
         draft.FactionPickBJ2 &&
         draft.FactionPickCJ2 &&
         etapeDraft === 9;
-    console.log('isReady', isReady, draft);
     if (isReady) {
         processCreationPoolCartes(currentDraftKeyforge, setIsLoading);
     }
@@ -174,7 +185,6 @@
         : j2isDrafting 
             ? factionsJB 
             : null;
-
     return (
         <>
         {sessionUser ? <>
@@ -226,8 +236,8 @@
                                 {isPhasePickBanFactions && 
                                 <>
                                     {factionsForPickBanCurrentPlayer?.map((current, index) => (
-                                        <img key={`factionLogo-${current.ID}`} 
-                                            src={current.LienImg} 
+                                        <img key={`factionLogo-${current.id}`} 
+                                            src={current.lienImg} 
                                             alt="Logo de la faction" 
                                             className={`borderRadius6 
                                                 ${styles.logoFactionBig} 
@@ -236,10 +246,10 @@
                                             onClick={() => {
                                             if (isNotPickedAndNotBanned(current)) {
                                                 handleClickOnPickBanFaction(
-                                                        current.ID, 
-                                                        current.LienImg, 
-                                                        current.Libelle, 
-                                                        current.CouleurRGB
+                                                        current.id, 
+                                                        current.lienImg, 
+                                                        current.libelle, 
+                                                        current.couleurRGB
                                                     );
                                                 }
                                             }}

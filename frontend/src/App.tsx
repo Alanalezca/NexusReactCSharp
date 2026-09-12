@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SessionUserContextProvider } from "./components/contexts/sessionUserContext";
+import { KeyforgeContextProvider } from "./components/contexts/keyforgeContext";
 import { OngletAlerteProvider } from "./components/contexts/ToastContext";
 import PrivateRoute from "./components/PrivateRoute";
 
@@ -13,6 +14,7 @@ import CreateArticle from "./pages/articles/createArticle";
 import Smashup from "./pages/smashup/smashup";
 import DiceThrone from '../src/pages/dicethrone/dicethrone';
 import Keyforge from "./pages/keyforge/keyforge";
+import DraftKeyforge from "./pages/keyforge/draftKeyforge";
 import Patchnotes from '../src/pages/others/patchnotes';
 import ValidationAccount from './pages/user/validationAccount'; 
 
@@ -34,6 +36,7 @@ function App() {
                 <Route path="/smashup" element={<Smashup />} />
                 <Route path="/dicethrone" element={<DiceThrone />} />
                 <Route path="/keyforge" element={<Keyforge />} />
+                <Route path="/draftKeyforge/:slug" element={<KeyforgeContextProvider><DraftKeyforge /></KeyforgeContextProvider>} />
                 <Route path="/release/patchnotes" element={<Patchnotes />} />
                 <Route path="/validation-email" element={<ValidationAccount />} />
                 <Route path="/dashboard"

@@ -9,7 +9,7 @@
         const {draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC} = useKeyforgeContext();
 
         const currentEtape = useMemo(() => {
-            return currentDraftKeyforge?.[0].Etat;
+            return currentDraftKeyforge?.[0].etat;
         }, [currentDraftKeyforge]);
 
         const etatLibelleEtClass = {
@@ -26,7 +26,7 @@
 
         const draftEnCours = currentEtape >= 10;
         const draftCardsFinish = currentEtape >= 12;
-        const titre = currentDraftKeyforge?.[0]?.Titre ?? "---";
+        const titre = currentDraftKeyforge?.[0]?.titre ?? "---";
 
         const getFactionImg = (img) =>
             img || "/images/keyforge/NC.png";
@@ -34,15 +34,15 @@
         const currentDraft = currentDraftKeyforge?.[0];
         
         const factionsJ1 = {
-        A: getFactionImg(currentDraft?.LienImgAJ1),
-        B: getFactionImg(currentDraft?.LienImgBJ1),
-        C: getFactionImg(currentDraft?.LienImgCJ1),
+        A: getFactionImg(currentDraft?.lienImgAJ1),
+        B: getFactionImg(currentDraft?.lienImgBJ1),
+        C: getFactionImg(currentDraft?.lienImgCJ1),
         };
 
         const factionsJ2 = {
-        A: getFactionImg(currentDraft?.LienImgAJ2),
-        B: getFactionImg(currentDraft?.LienImgBJ2),
-        C: getFactionImg(currentDraft?.LienImgCJ2),
+        A: getFactionImg(currentDraft?.lienImgAJ2),
+        B: getFactionImg(currentDraft?.lienImgBJ2),
+        C: getFactionImg(currentDraft?.lienImgCJ2),
         };
 
         const showStats = currentEtape >= 10;
@@ -88,15 +88,15 @@
                         {currentDraftKeyforge ? 
                         <>
                         {currentDraftKeyforge?.map((current, index) => (
-                        <div key={current.ID}>
+                        <div key={current.id}>
                             <div className="col-12,">
-                                <p className="txtColorWhite">{new Date(current.DateCreation).toLocaleDateString('fr-FR')}</p>
+                                <p className="txtColorWhite">{new Date(current.dateCreation).toLocaleDateString('fr-FR')}</p>
                             </div>
                             <div className="col-12">
-                                <p className="txtColorWhite">{new Date(current.DateDerModif).toLocaleDateString('fr-FR')}</p>
+                                <p className="txtColorWhite">{new Date(current.dateDerModif).toLocaleDateString('fr-FR')}</p>
                             </div>
                             <div className="col-12">
-                                <p className="txtColorPlayerRed">{current.PseudoJ1}</p>
+                                <p className="txtColorPlayerRed">{current.pseudoJ1}</p>
                             </div>
                                 <p>
                                     <img 
@@ -116,7 +116,7 @@
                                     />
                                 </p>
                             <div className="col-12">
-                                <p className="txtColorPlayerBlue">{current.PseudoJ2}</p>
+                                <p className="txtColorPlayerBlue">{current.pseudoJ2}</p>
                             </div>
                             <div className="col-12">
                                 <p>
@@ -138,10 +138,10 @@
                                 </p>
                             </div>
                             <div className="col-12">
-                                <p className="txtColorWhite">{current.Libelle + " (" + current.Numero + ")"}</p>
+                                <p className="txtColorWhite">{current.libelle + " (" + current.numero + ")"}</p>
                             </div>
                             <div className="col-12">
-                                <p className="txtColorWhite">{current.AvecAnomalies ? "Avec" : "Sans"}</p>
+                                <p className="txtColorWhite">{current.avecAnomalies ? "Avec" : "Sans"}</p>
                             </div>
                             <div className="col-12">
                                 <p className={etatClass}>{etatLibelle}</p>
