@@ -1,70 +1,69 @@
 export interface KeyforgeDraft {
-    ID: string;
+    id: string;
 
-    PseudoJ1: string | null;
-    PseudoJ2: string | null;
+    pseudoJ1: string | null;
+    pseudoJ2: string | null;
 
-    FactionBanJ1: string | null;
-    FactionBanJ2: string | null;
+    factionBanJ1: string | null;
+    factionBanJ2: string | null;
 
     // Joueur 1
 
-    FactionPickAJ1: string | null;
-    LienImgAJ1: string | null;
-    LibelleFactionAJ1: string | null;
-    CouleurAJ1: string | null;
+    factionPickAJ1: string | null;
+    lienImgAJ1: string | null;
+    libelleFactionAJ1: string | null;
+    couleurAJ1: string | null;
 
-    FactionPickBJ1: string | null;
-    LienImgBJ1: string | null;
-    LibelleFactionBJ1: string | null;
-    CouleurBJ1: string | null;
+    factionPickBJ1: string | null;
+    lienImgBJ1: string | null;
+    libelleFactionBJ1: string | null;
+    couleurBJ1: string | null;
 
-    FactionPickCJ1: string | null;
-    LienImgCJ1: string | null;
-    LibelleFactionCJ1: string | null;
-    CouleurCJ1: string | null;
+    factionPickCJ1: string | null;
+    lienImgCJ1: string | null;
+    libelleFactionCJ1: string | null;
+    couleurCJ1: string | null;
 
     // Joueur 2
 
-    FactionPickAJ2: string | null;
-    LienImgAJ2: string | null;
-    LibelleFactionAJ2: string | null;
-    CouleurAJ2: string | null;
+    factionPickAJ2: string | null;
+    lienImgAJ2: string | null;
+    libelleFactionAJ2: string | null;
+    couleurAJ2: string | null;
 
-    FactionPickBJ2: string | null;
-    LienImgBJ2: string | null;
-    LibelleFactionBJ2: string | null;
-    CouleurBJ2: string | null;
+    factionPickBJ2: string | null;
+    lienImgBJ2: string | null;
+    libelleFactionBJ2: string | null;
+    couleurBJ2: string | null;
 
-    FactionPickCJ2: string | null;
-    LienImgCJ2: string | null;
-    LibelleFactionCJ2: string | null;
-    CouleurCJ2: string | null;
+    factionPickCJ2: string | null;
+    lienImgCJ2: string | null;
+    libelleFactionCJ2: string | null;
+    couleurCJ2: string | null;
 
     // Informations draft
 
-    AvecAnomalies: boolean | null;
-    Etat: number;
-    Commentaire: string | null;
+    avecAnomalies: boolean | null;
+    etat: number | null;
+    commentaire: string | null;
 
-    DateCreation: string | null;
-    DateDerModif: string | null;
+    dateCreation: string | null;
+    dateDerModif: string | null;
 
-    IDSet: string | null;
+    idSet: string | null;
+    setID: string | null;
 
-    SetID: string | null;
-
-    Titre: string | null;
-    Libelle: string | null;
-    Numero: number | null;
+    titre: string | null;
+    libelle: string | null;
+    numero: number | null;
 
     // Etat draft cartes
 
-    DraftEnCoursPourJoueurAouB: number | null;
-    DraftEnCoursSurFactionAouBouC: string | null;
+    draftEnCoursPourJoueurAouB: number | null;
+    draftEnCoursSurFactionAouBouC: string | null;
 
-    DraftJ1Finished: boolean | null;
-    DraftJ2Finished: boolean | null;
+    draftJ1Finished: boolean | null;
+    draftJ2Finished: boolean | null;
 }
 
 export interface KeyforgeFaction {
