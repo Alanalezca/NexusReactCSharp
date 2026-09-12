@@ -73,7 +73,7 @@
                 if (draftData?.length > 0) {
                     const draft = draftData[0];
                     const factionsList = await callApiFetch<KeyforgeFaction[]>(
-                        `/api/keyforge/factions?setId=${encodeURIComponent(draft.idSet ?? '')}`,
+                        `/api/keyforge/factions?setId=${encodeURIComponent(draft.IDSet ?? '')}`,
                         'Erreur lors du chargement des factions KeyForge'
                     );
 
