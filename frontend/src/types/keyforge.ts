@@ -44,7 +44,7 @@ export interface KeyforgeDraft {
     // Informations draft
 
     AvecAnomalies: boolean | null;
-    Etat: number | null;
+    Etat: number;
     Commentaire: string | null;
 
     DateCreation: string | null;
