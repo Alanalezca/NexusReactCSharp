@@ -5,7 +5,6 @@
     import { Button } from 'react-bootstrap';
     import creationPoolCartes from '../../functions/keyforge/creationPoolCartes';
     import recupKeyforgeTxtCurrentInstruction from '../../functions/keyforge/recupKeyforgeTxtCurrentInstruction';
-    import updateFactionsCurrentDraft from '../../functions/callAPIx/keyforgeUpdateFactionsSpecificDraft';
     import DraftKeyforgePartCardsSelection from './draftKeyforgePartCardsSelection';
     import pullCurrentDraftPoolCards from '../../functions/callAPIx/keyforgePullCurrentDraftPoolCards';
     import pullCurrentDraftCardsSelected from '../../functions/callAPIx/keyforgePullCurrentDraftCardsSelected';
@@ -50,7 +49,6 @@
             etapeDraft,
             setEtapeDraft,
             currentDraftKeyforge,
-            updateFactionsCurrentDraft,
             setCurrentDraftKeyforge,
             setError,
             factionsJA,
@@ -85,7 +83,7 @@
                     // Chargement anticipé des données du pool si le draft a commencé (Etat >= 10)
                     let poolData = [];
                     let validatedData = [];
-                    if (draft.Etat >= 10) {
+                    if (draft.etat >= 10) {
                         [poolData, validatedData] = await Promise.all([
                             pullCurrentDraftPoolCards(draft.ID),
                             pullCurrentDraftCardsSelected(draft.ID)
@@ -93,10 +91,10 @@
                     }
 
                     const pickedIDs = [
-                        draft.FactionPickAJ1, draft.FactionPickBJ1, draft.FactionPickCJ1,
-                        draft.FactionPickAJ2, draft.FactionPickBJ2, draft.FactionPickCJ2
+                        draft.factionPickAJ1, draft.factionPickBJ1, draft.factionPickCJ1,
+                        draft.factionPickAJ2, draft.factionPickBJ2, draft.factionPickCJ2
                     ];
-                    const bannedIFactions = [draft.FactionBanJ1, draft.FactionBanJ2];
+                    const bannedIFactions = [draft.factionBanJ1, draft.factionBanJ2];
 
                     const syncedFactions = factionsList.map(current => ({
                         ...current,
@@ -106,9 +104,9 @@
 
                     // Regroupement des mises à jour d'état
                     setCurrentDraftKeyforge(draftData);
-                    setEtapeDraft(draft.Etat);
-                    setDraftEnCoursParJoueurAouB(draft.DraftEnCoursPourJoueurAouB);
-                    setDraftEnCoursSurFactionAouBouC(draft.DraftEnCoursSurFactionAouBouC);
+                    setEtapeDraft(draft.etat);
+                    setDraftEnCoursParJoueurAouB(draft.draftEnCoursPourJoueurAouB);
+                    setDraftEnCoursSurFactionAouBouC(draft.draftEnCoursSurFactionAouBouC);
                     setFactionsJA(syncedFactions);
                     setFactionsJB(syncedFactions);
                     setPoolCartesGlobal(poolData);

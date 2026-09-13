@@ -40,6 +40,11 @@ public interface IKeyforgeService
         string idDraft,
         int userId
     );
+
+    Task<bool> UpdateFactionsDraftAsync(
+        UpdateKeyforgeFactionsDto dto,
+        int userId
+    );
 }
 
 public class KeyforgeService : IKeyforgeService
@@ -104,6 +109,16 @@ public class KeyforgeService : IKeyforgeService
     {
         return await _keyforgeRepository.DeleteDraftAsync(
             idDraft,
+            userId
+        );
+    }
+
+    public async Task<bool> UpdateFactionsDraftAsync(
+    UpdateKeyforgeFactionsDto dto,
+    int userId)
+    {
+        return await _keyforgeRepository.UpdateFactionsDraftAsync(
+            dto,
             userId
         );
     }

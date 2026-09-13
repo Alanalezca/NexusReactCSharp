@@ -23,6 +23,7 @@ public interface IKeyforgeRepository
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(string idDraft);
     Task<bool> CreateDraftAsync(CreateKeyforgeDraftDto dto,int userId);
     Task<bool> DeleteDraftAsync(string idDraft, int userId);
+    Task<bool> UpdateFactionsDraftAsync(UpdateKeyforgeFactionsDto dto, int userId);
 }
 
 public class KeyforgeRepository : IKeyforgeRepository
@@ -445,6 +446,41 @@ public class KeyforgeRepository : IKeyforgeRepository
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+
+    public async Task<bool> UpdateFactionsDraftAsync(
+    UpdateKeyforgeFactionsDto dto,
+    int userId)
+    {
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
+            UPDATE tab_keyforge_draftsessions
+            SET
+                ""Etat"" = 10,
+                ""FactionBanJ1"" = {0},
+                ""FactionBanJ2"" = {1},
+                ""FactionPickAJ1"" = {2},
+                ""FactionPickBJ1"" = {3},
+                ""FactionPickCJ1"" = {4},
+                ""FactionPickAJ2"" = {5},
+                ""FactionPickBJ2"" = {6},
+                ""FactionPickCJ2"" = {7}
+            WHERE ""ID"" = {8}
+            AND ""CreePar"" = {9};
+        ",
+            dto.ParFactionBanJ1,
+            dto.ParFactionBanJ2,
+            dto.ParFactionPickAJ1,
+            dto.ParFactionPickBJ1,
+            dto.ParFactionPickCJ1,
+            dto.ParFactionPickAJ2,
+            dto.ParFactionPickBJ2,
+            dto.ParFactionPickCJ2,
+            dto.ParID,
+            userId
+        );
+
+        return rowsAffected > 0;
     }
 
     

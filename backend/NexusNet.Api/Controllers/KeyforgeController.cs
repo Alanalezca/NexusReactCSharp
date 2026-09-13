@@ -359,4 +359,58 @@ public class KeyforgeController : ControllerBase
             );
         }
     }
+
+    // ============================================================
+    // MISE À JOUR PICKS / BANS DES FACTIONS
+    // ============================================================
+
+    [Authorize]
+    [HttpPost("updateFactionsSpecificDraft")]
+    public async Task<IActionResult> UpdateFactionsSpecificDraft(
+        [FromBody] UpdateKeyforgeFactionsDto dto)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.UpdateFactionsDraftAsync(
+                dto,
+                userId
+            );
+
+            if (!success)
+            {
+                return NotFound(
+                    new
+                    {
+                        message = "Update des factions dans le draft en cours échouée"
+                    }
+                );
+            }
+
+            return Ok(
+                new { message = "Factions du draft mises à jour avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la mise à jour des factions KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
 }
