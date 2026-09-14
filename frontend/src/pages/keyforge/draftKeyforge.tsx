@@ -6,8 +6,6 @@
     import creationPoolCartes from '../../functions/keyforge/creationPoolCartes';
     import recupKeyforgeTxtCurrentInstruction from '../../functions/keyforge/recupKeyforgeTxtCurrentInstruction';
     import DraftKeyforgePartCardsSelection from './draftKeyforgePartCardsSelection';
-    import pullCurrentDraftPoolCards from '../../functions/callAPIx/keyforgePullCurrentDraftPoolCards';
-    import pullCurrentDraftCardsSelected from '../../functions/callAPIx/keyforgePullCurrentDraftCardsSelected';
     import DraftKeyforgeResume from '../../pages/keyforge/draftKeyforgeResume';
     import { useKeyforgeContext } from '../../components/contexts/keyforgeContext';
     import { useSessionUserContext } from '../../components/contexts/sessionUserContext';
@@ -15,7 +13,7 @@
     import DraftKeyforgePartBoutonsJ1J2 from '../../pages/keyforge/draftKeyforgePartBoutonsJ1J2';
     import { useDraftFactions } from '../../functions/hooks/useDraftFactions';
     import useApiFetch from "../../api/useApiFetch";
-    import type { KeyforgeDraft, KeyforgeFaction } from '../../types/keyforge';
+    import type { KeyforgeDraft, KeyforgeFaction, KeyforgePoolCarte } from '../../types/keyforge';
 
     {/* Composant parent du module de draft Keyforge */}
     const DraftKeyforge = () => {
@@ -81,13 +79,25 @@
                     }
 
                     // Chargement anticipé des données du pool si le draft a commencé (Etat >= 10)
-                    let poolData = [];
-                    let validatedData = [];
-                    if (draft.etat >= 10) {
-                        [poolData, validatedData] = await Promise.all([
-                            pullCurrentDraftPoolCards(draft.ID),
-                            pullCurrentDraftCardsSelected(draft.ID)
+                    let poolData: KeyforgePoolCarte[] = [];
+                    let validatedData: KeyforgePoolCarte[] = [];
+
+                    if ((draft.etat ?? 0) >= 10) {
+
+                        const [poolResult, validatedResult] = await Promise.all([
+                            callApiFetch<KeyforgePoolCarte[]>(
+                                `/api/keyforge/draft/${encodeURIComponent(draft.id)}/pool`,
+                                'Erreur lors du chargement du pool de cartes KeyForge'
+                            ),
+
+                            callApiFetch<KeyforgePoolCarte[]>(
+                                `/api/keyforge/draft/${encodeURIComponent(draft.id)}/pool-valide`,
+                                'Erreur lors du chargement des cartes validées KeyForge'
+                            )
                         ]);
+
+                        poolData = poolResult ?? [];
+                        validatedData = validatedResult ?? [];
                     }
 
                     const pickedIDs = [
@@ -145,7 +155,7 @@
     // Creation du pool de cartes (en prévision de son upload en bdd + mise en state)
     const processCreationPoolCartes = async (currentDraftKeyforge, setIsLoading) => {
         try {
-            await creationPoolCartes(currentDraftKeyforge, setIsLoading, setPoolCartesGlobal);
+            await creationPoolCartes(currentDraftKeyforge, setIsLoading, setPoolCartesGlobal, callApiFetch);
             setEtapeDraft(prev => prev + 1);
         } catch (e) {
             console.error(e);

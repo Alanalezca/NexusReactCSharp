@@ -1,25 +1,29 @@
 import getRandomisationArray from '../../functions/getRandomisationArray';
 import getRandomUniqueNumbers from '../../functions/getRandomUniqueNumbers';
-import enregistrementPoolsVersBdd from '../callAPIx/keyforgeEnregistrementPoolsVersBdd'
-import pullCurrentDraftPoolCards from '../callAPIx/keyforgePullCurrentDraftPoolCards'
+import enregistrementPoolsVersBdd from '../callAPIx/keyforgeEnregistrementPoolsVersBdd';
 
 
-const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCartesGlobal) => {
+const creationPoolCartes = async (
+    currentDraftKeyforge,
+    setIsLoading,
+    setPoolCartesGlobal,
+    callApiFetch
+) => {
         try {
 
             const response = await fetch(
-                `/api/keyforge/basePoolCartes?factions=${
-                    currentDraftKeyforge?.[0]?.FactionPickAJ1
+                `/api/keyforge/base-pool?factions=${
+                    currentDraftKeyforge?.[0]?.factionPickAJ1
                 },${
-                    currentDraftKeyforge?.[0]?.FactionPickBJ1
+                    currentDraftKeyforge?.[0]?.factionPickBJ1
                 },${
-                    currentDraftKeyforge?.[0]?.FactionPickCJ1
+                    currentDraftKeyforge?.[0]?.factionPickCJ1
                 },${
-                    currentDraftKeyforge?.[0]?.FactionPickAJ2
+                    currentDraftKeyforge?.[0]?.factionPickAJ2
                 },${
-                    currentDraftKeyforge?.[0]?.FactionPickBJ2
+                    currentDraftKeyforge?.[0]?.factionPickBJ2
                 },${
-                    currentDraftKeyforge?.[0]?.FactionPickCJ2
+                    currentDraftKeyforge?.[0]?.factionPickCJ2
                 }`
             );
 
@@ -31,12 +35,12 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
 
             const data = await response.json();
 
-            const poolCartesAJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.FactionPickAJ1);
-            const poolCartesBJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.FactionPickBJ1);
-            const poolCartesCJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.FactionPickCJ1);
-            const poolCartesAJ2 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.FactionPickAJ2);
-            const poolCartesBJ2 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.FactionPickBJ2);
-            const poolCartesCJ2 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.FactionPickCJ2);
+            const poolCartesAJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickAJ1);
+            const poolCartesBJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickBJ1);
+            const poolCartesCJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickCJ1);
+            const poolCartesAJ2 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickAJ2);
+            const poolCartesBJ2 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickBJ2);
+            const poolCartesCJ2 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickCJ2);
             let poolCartesAJ1Final = [];
             let poolCartesBJ1Final = [];
             let poolCartesCJ1Final = [];
@@ -44,18 +48,18 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
             let poolCartesBJ2Final = [];
             let poolCartesCJ2Final = [];
             /* Génération des pools de cartes pour chargement bdd */
-            switch (currentDraftKeyforge?.[0]?.FactionPickAJ1) {
-                case currentDraftKeyforge?.[0]?.FactionPickAJ2:
+            switch (currentDraftKeyforge?.[0]?.factionPickAJ1) {
+                case currentDraftKeyforge?.[0]?.factionPickAJ2:
                     poolCartesAJ1Final = generationPoolCartesDouble(poolCartesAJ1);
                     poolCartesAJ2Final = getRandomisationArray(poolCartesAJ1Final[1]);
                     poolCartesAJ1Final = getRandomisationArray(poolCartesAJ1Final[0]);
                     break;
-                case currentDraftKeyforge?.[0]?.FactionPickBJ2:
+                case currentDraftKeyforge?.[0]?.factionPickBJ2:
                     poolCartesAJ1Final = generationPoolCartesDouble(poolCartesAJ1);
                     poolCartesBJ2Final = getRandomisationArray(poolCartesAJ1Final[1]);
                     poolCartesAJ1Final = getRandomisationArray(poolCartesAJ1Final[0]);
                     break;
-                case currentDraftKeyforge?.[0]?.FactionPickCJ2:
+                case currentDraftKeyforge?.[0]?.factionPickCJ2:
                     poolCartesAJ1Final = generationPoolCartesDouble(poolCartesAJ1);
                     poolCartesCJ2Final = getRandomisationArray(poolCartesAJ1Final[1]);
                     poolCartesAJ1Final = getRandomisationArray(poolCartesAJ1Final[0]);
@@ -65,18 +69,18 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
                     break;
             }
 
-            switch (currentDraftKeyforge?.[0]?.FactionPickBJ1) {
-                case currentDraftKeyforge?.[0]?.FactionPickAJ2:
+            switch (currentDraftKeyforge?.[0]?.factionPickBJ1) {
+                case currentDraftKeyforge?.[0]?.factionPickAJ2:
                     poolCartesBJ1Final = generationPoolCartesDouble(poolCartesBJ1);
                     poolCartesAJ2Final = getRandomisationArray(poolCartesBJ1Final[1]);
                     poolCartesBJ1Final = getRandomisationArray(poolCartesBJ1Final[0]);
                     break;
-                case currentDraftKeyforge?.[0]?.FactionPickBJ2:
+                case currentDraftKeyforge?.[0]?.factionPickBJ2:
                     poolCartesBJ1Final = generationPoolCartesDouble(poolCartesBJ1);
                     poolCartesBJ2Final = getRandomisationArray(poolCartesBJ1Final[1]);
                     poolCartesBJ1Final = getRandomisationArray(poolCartesBJ1Final[0]);
                     break;
-                case currentDraftKeyforge?.[0]?.FactionPickCJ2:
+                case currentDraftKeyforge?.[0]?.factionPickCJ2:
                     poolCartesBJ1Final = generationPoolCartesDouble(poolCartesBJ1);
                     poolCartesCJ2Final = getRandomisationArray(poolCartesBJ1Final[1]);
                     poolCartesBJ1Final = getRandomisationArray(poolCartesBJ1Final[0]);
@@ -86,18 +90,18 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
                     break;
             }
 
-            switch (currentDraftKeyforge?.[0]?.FactionPickCJ1) {
-                case currentDraftKeyforge?.[0]?.FactionPickAJ2:
+            switch (currentDraftKeyforge?.[0]?.factionPickCJ1) {
+                case currentDraftKeyforge?.[0]?.factionPickAJ2:
                     poolCartesCJ1Final = generationPoolCartesDouble(poolCartesCJ1);
                     poolCartesAJ2Final = getRandomisationArray(poolCartesCJ1Final[1]);
                     poolCartesCJ1Final = getRandomisationArray(poolCartesCJ1Final[0]);
                     break;
-                case currentDraftKeyforge?.[0]?.FactionPickBJ2:
+                case currentDraftKeyforge?.[0]?.factionPickBJ2:
                     poolCartesCJ1Final = generationPoolCartesDouble(poolCartesCJ1);
                     poolCartesBJ2Final = getRandomisationArray(poolCartesCJ1Final[1]);
                     poolCartesCJ1Final = getRandomisationArray(poolCartesCJ1Final[0]);
                     break;
-                case currentDraftKeyforge?.[0]?.FactionPickCJ2:
+                case currentDraftKeyforge?.[0]?.factionPickCJ2:
                     poolCartesCJ1Final = generationPoolCartesDouble(poolCartesCJ1);
                     poolCartesCJ2Final = getRandomisationArray(poolCartesCJ1Final[1]);
                     poolCartesCJ1Final = getRandomisationArray(poolCartesCJ1Final[0]);
@@ -120,25 +124,35 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
             }
             const arrayFinalToCharge = [...poolCartesAJ1Final, ...poolCartesBJ1Final, ...poolCartesCJ1Final, ...poolCartesAJ2Final, ...poolCartesBJ2Final, ...poolCartesCJ2Final];
 
-            const result = await enregistrementPoolsVersBdd(arrayFinalToCharge, currentDraftKeyforge[0].ID);
-            if(result) {
+            const result = await enregistrementPoolsVersBdd(
+                arrayFinalToCharge,
+                currentDraftKeyforge[0].id
+            );
+
+            if (result) {
                 try {
-                    const cartePoolPulled = await pullCurrentDraftPoolCards(currentDraftKeyforge[0].ID);
-                    
-                    if (cartePoolPulled.length > 0) {
+                    const cartePoolPulled = await callApiFetch(
+                        `/api/keyforge/draft/${encodeURIComponent(currentDraftKeyforge[0].id)}/pool`,
+                        'Erreur lors de la récupération du pool de cartes KeyForge'
+                    );
+
+                    if (cartePoolPulled && cartePoolPulled.length > 0) {
                         setPoolCartesGlobal(cartePoolPulled);
                     }
                 }
                 catch (error) {
-                    console.error("Erreur génération du pool de cartes:", error);
+                    console.error(
+                        "Erreur génération du pool de cartes:",
+                        error
+                    );
+
                     throw new Error(`Erreur HTTP ${error}`);
                 }
-
-                pullCurrentDraftPoolCards(currentDraftKeyforge[0].ID);
-            } 
+            }
             else {
                 return "erreur lors du chargement";
             }
+
             setIsLoading(false);
 
         } catch (error) {
@@ -150,7 +164,7 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
 
     const splitCardsByFaction = (arrayCartes, codeFaction) => {
         return arrayCartes
-            .filter(prev => prev.Faction === codeFaction)
+            .filter(prev => prev.faction === codeFaction)
             .map(card => ({ ...card }));
     }
 
@@ -164,7 +178,7 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
             securite++;
 
             // On filtre toutes les cartes encore disponibles
-            const poolCartes = poolCartesReady.filter(current => current.QteDispo > 0);
+            const poolCartes = poolCartesReady.filter(current => (current.qteDispo ?? 0) > 0);
 
             if (poolCartes.length === 0) break;
 
@@ -172,23 +186,27 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
             const carte = poolCartes[randomInt];
 
             // Si c'est une carte hors ensemble
-            if (!carte.Ensemble) {
-                carte.PlayerAorB = joueurAorB;
-                carte.QteDispo -= 1;
+            if (!carte.ensemble) {
+                carte.playerAorB = joueurAorB;
+                carte.qteDispo = (carte.qteDispo ?? 0) - 1;
                 arrayFinal.push(carte);
             } 
             // Sinon c'est une carte d'ensemble
             else {
-                const currentEnsemble = carte.Ensemble;
+                const currentEnsemble = carte.ensemble;
 
                 // Récupération de toutes les cartes de cet ensemble
-                const cartesEnsemble = poolCartesReady.filter(current => current.Ensemble === currentEnsemble && current.QteDispo > 0);
+                const cartesEnsemble = poolCartesReady.filter(
+                    c =>
+                        c.ensemble === currentEnsemble &&
+                        (c.qteDispo ?? 0) > 0
+                );
 
                 // On vérifie qu'il reste assez de slots pour tout l'ensemble
                 if (arrayFinal.length + cartesEnsemble.length <= 36) {
                     cartesEnsemble.forEach(current => {
-                        current.PlayerAorB = joueurAorB;
-                        current.QteDispo -= 1;
+                        current.playerAorB = joueurAorB;
+                        current.qteDispo = (current.qteDispo ?? 0) - 1;
                         arrayFinal.push(current);
                     });
                 }
@@ -216,27 +234,27 @@ const creationPoolCartes = async (currentDraftKeyforge, setIsLoading, setPoolCar
                 if (arrayFinal[j].length >= 36) continue; // joueur déjà rempli
 
                 // on filtre les cartes encore disponibles
-                const poolCartes = poolCartesReady.filter(current => current.QteDispo > 0);
+                const poolCartes = poolCartesReady.filter(current => (current.qteDispo ?? 0) > 0);
 
                 if (poolCartes.length === 0) break;
 
                 const randomInt = getRandomUniqueNumbers(1, poolCartes.length - 1)[0];
                 const carte = poolCartes[randomInt];
 
-                if (!carte.Ensemble) {
+                if (!carte.ensemble) {
                     // carte hors ensemble
-                    carte.PlayerAorB = j;
-                    carte.QteDispo -= 1;
+                    carte.playerAorB = j;
+                    carte.qteDispo = (carte.qteDispo ?? 0) - 1;
                     arrayFinal[j].push(carte);
                 } else {
                     // carte d'ensemble
-                    const currentEnsemble = carte.Ensemble;
-                    const cartesEnsemble = poolCartesReady.filter(c => c.Ensemble === currentEnsemble && c.QteDispo > 0);
+                    const currentEnsemble = carte.ensemble;
+                    const cartesEnsemble = poolCartesReady.filter(c => c.ensemble === currentEnsemble && c.qteDispo > 0);
 
                     if (arrayFinal[j].length + cartesEnsemble.length <= 36) {
                         cartesEnsemble.forEach(current => {
-                            current.PlayerAorB = j;
-                            current.QteDispo -= 1;
+                            current.playerAorB = j;
+                            current.qteDispo = (current.qteDispo ?? 0) - 1;
                             arrayFinal[j].push(current);
                         });
                     }

@@ -75,3 +75,36 @@ export interface KeyforgeFaction {
     Picked?: boolean;
     Banned?: boolean;
 }
+
+export interface KeyforgePoolCarte {
+    idDraftSession: string;
+    idCarte: string;
+
+    joueurAouB: string | null;
+    classement: number;
+
+    libelleCarte: string | null;
+    cheminImgCarte: string | null;
+
+    numero: number | null;
+    rarete: string | null;
+
+    aombre: number | null;
+    puissance: number | null;
+    armure: number | null;
+
+    libelleType: string | null;
+
+    libelleFaction: string | null;
+    lienImgFaction: string | null;
+    idFaction: string;
+}
+
+
+export interface KeyforgeBaseCarte {
+    id: string;
+    qteDispo: number | null;
+    faction: string | null;
+    ensemble: string | null;
+    nbCartesDansEnsemble: number | null;
+}
