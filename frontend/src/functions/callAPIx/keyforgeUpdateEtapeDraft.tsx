@@ -1,25 +1,21 @@
-    const updateEtapeDraft = async (idCurrentDraft, numEtape) => {
-        const newValEtape = numEtape+1;
-        try {
-            const response = await fetch('/api/keyforge/updateEtapeDraft', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({parID: idCurrentDraft, parEtape: newValEtape})
-            });
+const updateEtapeDraft = async (
+    idCurrentDraft,
+    numEtape,
+    callApiFetch
+) => {
+    const newValEtape = numEtape + 1;
 
-            if (!response.ok) {
-                const text = await response.text();
-                console.error("Erreur backend :", text);
-                throw new Error("Erreur serveur");
-            }
-
-            return await response.json();
-
-        } catch (error) {
-            console.error("Erreur :", error);
+    return await callApiFetch(
+        `/api/keyforge/draft/${encodeURIComponent(idCurrentDraft)}/etape`,
+        "Erreur lors de la mise à jour de l'étape du draft KeyForge",
+        undefined,
+        {
+            method: "POST",
+            body: JSON.stringify({
+                etape: newValEtape
+            })
         }
-    };
+    );
+};
 
-    export default updateEtapeDraft;
+export default updateEtapeDraft;

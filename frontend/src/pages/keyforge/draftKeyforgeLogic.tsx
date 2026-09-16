@@ -3,7 +3,7 @@ export const hasCardsForFaction = (pool, faction, joueur) => {
 
     return pool.some(
         card =>
-            card.IDFaction === faction &&
-            card.JoueurAouB == joueur
+            card.idFaction === faction &&
+            card.joueurAouB == joueur
     );
 };

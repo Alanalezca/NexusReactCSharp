@@ -1,23 +1,20 @@
-   
-    const updateFocusSurJoueurAouB = async (idCurrentDraft, indiceJoueurAouB) => {
-        console.log('test');
-        const response = await fetch('/api/keyforge/updateFocusSurJoueurAouB', {
+const updateFocusSurJoueurAouB = async (
+    idCurrentDraft,
+    indiceJoueurAouB,
+    callApiFetch
+) => {
+
+    return await callApiFetch(
+        `/api/keyforge/draft/${encodeURIComponent(idCurrentDraft)}/focus-joueur`,
+        "Erreur lors de la mise à jour du joueur actif KeyForge",
+        undefined,
+        {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
             body: JSON.stringify({
-                parID: idCurrentDraft,
-                parJoueurAorB: indiceJoueurAouB
+                joueurAouB: indiceJoueurAouB
             })
-        });
-
-        if (!response.ok) {
-            const text = await response.text();
-            throw new Error(text || "Erreur serveur");
         }
+    );
+};
 
-        return response.json();
-    };
-
-    export default updateFocusSurJoueurAouB;
+export default updateFocusSurJoueurAouB;

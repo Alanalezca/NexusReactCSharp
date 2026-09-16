@@ -10,8 +10,8 @@ const creationPoolCartes = async (
     callApiFetch
 ) => {
         try {
-
-            const response = await fetch(
+            
+            const data = await callApiFetch(
                 `/api/keyforge/base-pool?factions=${
                     currentDraftKeyforge?.[0]?.factionPickAJ1
                 },${
@@ -24,16 +24,13 @@ const creationPoolCartes = async (
                     currentDraftKeyforge?.[0]?.factionPickBJ2
                 },${
                     currentDraftKeyforge?.[0]?.factionPickCJ2
-                }`
+                }`,
+                "Erreur lors de la récupération du pool de cartes KeyForge"
             );
 
-
-            if (!response.ok) {
-                const errText = await response.text();
-                throw new Error(`HTTP ${response.status} : ${errText}`);
+            if (!data) {
+                throw new Error("Impossible de récupérer le pool de cartes KeyForge");
             }
-
-            const data = await response.json();
 
             const poolCartesAJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickAJ1);
             const poolCartesBJ1 = splitCardsByFaction(data, currentDraftKeyforge?.[0]?.factionPickBJ1);
@@ -126,7 +123,8 @@ const creationPoolCartes = async (
 
             const result = await enregistrementPoolsVersBdd(
                 arrayFinalToCharge,
-                currentDraftKeyforge[0].id
+                currentDraftKeyforge[0].id,
+                callApiFetch
             );
 
             if (result) {

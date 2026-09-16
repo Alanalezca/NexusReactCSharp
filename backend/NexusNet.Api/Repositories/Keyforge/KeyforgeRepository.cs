@@ -24,6 +24,11 @@ public interface IKeyforgeRepository
     Task<bool> CreateDraftAsync(CreateKeyforgeDraftDto dto,int userId);
     Task<bool> DeleteDraftAsync(string idDraft, int userId);
     Task<bool> UpdateFactionsDraftAsync(UpdateKeyforgeFactionsDto dto, int userId);
+    Task<bool> CreatePoolCartesAsync(string idDraft, List<CreateKeyforgePoolCarteDto> cartes, int userId);
+
+    Task<bool> UpdateFocusJoueurAsync(string idDraft, int joueurAouB, int userId);
+
+    Task<bool> UpdateEtapeDraftAsync(string idDraft, int etape, int userId);
 }
 
 public class KeyforgeRepository : IKeyforgeRepository
@@ -483,7 +488,109 @@ public class KeyforgeRepository : IKeyforgeRepository
         return rowsAffected > 0;
     }
 
-    
+    public async Task<bool> CreatePoolCartesAsync(
+    string idDraft,
+    List<CreateKeyforgePoolCarteDto> cartes,
+    int userId)
+    {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            // Vérifie que le draft existe et appartient à l'utilisateur
+            var draftExists = await _context.Database
+                .SqlQueryRaw<int>(@"
+                    SELECT 1 AS ""Value""
+                    FROM tab_keyforge_draftsessions
+                    WHERE ""ID"" = {0}
+                    AND ""CreePar"" = {1}
+                ",
+                idDraft,
+                userId)
+                .AnyAsync();
+
+            if (!draftExists)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            // Enregistrement des cartes du pool
+            for (var i = 0; i < cartes.Count; i++)
+            {
+                var carte = cartes[i];
+
+                await _context.Database.ExecuteSqlRawAsync(@"
+                    INSERT INTO tab_affectations_keyforge_draftpool_cartes
+                    (
+                        ""IDDraftSession"",
+                        ""IDCarte"",
+                        ""JoueurAouB"",
+                        ""Classement""
+                    )
+                    VALUES
+                    (
+                        {0},
+                        {1},
+                        {2},
+                        {3}
+                    );
+                ",
+                    idDraft,
+                    carte.IDCarte,
+                    carte.JoueurAouB,
+                    i
+                );
+            }
+
+            await transaction.CommitAsync();
+
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    public async Task<bool> UpdateFocusJoueurAsync(
+    string idDraft,
+    int joueurAouB,
+    int userId)
+    {
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
+            UPDATE tab_keyforge_draftsessions
+            SET ""DraftEnCoursPourJoueurAouB"" = {0}
+            WHERE ""ID"" = {1}
+            AND ""CreePar"" = {2};
+        ",
+            joueurAouB,
+            idDraft,
+            userId
+        );
+
+        return rowsAffected > 0;
+    }
+
+    public async Task<bool> UpdateEtapeDraftAsync(
+    string idDraft,
+    int etape,
+    int userId)
+    {
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
+            UPDATE tab_keyforge_draftsessions
+            SET ""Etat"" = {0}
+            WHERE ""ID"" = {1}
+            AND ""CreePar"" = {2};
+        ",
+            etape,
+            idDraft,
+            userId
+        );
+
+        return rowsAffected > 0;
+    }
 }
 
 

@@ -45,6 +45,24 @@ public interface IKeyforgeService
         UpdateKeyforgeFactionsDto dto,
         int userId
     );
+
+    Task<bool> CreatePoolCartesAsync(
+        string idDraft,
+        List<CreateKeyforgePoolCarteDto> cartes,
+        int userId
+    );
+
+    Task<bool> UpdateFocusJoueurAsync(
+        string idDraft,
+        int joueurAouB,
+        int userId
+    );
+
+    Task<bool> UpdateEtapeDraftAsync(
+        string idDraft,
+        int etape,
+        int userId
+    );
 }
 
 public class KeyforgeService : IKeyforgeService
@@ -122,4 +140,41 @@ public class KeyforgeService : IKeyforgeService
             userId
         );
     }
+
+    public async Task<bool> CreatePoolCartesAsync(
+        string idDraft,
+        List<CreateKeyforgePoolCarteDto> cartes,
+        int userId)
+    {
+        return await _keyforgeRepository.CreatePoolCartesAsync(
+            idDraft,
+            cartes,
+            userId
+        );
+    }
+
+    public async Task<bool> UpdateFocusJoueurAsync(
+    string idDraft,
+    int joueurAouB,
+    int userId)
+    {
+        return await _keyforgeRepository.UpdateFocusJoueurAsync(
+            idDraft,
+            joueurAouB,
+            userId
+        );
+    }
+
+    public async Task<bool> UpdateEtapeDraftAsync(
+    string idDraft,
+    int etape,
+    int userId)
+    {
+        return await _keyforgeRepository.UpdateEtapeDraftAsync(
+            idDraft,
+            etape,
+            userId
+        );
+    }
+    
 }

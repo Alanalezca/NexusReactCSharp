@@ -1,25 +1,23 @@
-const enregistrementPoolsVersBdd = async (payload, idDraft) => {
+const enregistrementPoolsVersBdd = async (
+    payload,
+    idDraft,
+    callApiFetch
+) => {
 
-        try {
-            const response = await fetch('/api/keyforge/enregistrementPoolsCartes', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({payload: payload, idDraft: idDraft})
-            });
+    const cartes = payload.map(carte => ({
+        idCarte: carte.id,
+        joueurAouB: carte.playerAorB
+    }));
 
-            if (!response.ok) {
-                const text = await response.text();
-                console.error("Erreur backend :", text);
-                throw new Error("Erreur serveur");
-            }
-
-            return await response.json();
-
-        } catch (error) {
-            console.error("Erreur :", error);
+    return await callApiFetch(
+        `/api/keyforge/draft/${encodeURIComponent(idDraft)}/pool`,
+        "Erreur lors de l'enregistrement du pool de cartes KeyForge",
+        undefined,
+        {
+            method: "POST",
+            body: JSON.stringify(cartes)
         }
-    };
+    );
+};
 
 export default enregistrementPoolsVersBdd;

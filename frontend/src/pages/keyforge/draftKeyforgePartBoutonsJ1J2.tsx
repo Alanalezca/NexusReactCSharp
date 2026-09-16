@@ -3,6 +3,7 @@ import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeCon
 import { Button } from 'react-bootstrap';
 import updateFocusSurJoueurAouB from '../../../src/functions/callAPIx/keyforgeUpdateFocusSurJoueurAouB';
 import updateEtapeDraft from '../../../src/functions/callAPIx/keyforgeUpdateEtapeDraft';
+import useApiFetch from "../../api/useApiFetch";
 
 
 const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermine, focusAouBforStats, setfocusAouBforStats}) => {
@@ -10,7 +11,7 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
         setDraftEnCoursParJoueurAouB, 
         draftEnCoursParJoueurAouB
     } = useKeyforgeContext();
-
+    const { callApiFetch } = useApiFetch();
     const styleBoutonJoueur = ({
         isDraftFinished,
         joueurFini,
@@ -46,8 +47,17 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
             if (joueurFini) return;
 
             try {
-                await updateFocusSurJoueurAouB(currentDraft.ID, joueurIndex);
-                await updateEtapeDraft(currentDraft.ID, 10);
+                await updateFocusSurJoueurAouB(
+                    currentDraft.id,
+                    joueurIndex,
+                    callApiFetch
+                );
+
+                await updateEtapeDraft(
+                    currentDraft.id,
+                    10,
+                    callApiFetch
+                );
 
                 setCurrentDraft(prev => [{
                     ...prev[0],
@@ -79,7 +89,7 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
                         className={`btn btn-primary 
                             ${styleBoutonJoueur({
                                 isDraftFinished: draftTermine,
-                                joueurFini: currentDraft.DraftJ1Finished,
+                                joueurFini: currentDraft.draftJ1Finished,
                                 focusGlobal: draftEnCoursParJoueurAouB,
                                 joueurIndex: 0,
                                 focusStats: focusAouBforStats
@@ -89,12 +99,12 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
                         onClick={() =>
                             handleClickBoutonJoueur({
                                 isDraftFinished: draftTermine,
-                                joueurFini: currentDraft.DraftJ1Finished,
+                                joueurFini: currentDraft.draftJ1Finished,
                                 joueurIndex: 0
                             })
                         }  
                     >
-                        {getButtonLabel(currentDraft?.PseudoJ1)}
+                        {getButtonLabel(currentDraft?.pseudoJ1)}
                     </Button>
                 </div>
                 <div className="col-6 mt-4 mb-4 d-flex justify-content-center">
@@ -102,7 +112,7 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
                         className={`btn btn-primary 
                             ${styleBoutonJoueur({
                                 isDraftFinished: draftTermine,
-                                joueurFini: currentDraft.DraftJ2Finished,
+                                joueurFini: currentDraft.draftJ2Finished,
                                 focusGlobal: draftEnCoursParJoueurAouB,
                                 joueurIndex: 1,
                                 focusStats: focusAouBforStats
@@ -112,12 +122,12 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
                         onClick={() =>
                             handleClickBoutonJoueur({
                                 isDraftFinished: draftTermine,
-                                joueurFini: currentDraft.DraftJ2Finished,
+                                joueurFini: currentDraft.draftJ2Finished,
                                 joueurIndex: 1
                             })
                         }
                     >
-                        {getButtonLabel(currentDraft?.PseudoJ2)}
+                        {getButtonLabel(currentDraft?.pseudoJ2)}
                     </Button>
                 </div>
             </div>

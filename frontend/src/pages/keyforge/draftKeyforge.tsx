@@ -1,4 +1,4 @@
-    import {useState, useMemo, useEffect} from 'react';
+    import { useState, useMemo, useEffect, useRef } from 'react';
     import styles from './draftKeyforge.module.css';
     import { useParams } from 'react-router-dom';
     import Loader from '../../components/others/Loader';
@@ -36,6 +36,7 @@
         const [factionsJA, setFactionsJA] = useState(null);
         const [factionsJB, setFactionsJB] = useState(null);
         const { callApiFetch } = useApiFetch();
+        const poolCreationStarted = useRef(false);
 
         const txtInstructionDraft = useMemo(() => {
             return recupKeyforgeTxtCurrentInstruction(etapeDraft, currentDraftKeyforge);
@@ -135,21 +136,28 @@
 
     // En fin de phase picks/bans de faction, génération et push bdd du pool de cartes
     useEffect(() => {
-    if (!currentDraftKeyforge?.[0]) return;
+        if (!currentDraftKeyforge?.[0]) return;
 
-    const draft = currentDraftKeyforge[0];
-    
-    const isReady =
-        draft.FactionPickAJ1 &&
-        draft.FactionPickBJ1 &&
-        draft.FactionPickCJ1 &&
-        draft.FactionPickAJ2 &&
-        draft.FactionPickBJ2 &&
-        draft.FactionPickCJ2 &&
-        etapeDraft === 9;
-    if (isReady) {
-        processCreationPoolCartes(currentDraftKeyforge, setIsLoading);
-    }
+        const draft = currentDraftKeyforge[0];
+
+        const isReady =
+            draft.factionPickAJ1 &&
+            draft.factionPickBJ1 &&
+            draft.factionPickCJ1 &&
+            draft.factionPickAJ2 &&
+            draft.factionPickBJ2 &&
+            draft.factionPickCJ2 &&
+            etapeDraft === 9;
+
+        if (isReady && !poolCreationStarted.current) {
+            poolCreationStarted.current = true;
+
+            processCreationPoolCartes(
+                currentDraftKeyforge,
+                setIsLoading
+            );
+        }
+
     }, [currentDraftKeyforge, etapeDraft]);
 
     // Creation du pool de cartes (en prévision de son upload en bdd + mise en state)

@@ -413,4 +413,173 @@ public class KeyforgeController : ControllerBase
             );
         }
     }
+
+    [Authorize]
+    [HttpPost("draft/{idDraft}/pool")]
+    public async Task<IActionResult> CreatePoolCartesPourDraft(
+        string idDraft,
+        [FromBody] List<CreateKeyforgePoolCarteDto> cartes)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(idDraft))
+            {
+                return BadRequest(
+                    new { message = "Identifiant du draft manquant" }
+                );
+            }
+
+            if (cartes == null || cartes.Count == 0)
+            {
+                return BadRequest(
+                    new { message = "Aucune carte à enregistrer" }
+                );
+            }
+
+            var userIdClaim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.CreatePoolCartesAsync(
+                idDraft,
+                cartes,
+                userId
+            );
+
+            if (!success)
+            {
+                return NotFound(
+                    new { message = "Draft introuvable ou non autorisé" }
+                );
+            }
+
+            return Ok(
+                new { message = "Pool de cartes créé avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la création du pool KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
+
+    // ============================================================
+    // MISE À JOUR DU JOUEUR ACTIF DU DRAFT
+    // ============================================================
+
+    [Authorize]
+    [HttpPost("draft/{idDraft}/focus-joueur")]
+    public async Task<IActionResult> UpdateFocusJoueur(
+        string idDraft,
+        [FromBody] UpdateKeyforgeFocusJoueurDto dto)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.UpdateFocusJoueurAsync(
+                idDraft,
+                dto.JoueurAouB,
+                userId
+            );
+
+            if (!success)
+            {
+                return NotFound(
+                    new { message = "Draft introuvable ou non autorisé" }
+                );
+            }
+
+            return Ok(
+                new { message = "Joueur actif mis à jour avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la mise à jour du joueur actif KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
+
+    // ============================================================
+    // MISE À JOUR DE L'ÉTAPE DU DRAFT
+    // ============================================================
+
+    [Authorize]
+    [HttpPost("draft/{idDraft}/etape")]
+    public async Task<IActionResult> UpdateEtapeDraft(
+        string idDraft,
+        [FromBody] UpdateKeyforgeEtapeDto dto)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.UpdateEtapeDraftAsync(
+                idDraft,
+                dto.Etape,
+                userId
+            );
+
+            if (!success)
+            {
+                return NotFound(
+                    new { message = "Draft introuvable ou non autorisé" }
+                );
+            }
+
+            return Ok(
+                new { message = "Étape du draft mise à jour avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la mise à jour de l'étape du draft KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
 }

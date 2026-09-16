@@ -9,7 +9,7 @@
 
     const DraftKeyforgePartCardsSelection = ({currentDraftKeyforge, setCurrentDraftKeyforge, draftEnCoursParJoueurAouB, setdraftEnCoursParJoueurAouB, draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC, setEtapeDraft}) => {
         const indiceFactionJoueurCourant = `${draftEnCoursSurFactionAouBouC}J${draftEnCoursParJoueurAouB + 1}`;
-        const factionCourante = currentDraftKeyforge?.[0]?.[`FactionPick${indiceFactionJoueurCourant}`];
+        const factionCourante = currentDraftKeyforge?.[0]?.[`factionPick${indiceFactionJoueurCourant}`];
         const { poolCartesGlobal, setPoolCartesGlobal } = useKeyforgeContext();
         const { cartesValidees, setCartesValidees } = useKeyforgeContext();
         const [indexCarte, setIndexCarte] = useState(0);
@@ -20,8 +20,8 @@
 
             return poolCartesGlobal.filter(
                 current =>
-                    current.IDFaction === factionCourante &&
-                    current.JoueurAouB == draftEnCoursParJoueurAouB
+                    current.idFaction === factionCourante &&
+                    current.joueurAouB == draftEnCoursParJoueurAouB
             );
         }, [factionCourante, draftEnCoursParJoueurAouB, poolCartesGlobal]);
 
@@ -32,9 +32,9 @@
 
             return cartesValidees.filter(
                 current =>
-                    current.Rarete === "Légendaire" &&
-                    current.IDFaction === factionCourante
-                    && current.JoueurAouB == draftEnCoursParJoueurAouB
+                    current.rarete === "Légendaire" &&
+                    current.idFaction === factionCourante
+                    && current.joueurAouB == draftEnCoursParJoueurAouB
             ).length;
         }, [factionCourante, draftEnCoursParJoueurAouB, cartesValidees]);
 
@@ -43,8 +43,8 @@
 
             return cartesValidees.filter(
                 current =>
-                    current.IDFaction === factionCourante &&
-                    current.JoueurAouB == draftEnCoursParJoueurAouB
+                    current.idFaction === factionCourante &&
+                    current.joueurAouB == draftEnCoursParJoueurAouB
             ).length;
         }, [factionCourante, draftEnCoursParJoueurAouB, cartesValidees]);
 
@@ -56,7 +56,7 @@
         const retraitCartesTraitees = (indiceJoueur, indiceFaction) => {
 
             const poolCartesEpure = poolCartesGlobal?.filter(
-                card => !(card.IDFaction === indiceFaction && card.JoueurAouB == indiceJoueur)
+                card => !(card.idFaction === indiceFaction && card.joueurAouB == indiceJoueur)
             );
 
             setPoolCartesGlobal(poolCartesEpure);
@@ -66,14 +66,14 @@
             if (!poolCartesGlobal) return null;
 
             const draft = currentDraftKeyforge[0];
-
+            console.log('draft', poolCartesGlobal, draft.factionPickAJ1);
             return {
-                AJ1: hasCardsForFaction(poolCartesGlobal, draft.FactionPickAJ1, 0),
-                BJ1: hasCardsForFaction(poolCartesGlobal, draft.FactionPickBJ1, 0),
-                CJ1: hasCardsForFaction(poolCartesGlobal, draft.FactionPickCJ1, 0),
-                AJ2: hasCardsForFaction(poolCartesGlobal, draft.FactionPickAJ2, 1),
-                BJ2: hasCardsForFaction(poolCartesGlobal, draft.FactionPickBJ2, 1),
-                CJ2: hasCardsForFaction(poolCartesGlobal, draft.FactionPickCJ2, 1)
+                AJ1: hasCardsForFaction(poolCartesGlobal, draft.factionPickAJ1, 0),
+                BJ1: hasCardsForFaction(poolCartesGlobal, draft.factionPickBJ1, 0),
+                CJ1: hasCardsForFaction(poolCartesGlobal, draft.factionPickCJ1, 0),
+                AJ2: hasCardsForFaction(poolCartesGlobal, draft.factionPickAJ2, 1),
+                BJ2: hasCardsForFaction(poolCartesGlobal, draft.factionPickBJ2, 1),
+                CJ2: hasCardsForFaction(poolCartesGlobal, draft.factionPickCJ2, 1)
             };
         }, [poolCartesGlobal]);
 
@@ -102,12 +102,12 @@
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
-                            parIDDraft: carte.IDDraftSession,
-                            parIDCard: carte.IDCarte,
-                            parJAorB: carte.JoueurAouB,
-                            Classement: trinomeCards[0].Classement,
-                            ClassementCardToDeleteA: trinomeCards[1].Classement,
-                            ClassementCardToDeleteB: trinomeCards[2].Classement,
+                            parIDDraft: carte.idDraftSession,
+                            parIDCard: carte.idCarte,
+                            parJAorB: carte.joueurAouB,
+                            Classement: trinomeCards[0].classement,
+                            ClassementCardToDeleteA: trinomeCards[1].classement,
+                            ClassementCardToDeleteB: trinomeCards[2].classement,
                             reinitFocusFactionDuDraft: isLastPickForCurrentFaction,
                             reinitFocusJoueurDuDraft: isLastPickForCurrentPlayer,
                             draftJ1Finished: draftJ1AlreadyFinished === true ? true : draftEnCoursParJoueurAouB === 0 && closeDraftCurrentPlayer,
@@ -127,14 +127,14 @@
                         setDraftEnCoursSurFactionAouBouC(null);
                         if(isLastPickForCurrentPlayer) {
                             setdraftEnCoursParJoueurAouB(null);
-                            setCurrentDraftKeyforge(prev => [{...prev[0], [`DraftJ${draftEnCoursParJoueurAouB + 1}Finished`] : true}]);
+                            setCurrentDraftKeyforge(prev => [{...prev[0], [`draftJ${draftEnCoursParJoueurAouB + 1}Finished`] : true}]);
                         }
                         retraitCartesTraitees(draftEnCoursParJoueurAouB, factionCourante);
                     }
                     setCartesValidees(prev => [...prev, carte]);
                     
                     if(updateEtapeSiDraftJ1J2Finished === 12) {
-                        setCurrentDraftKeyforge(prev => [{...prev[0], Etat: 12}]);
+                        setCurrentDraftKeyforge(prev => [{...prev[0], etat: 12}]);
                         setEtapeDraft(updateEtapeSiDraftJ1J2Finished);
                     }
 
@@ -178,35 +178,35 @@
                         justify-content-center"
                         >
                             {currentDraftKeyforge.map((current, index) => (
-                                <p key={current.ID}>
-                                    <img src={draftEnCoursParJoueurAouB === 1 ? current.LienImgAJ2 : current.LienImgAJ1} 
+                                <p key={current.id}>
+                                    <img src={draftEnCoursParJoueurAouB === 1 ? current.lienImgAJ2 : current.lienImgAJ1} 
                                         alt="Logo de la faction A" 
                                         className={`borderRadius6 ${styles.logoFactionBig} ${draftEnCoursSurFactionAouBouC === "A" && "backgroundAnimFocus"} ${factionsDraftHasCardsOrNot?.[`AJ${draftEnCoursParJoueurAouB +1}`] === false  ? "backgroundGreen" : "backgroundAnimSurvol"}`} 
                                         onClick={() => {
                                             if(!draftEnCoursSurFactionAouBouC && factionsDraftHasCardsOrNot?.[`AJ${draftEnCoursParJoueurAouB +1}`] === true) 
                                                 {setDraftEnCoursSurFactionAouBouC("A"); 
-                                                    updateFocusSurFactionAouBouC(current.ID, "A"); 
-                                                    setCurrentDraftKeyforge(prev => [{...prev[0], DraftEnCoursSurFactionAouBouC: "A"}]);
+                                                    updateFocusSurFactionAouBouC(current.id, "A"); 
+                                                    setCurrentDraftKeyforge(prev => [{...prev[0], draftEnCoursSurFactionAouBouC: "A"}]);
                                             }}}>
                                     </img>
-                                    <img src={draftEnCoursParJoueurAouB === 1 ? current.LienImgBJ2 : current.LienImgBJ1} 
+                                    <img src={draftEnCoursParJoueurAouB === 1 ? current.lienImgBJ2 : current.lienImgBJ1} 
                                         alt="Logo de la faction B" 
                                         className={`borderRadius6 ms-4 ${styles.logoFactionBig} ${draftEnCoursSurFactionAouBouC === "B" && "backgroundAnimFocus"} ${factionsDraftHasCardsOrNot?.[`BJ${draftEnCoursParJoueurAouB +1}`] === false  ? "backgroundGreen" : "backgroundAnimSurvol"}`}  
                                         onClick={() => {
                                             if(!draftEnCoursSurFactionAouBouC && factionsDraftHasCardsOrNot?.[`BJ${draftEnCoursParJoueurAouB +1}`] === true) 
                                                 {setDraftEnCoursSurFactionAouBouC("B"); 
-                                                    updateFocusSurFactionAouBouC(current.ID, "B"); 
-                                                    setCurrentDraftKeyforge(prev => [{...prev[0], DraftEnCoursSurFactionAouBouC: "B"}]);
+                                                    updateFocusSurFactionAouBouC(current.id, "B"); 
+                                                    setCurrentDraftKeyforge(prev => [{...prev[0], draftEnCoursSurFactionAouBouC: "B"}]);
                                             }}}>
                                     </img>
-                                    <img src={draftEnCoursParJoueurAouB === 1 ? current.LienImgCJ2 : current.LienImgCJ1} 
+                                    <img src={draftEnCoursParJoueurAouB === 1 ? current.lienImgCJ2 : current.lienImgCJ1} 
                                         alt="Logo de la faction C" 
                                         className={`borderRadius6 ms-4 ${styles.logoFactionBig} ${draftEnCoursSurFactionAouBouC === "C" && "backgroundAnimFocus"} ${factionsDraftHasCardsOrNot?.[`CJ${draftEnCoursParJoueurAouB +1}`] === false  ? "backgroundGreen" : "backgroundAnimSurvol"}`}  
                                         onClick={() => {
                                         if(!draftEnCoursSurFactionAouBouC && factionsDraftHasCardsOrNot?.[`CJ${draftEnCoursParJoueurAouB +1}`] === true) 
                                             {setDraftEnCoursSurFactionAouBouC("C"); 
-                                                updateFocusSurFactionAouBouC(current.ID, "C"); 
-                                                setCurrentDraftKeyforge(prev => [{...prev[0], DraftEnCoursSurFactionAouBouC: "C"}]);
+                                                updateFocusSurFactionAouBouC(current.id, "C"); 
+                                                setCurrentDraftKeyforge(prev => [{...prev[0], draftEnCoursSurFactionAouBouC: "C"}]);
                                         }}}>
                                     </img>
                                 </p>
@@ -227,11 +227,11 @@
                     }
                     <div className="row">    
                         {poolCartesGlobalWithFilters?.slice(indexCarte, indexCarte + 3)?.map((current, index) => (
-                            <div className={`col-4 d-flex justify-content-center`} key={current.IDCarte + current.Classement}>
+                            <div className={`col-4 d-flex justify-content-center`} key={current.idCarte + current.classement}>
                                 <TCGCard 
-                                nomCarte={current.NomCarte} 
-                                imageCarte={current.CheminImgCarte} 
-                                rareteCarte={current.Rarete} 
+                                nomCarte={current.nomCarte} 
+                                imageCarte={current.cheminImgCarte} 
+                                rareteCarte={current.rarete} 
                                 handleClicValiderCarte={() => {!loaderCardisPicking && handleClicValiderCard(currentTrinomeCards, current)}} 
                                 isLoading={loaderCardisPicking}/>
                             </div>
