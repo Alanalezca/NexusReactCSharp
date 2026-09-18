@@ -6,6 +6,8 @@
     import updateEtapeDraft from '../../functions/callAPIx/keyforgeUpdateEtapeDraft';
     import { hasCardsForFaction } from '../keyforge/draftKeyforgeLogic.js';
     import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeContext';
+    import useApiFetch from "../../api/useApiFetch";
+
 
     const DraftKeyforgePartCardsSelection = ({currentDraftKeyforge, setCurrentDraftKeyforge, draftEnCoursParJoueurAouB, setdraftEnCoursParJoueurAouB, draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC, setEtapeDraft}) => {
         const indiceFactionJoueurCourant = `${draftEnCoursSurFactionAouBouC}J${draftEnCoursParJoueurAouB + 1}`;
@@ -14,6 +16,7 @@
         const { cartesValidees, setCartesValidees } = useKeyforgeContext();
         const [indexCarte, setIndexCarte] = useState(0);
         const [loaderCardisPicking, setLoaderCardIsPicking] = useState(false);
+        const { callApiFetch } = useApiFetch();
 
         const poolCartesGlobalWithFilters = useMemo(() => {
             if (!poolCartesGlobal) return [];
@@ -185,7 +188,7 @@
                                         onClick={() => {
                                             if(!draftEnCoursSurFactionAouBouC && factionsDraftHasCardsOrNot?.[`AJ${draftEnCoursParJoueurAouB +1}`] === true) 
                                                 {setDraftEnCoursSurFactionAouBouC("A"); 
-                                                    updateFocusSurFactionAouBouC(current.id, "A"); 
+                                                    updateFocusSurFactionAouBouC(current.id, "A", callApiFetch); 
                                                     setCurrentDraftKeyforge(prev => [{...prev[0], draftEnCoursSurFactionAouBouC: "A"}]);
                                             }}}>
                                     </img>
@@ -195,7 +198,7 @@
                                         onClick={() => {
                                             if(!draftEnCoursSurFactionAouBouC && factionsDraftHasCardsOrNot?.[`BJ${draftEnCoursParJoueurAouB +1}`] === true) 
                                                 {setDraftEnCoursSurFactionAouBouC("B"); 
-                                                    updateFocusSurFactionAouBouC(current.id, "B"); 
+                                                    updateFocusSurFactionAouBouC(current.id, "B", callApiFetch); 
                                                     setCurrentDraftKeyforge(prev => [{...prev[0], draftEnCoursSurFactionAouBouC: "B"}]);
                                             }}}>
                                     </img>
@@ -205,7 +208,7 @@
                                         onClick={() => {
                                         if(!draftEnCoursSurFactionAouBouC && factionsDraftHasCardsOrNot?.[`CJ${draftEnCoursParJoueurAouB +1}`] === true) 
                                             {setDraftEnCoursSurFactionAouBouC("C"); 
-                                                updateFocusSurFactionAouBouC(current.id, "C"); 
+                                                updateFocusSurFactionAouBouC(current.id, "C", callApiFetch); 
                                                 setCurrentDraftKeyforge(prev => [{...prev[0], draftEnCoursSurFactionAouBouC: "C"}]);
                                         }}}>
                                     </img>

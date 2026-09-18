@@ -63,6 +63,12 @@ public interface IKeyforgeService
         int etape,
         int userId
     );
+
+    Task<bool> UpdateFocusFactionAsync(
+        string idDraft,
+        string factionAouBouC,
+        int userId
+    );
 }
 
 public class KeyforgeService : IKeyforgeService
@@ -177,4 +183,15 @@ public class KeyforgeService : IKeyforgeService
         );
     }
     
+    public async Task<bool> UpdateFocusFactionAsync(
+        string idDraft,
+        string factionAouBouC,
+        int userId)
+    {
+        return await _keyforgeRepository.UpdateFocusFactionAsync(
+            idDraft,
+            factionAouBouC,
+            userId
+        );
+    }
 }

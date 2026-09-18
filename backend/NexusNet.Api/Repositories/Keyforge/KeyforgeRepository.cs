@@ -29,6 +29,8 @@ public interface IKeyforgeRepository
     Task<bool> UpdateFocusJoueurAsync(string idDraft, int joueurAouB, int userId);
 
     Task<bool> UpdateEtapeDraftAsync(string idDraft, int etape, int userId);
+
+    Task<bool> UpdateFocusFactionAsync(string idDraft, string factionAouBouC, int userId);
 }
 
 public class KeyforgeRepository : IKeyforgeRepository
@@ -585,6 +587,25 @@ public class KeyforgeRepository : IKeyforgeRepository
             AND ""CreePar"" = {2};
         ",
             etape,
+            idDraft,
+            userId
+        );
+
+        return rowsAffected > 0;
+    }
+
+    public async Task<bool> UpdateFocusFactionAsync(
+    string idDraft,
+    string factionAouBouC,
+    int userId)
+    {
+        var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
+            UPDATE tab_keyforge_draftsessions
+            SET ""DraftEnCoursSurFactionAouBouC"" = {0}
+            WHERE ""ID"" = {1}
+            AND ""CreePar"" = {2};
+        ",
+            factionAouBouC,
             idDraft,
             userId
         );

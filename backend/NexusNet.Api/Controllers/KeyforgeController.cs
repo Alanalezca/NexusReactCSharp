@@ -582,4 +582,57 @@ public class KeyforgeController : ControllerBase
             );
         }
     }
+
+    // ============================================================
+    // MISE À JOUR DE LA FACTION ACTIVE DU DRAFT
+    // ============================================================
+
+    [Authorize]
+    [HttpPost("draft/{idDraft}/focus-faction")]
+    public async Task<IActionResult> UpdateFocusFaction(
+        string idDraft,
+        [FromBody] UpdateKeyforgeFocusFactionDto dto)
+    {
+        try
+        {
+            var userIdClaim = User.FindFirstValue(
+                ClaimTypes.NameIdentifier
+            );
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success = await _keyforgeService.UpdateFocusFactionAsync(
+                idDraft,
+                dto.FactionAouBouC,
+                userId
+            );
+
+            if (!success)
+            {
+                return NotFound(
+                    new { message = "Draft introuvable ou non autorisé" }
+                );
+            }
+
+            return Ok(
+                new { message = "Faction active mise à jour avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la mise à jour de la faction active KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
 }
