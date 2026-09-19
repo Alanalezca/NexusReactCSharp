@@ -635,4 +635,70 @@ public class KeyforgeController : ControllerBase
             );
         }
     }
+
+    // ============================================================
+    // VALIDATION DE LA CARTE SELECTIONNEE
+    // ============================================================
+    [Authorize]
+    [HttpPost("draft/{idDraft}/carte-validee")]
+    public async Task<IActionResult> EnregistrerCarteValidee(
+        string idDraft,
+        [FromBody] CreateKeyforgeCarteValideeDto dto)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(idDraft))
+            {
+                return BadRequest(
+                    new { message = "Identifiant du draft manquant" }
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.IDCarte))
+            {
+                return BadRequest(
+                    new { message = "Identifiant de la carte manquant" }
+                );
+            }
+
+            var userIdClaim =
+                User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(
+                    new { message = "Utilisateur non authentifié" }
+                );
+            }
+
+            var success =
+                await _keyforgeService.EnregistrerCarteValideeAsync(
+                    idDraft,
+                    dto,
+                    userId
+                );
+
+            if (!success)
+            {
+                return NotFound(
+                    new { message = "Draft introuvable ou non autorisé" }
+                );
+            }
+
+            return Ok(
+                new { message = "Carte validée avec succès" }
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur validation carte KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
 }

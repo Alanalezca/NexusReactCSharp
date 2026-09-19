@@ -79,7 +79,7 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
     const getButtonLabel = (pseudo) => {
         return !draftTermine
             ? `Commencer le draft de ${pseudo}`
-            : `Voir les statistiques de ${pseudo}`;
+            : `Liste des cartes de ${pseudo}`;
     };
 
     return (

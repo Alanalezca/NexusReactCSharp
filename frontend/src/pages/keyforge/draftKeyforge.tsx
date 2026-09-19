@@ -6,6 +6,7 @@
     import creationPoolCartes from '../../functions/keyforge/creationPoolCartes';
     import recupKeyforgeTxtCurrentInstruction from '../../functions/keyforge/recupKeyforgeTxtCurrentInstruction';
     import DraftKeyforgePartCardsSelection from './draftKeyforgePartCardsSelection';
+    import DraftKeyforgePartVueListeCartesValidees from './draftKeyforgePartVueListeCartesValidees';
     import DraftKeyforgeResume from '../../pages/keyforge/draftKeyforgeResume';
     import { useKeyforgeContext } from '../../components/contexts/keyforgeContext';
     import { useSessionUserContext } from '../../components/contexts/sessionUserContext';
@@ -303,7 +304,21 @@
                         />
                     </div>
                 }
-            </div>
+                {/* Liste de cartes déjà validées */}
+                {phaseDeDraftParTrinomeEnCours(currentDraftKeyforge, draftEnCoursParJoueurAouB, etapeDraft) && 
+                    <div className={`${styles.EnteteDraft} mb-5`}>
+                        <DraftKeyforgePartVueListeCartesValidees
+                            currentDraftKeyforge={currentDraftKeyforge} 
+                            setCurrentDraftKeyforge={setCurrentDraftKeyforge} 
+                            draftEnCoursParJoueurAouB={draftEnCoursParJoueurAouB} 
+                            setdraftEnCoursParJoueurAouB={setDraftEnCoursParJoueurAouB} 
+                            draftEnCoursSurFactionAouBouC={draftEnCoursSurFactionAouBouC} 
+                            setDraftEnCoursSurFactionAouBouC={setDraftEnCoursSurFactionAouBouC}
+                            setEtapeDraft={setEtapeDraft}
+                        />
+                    </div>
+                }
+                </div>
             {/* Bandeau d instruction du pick/ban factions bottom */}
             {draftFactionsEnCours(etapeDraft)  &&
                 <div className={styles.bandeauInstructionDraft}>

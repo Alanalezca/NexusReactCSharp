@@ -54,11 +54,40 @@
   opacity: 1; /* visible quand loading */
 }
 
-/* image */
-.cardImage {
-  display: block;
+
+/* Image temporaire située sous la vraie carte */
+.cardPlaceholder {
+  position: absolute;
+  inset: 0;
+
   width: 100%;
+  height: 100%;
+
   object-fit: cover;
+}
+
+
+/* Véritable carte */
+.cardImage {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+
+
+/* L'image apparaît uniquement lorsqu'elle est chargée */
+.cardImageLoaded {
+  opacity: 1;
 }
 
 /* raretés */

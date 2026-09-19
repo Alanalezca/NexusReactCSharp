@@ -69,6 +69,12 @@ public interface IKeyforgeService
         string factionAouBouC,
         int userId
     );
+
+    Task<bool> EnregistrerCarteValideeAsync(
+        string idDraft,
+        CreateKeyforgeCarteValideeDto dto,
+        int userId
+    );
 }
 
 public class KeyforgeService : IKeyforgeService
@@ -191,6 +197,18 @@ public class KeyforgeService : IKeyforgeService
         return await _keyforgeRepository.UpdateFocusFactionAsync(
             idDraft,
             factionAouBouC,
+            userId
+        );
+    }
+
+    public async Task<bool> EnregistrerCarteValideeAsync(
+        string idDraft,
+        CreateKeyforgeCarteValideeDto dto,
+        int userId)
+    {
+        return await _keyforgeRepository.EnregistrerCarteValideeAsync(
+            idDraft,
+            dto,
             userId
         );
     }

@@ -69,7 +69,7 @@
             if (!poolCartesGlobal) return null;
 
             const draft = currentDraftKeyforge[0];
-            console.log('draft', poolCartesGlobal, draft.factionPickAJ1);
+
             return {
                 AJ1: hasCardsForFaction(poolCartesGlobal, draft.factionPickAJ1, 0),
                 BJ1: hasCardsForFaction(poolCartesGlobal, draft.factionPickBJ1, 0),
@@ -99,62 +99,84 @@
             setLoaderCardIsPicking(true);
 
             try {
-                const res = await fetch(`/api/keyforge/enregistrementCarteValidee`, {
+                const data = await callApiFetch(
+                    `/api/keyforge/draft/${encodeURIComponent(carte.idDraftSession)}/carte-validee`,
+                    "Erreur lors de la validation de la carte KeyForge",
+                    undefined,
+                    {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
                         body: JSON.stringify({
-                            parIDDraft: carte.idDraftSession,
-                            parIDCard: carte.idCarte,
-                            parJAorB: carte.joueurAouB,
-                            Classement: trinomeCards[0].classement,
-                            ClassementCardToDeleteA: trinomeCards[1].classement,
-                            ClassementCardToDeleteB: trinomeCards[2].classement,
+                            idCarte: carte.idCarte,
+                            joueurAouB: carte.joueurAouB,
+                            classement: trinomeCards[0].classement,
+                            classementCardToDeleteA: trinomeCards[1].classement,
+                            classementCardToDeleteB: trinomeCards[2].classement,
                             reinitFocusFactionDuDraft: isLastPickForCurrentFaction,
                             reinitFocusJoueurDuDraft: isLastPickForCurrentPlayer,
-                            draftJ1Finished: draftJ1AlreadyFinished === true ? true : draftEnCoursParJoueurAouB === 0 && closeDraftCurrentPlayer,
-                            draftJ2Finished: draftJ2AlreadyFinished === true ? true : draftEnCoursParJoueurAouB === 1 && closeDraftCurrentPlayer,
+
+                            draftJ1Finished:
+                                draftJ1AlreadyFinished === true
+                                    ? true
+                                    : draftEnCoursParJoueurAouB === 0 && closeDraftCurrentPlayer,
+
+                            draftJ2Finished:
+                                draftJ2AlreadyFinished === true
+                                    ? true
+                                    : draftEnCoursParJoueurAouB === 1 && closeDraftCurrentPlayer,
+
                             etape: updateEtapeSiDraftJ1J2Finished
-                        }),
-                    });
-
-                    if (!res.ok) {
-                        throw new Error(`Erreur HTTP: ${res.status}`);
+                        })
                     }
+                );
 
-                    if(indexCarte < (poolCartesGlobalWithFilters.length-3)) {
-                        setIndexCarte(prev => prev + 3);
-                    } else {
-                        setIndexCarte(0);
-                        setDraftEnCoursSurFactionAouBouC(null);
-                        if(isLastPickForCurrentPlayer) {
-                            setdraftEnCoursParJoueurAouB(null);
-                            setCurrentDraftKeyforge(prev => [{...prev[0], [`draftJ${draftEnCoursParJoueurAouB + 1}Finished`] : true}]);
-                        }
-                        retraitCartesTraitees(draftEnCoursParJoueurAouB, factionCourante);
-                    }
-                    setCartesValidees(prev => [...prev, carte]);
-                    
-                    if(updateEtapeSiDraftJ1J2Finished === 12) {
-                        setCurrentDraftKeyforge(prev => [{...prev[0], etat: 12}]);
-                        setEtapeDraft(updateEtapeSiDraftJ1J2Finished);
-                    }
-
-                    const data = await res.json();
-                    return data;
-
-                } catch (err) {
-                    console.error('Erreur chargement carte:', err);
+                if (!data) {
                     return null;
                 }
-                 finally {
-                    setLoaderCardIsPicking(false);
+
+                if (indexCarte < (poolCartesGlobalWithFilters.length - 3)) {
+                    setIndexCarte(prev => prev + 3);
+                } else {
+                    setIndexCarte(0);
+                    setDraftEnCoursSurFactionAouBouC(null);
+
+                    if (isLastPickForCurrentPlayer) {
+                        setdraftEnCoursParJoueurAouB(null);
+
+                        setCurrentDraftKeyforge(prev => [{
+                            ...prev[0],
+                            [`draftJ${draftEnCoursParJoueurAouB + 1}Finished`]: true
+                        }]);
+                    }
+
+                    retraitCartesTraitees(
+                        draftEnCoursParJoueurAouB,
+                        factionCourante
+                    );
                 }
+
+                setCartesValidees(prev => [
+                    ...prev,
+                    carte
+                ]);
+
+                if (updateEtapeSiDraftJ1J2Finished === 12) {
+                    setCurrentDraftKeyforge(prev => [{
+                        ...prev[0],
+                        etat: 12
+                    }]);
+
+                    setEtapeDraft(updateEtapeSiDraftJ1J2Finished);
+                }
+
+                return data;
+
+            } finally {
+                setLoaderCardIsPicking(false);
+            }
         }
 
         const currentTrinomeCards = poolCartesGlobalWithFilters?.slice(indexCarte, indexCarte + 3);
-        console.log('factionsDraftHasCardsOrNot', factionsDraftHasCardsOrNot, poolCartesGlobal);
+
         return (
                 <>
                     <div className="row mb-4">

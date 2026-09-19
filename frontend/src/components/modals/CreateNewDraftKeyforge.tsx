@@ -179,8 +179,8 @@ interface KeyforgeSet {
                 <div className="row">             
                     <div className="col-12 mt-3 d-flex justify-content-center">
                         <div className="mb-3 form-check">
-                            <input type="checkbox" className="form-check-input" id="checkAvecAnomalies" ref={(e) => {inputsRef.current["checkAvecAnomalies"] = e;}}></input>
-                            <label className="form-check-label txtColorWhite" htmlFor="checkAvecAnomalies">Inclure la possibilité d'anomalies</label>
+                            <input disabled type="checkbox" className="form-check-input" id="checkAvecAnomalies" ref={(e) => {inputsRef.current["checkAvecAnomalies"] = e;}}></input>
+                            <label className="form-check-label txtColorWhite" htmlFor="checkAvecAnomalies"><s>Inclure la possibilité d'anomalies</s></label>
                         </div>
                     </div>
                 </div>

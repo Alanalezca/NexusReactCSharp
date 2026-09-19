@@ -147,7 +147,7 @@ const DiceThroneDrafter = () => {
                     Selected: !prevBoite?.Selected}
                 : prevBoite,
             ));
-        //console.log(numWave);
+
         setListeSets(prevListeSets => 
             prevListeSets.map(prevSet =>
                 prevSet.Numero === numWave
@@ -481,7 +481,6 @@ const DiceThroneDrafter = () => {
     useEffect(() => {
         let nbHeros = 0;
         listeBoites?.map((currentBoite) => {
-            console.log('currentboite', currentBoite.Selected);
             currentBoite.Selected && (nbHeros += currentBoite.nbHeros);
         });
 
@@ -492,7 +491,6 @@ const DiceThroneDrafter = () => {
         } */
 
         setCompteurNbHerosSelonBoitesSelected(isNaN(nbHeros) ? 0 : nbHeros);
-        console.log('nbHeros', nbHeros);
     }, [listeBoites]) 
 
     const handleClickOnRollback = (idCurrentPlayer, codeHerosPickBanByPlayerToReinit, indiceHerosPickBanByPlayer, indiceHerosPickBanByPlayerImg) => {
@@ -533,11 +531,6 @@ const DiceThroneDrafter = () => {
         setTxtCurrentInstruction(lastHeroSaisiForRollback.lastTxtCurrentInstruction);
     }
 
-    //console.log('boites', listeBoites);
-    //console.log('heros', listeHeros);
-    console.log('etape', currentEtapeDraft);
-    console.log('listeSets', listeSets);
-    console.log('listeBoites', listeBoites);
     return (
         <>
             <div className="container-xl mt-3">

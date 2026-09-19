@@ -31,6 +31,7 @@ public interface IKeyforgeRepository
     Task<bool> UpdateEtapeDraftAsync(string idDraft, int etape, int userId);
 
     Task<bool> UpdateFocusFactionAsync(string idDraft, string factionAouBouC, int userId);
+    Task<bool> EnregistrerCarteValideeAsync(string idDraft, CreateKeyforgeCarteValideeDto dto, int userId);
 }
 
 public class KeyforgeRepository : IKeyforgeRepository
@@ -611,6 +612,154 @@ public class KeyforgeRepository : IKeyforgeRepository
         );
 
         return rowsAffected > 0;
+    }
+
+    public async Task<bool> EnregistrerCarteValideeAsync(
+        string idDraft,
+        CreateKeyforgeCarteValideeDto dto,
+        int userId)
+    {
+        await using var transaction =
+            await _context.Database.BeginTransactionAsync();
+
+        try
+        {
+            // ----------------------------------------------------
+            // Vérification que le draft existe
+            // ET appartient à l'utilisateur connecté
+            // ----------------------------------------------------
+
+            var draftExists = await _context.Database
+                .SqlQueryRaw<int>(@"
+                    SELECT 1 AS ""Value""
+                    FROM tab_keyforge_draftsessions
+                    WHERE ""ID"" = {0}
+                    AND ""CreePar"" = {1}
+                ",
+                    idDraft,
+                    userId
+                )
+                .AnyAsync();
+
+            if (!draftExists)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+
+            // ----------------------------------------------------
+            // Enregistrement de la carte choisie
+            // ----------------------------------------------------
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                INSERT INTO tab_affectations_keyforge_draftpool_cartes_validees
+                (
+                    ""IDDraftSession"",
+                    ""IDCarte"",
+                    ""JoueurAouB"",
+                    ""Classement""
+                )
+                VALUES
+                (
+                    {0},
+                    {1},
+                    {2},
+                    {3}
+                );
+            ",
+                idDraft,
+                dto.IDCarte,
+                dto.JoueurAouB,
+                dto.Classement
+            );
+
+
+            // ----------------------------------------------------
+            // Suppression des 3 cartes du trinôme
+            // ----------------------------------------------------
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                DELETE FROM tab_affectations_keyforge_draftpool_cartes
+                WHERE ""IDDraftSession"" = {0}
+                AND ""Classement"" IN ({1}, {2}, {3});
+            ",
+                idDraft,
+                dto.ClassementCardToDeleteA,
+                dto.ClassementCardToDeleteB,
+                dto.Classement
+            );
+
+
+            // ----------------------------------------------------
+            // Fin de la faction courante
+            // ----------------------------------------------------
+
+            if (dto.ReinitFocusFactionDuDraft)
+            {
+                await _context.Database.ExecuteSqlRawAsync(@"
+                    UPDATE tab_keyforge_draftsessions
+                    SET
+                        ""DraftEnCoursSurFactionAouBouC"" = NULL,
+                        ""DraftJ1Finished"" = {0},
+                        ""DraftJ2Finished"" = {1}
+                    WHERE ""ID"" = {2}
+                    AND ""CreePar"" = {3};
+                ",
+                    dto.DraftJ1Finished,
+                    dto.DraftJ2Finished,
+                    idDraft,
+                    userId
+                );
+            }
+
+
+            // ----------------------------------------------------
+            // Mise à jour éventuelle de l'étape
+            // ----------------------------------------------------
+
+            if (dto.Etape.HasValue)
+            {
+                await _context.Database.ExecuteSqlRawAsync(@"
+                    UPDATE tab_keyforge_draftsessions
+                    SET ""Etat"" = {0}
+                    WHERE ""ID"" = {1}
+                    AND ""CreePar"" = {2};
+                ",
+                    dto.Etape.Value,
+                    idDraft,
+                    userId
+                );
+            }
+
+
+            // ----------------------------------------------------
+            // Fin du joueur courant
+            // ----------------------------------------------------
+
+            if (dto.ReinitFocusJoueurDuDraft)
+            {
+                await _context.Database.ExecuteSqlRawAsync(@"
+                    UPDATE tab_keyforge_draftsessions
+                    SET ""DraftEnCoursPourJoueurAouB"" = NULL
+                    WHERE ""ID"" = {0}
+                    AND ""CreePar"" = {1};
+                ",
+                    idDraft,
+                    userId
+                );
+            }
+
+
+            await transaction.CommitAsync();
+
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }
 
