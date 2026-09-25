@@ -165,12 +165,35 @@ main {
 
   --txtColorPlayerYellow: #FDD835;
   --txtColorPlayerYellowRGB: rgba(253, 216, 53);
+
+  --colorRareteCommune: #B0B0B0;
+  --colorRareteCommuneRGB: rgba(176, 176, 176);
+  --colorRareteRare: #4F8CFF;
+  --colorRareteRareRGB: rgba(79, 140, 255);
+  --colorRareteLegendaire: #B45CFF;
+  --colorRareteLegendaireRGB: rgb(180, 92, 255);
 }
 
 .alignIconText {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.colorRareteCommune {
+  color: var(--colorRareteCommune);
+}
+
+.colorRareteRare {
+  color: var(--colorRareteRare);
+}
+
+.colorRareteLegendaire {
+  color: var(--colorRareteLegendaire);
+}
+
+.border2solidWhite {
+  border: 2px solid white;
 }
 
 .bxNormalOrangeWithoutHover {
