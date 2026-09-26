@@ -9,9 +9,11 @@ const TCGCardForList = ({
     lienImgFaction,
     couleurFactionCarte,
     libelleType,
-    quantite
+    quantite,
+    marquageCarte,
+    flagCarteMarquee
 }) => {
-
+    
     const [mousePosition, setMousePosition] = useState({
         x: 0,
         y: 0
@@ -32,12 +34,12 @@ const TCGCardForList = ({
                 return null;
         }
     };
-
+    console.log(flagCarteMarquee);
     return (
         <div className="col-12 mb-1 d-flex justify-content-center">
 
             <div
-                className={styles.capsuleResumeCard}
+                className={`${styles.capsuleResumeCard} ${flagCarteMarquee && styles.carteMarquee}`}
                 onMouseMove={(e) => {
                     setMousePosition({
                         x: e.clientX,
@@ -51,6 +53,8 @@ const TCGCardForList = ({
                         rgba(${couleurFactionCarte}, 0.65)
                     )`
                 }}
+
+                onClick={() => marquageCarte(numeroCarte)}
             >
 
                 <img

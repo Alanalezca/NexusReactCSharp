@@ -23,7 +23,29 @@
     color: white;
     cursor: default;
 
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease,
+        border-color 0.25s ease;
+}
+
+.capsuleResumeCard::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: 50px;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition: opacity 0.25s ease;
+}
+
+.carteMarquee::after {
+    opacity: 1;
 }
 
 
@@ -32,7 +54,7 @@
 =================================== */
 
 .capsuleResumeCard:hover {
-    border-color: rgba(255, 255, 255, 0.40);
+    border-color: var(--ColorA);
 }
 
 
@@ -235,4 +257,45 @@
 .capsuleResumeCard:hover .cardPreview {
     opacity: 1;
     visibility: visible;
+}
+
+/* ===================================
+   CARTE MARQUEE RECUPEREE
+=================================== */
+
+.carteMarquee {
+    border-color: rgba(100, 255, 140, 0.90);
+
+    cursor: pointer;
+}
+
+
+/* ===================================
+   ICONE CARTE RECUPEREE
+=================================== */
+
+.carteMarqueeIcon {
+    position: absolute;
+
+    right: -8px;
+    top: -8px;
+
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgb(45, 160, 80);
+
+    color: white;
+
+    font-size: 18px;
+
+    z-index: 2;
+
+    pointer-events: none;
 }

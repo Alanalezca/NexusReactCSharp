@@ -37,7 +37,7 @@ const DraftKeyforgeStatsResume = ({ nbLegendaires, pseudoJ1, pseudoJ2 }) => {
           <span className={classeCouleur}> {joueur} </span>
           subit un malus :
           <span className={classeCouleur}> {deltaLegendaires}</span>
-          chaîne{deltaLegendaires > 1 && "s"}
+          &nbsp;chaîne{deltaLegendaires > 1 && "s"}
         </p>
       ) : (
         <p className="txtBold">

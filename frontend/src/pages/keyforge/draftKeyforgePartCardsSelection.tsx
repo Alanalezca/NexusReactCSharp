@@ -162,7 +162,9 @@
                 if (updateEtapeSiDraftJ1J2Finished === 12) {
                     setCurrentDraftKeyforge(prev => [{
                         ...prev[0],
-                        etat: 12
+                        etat: 12,
+                        draftEnCoursPourJoueurAouB: null,
+                        draftEnCoursSurFactionAouBouC: null
                     }]);
 
                     setEtapeDraft(updateEtapeSiDraftJ1J2Finished);

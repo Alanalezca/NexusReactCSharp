@@ -61,8 +61,8 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
 
                 setCurrentDraft(prev => [{
                     ...prev[0],
-                    DraftEnCoursPourJoueurAouB: joueurIndex,
-                    Etat: 11
+                    draftEnCoursPourJoueurAouB: joueurIndex,
+                    etat: 11
                 }]);
 
                 setDraftEnCoursParJoueurAouB(joueurIndex);
@@ -73,6 +73,10 @@ const DraftKeyforgePartBoutonsJ1J2 = ({currentDraft, setCurrentDraft, draftTermi
 
         } else {
             setfocusAouBforStats(joueurIndex);
+            setCurrentDraft(prev => [{
+                ...prev[0],
+                draftEnCoursPourJoueurAouB: joueurIndex
+            }]);
         }
     };
 

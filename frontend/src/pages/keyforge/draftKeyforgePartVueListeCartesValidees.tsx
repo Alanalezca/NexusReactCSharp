@@ -9,36 +9,104 @@
     const DraftKeyforgePartVueListeCartesValidees = ({currentDraftKeyforge, setCurrentDraftKeyforge, draftEnCoursParJoueurAouB, setdraftEnCoursParJoueurAouB, draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC, setEtapeDraft}) => {
         const { cartesValidees, setCartesValidees } = useKeyforgeContext();
         const [showListSimpleActive, setShowListSimpleActive] = useState(true);
+        const [listeCartesMarquees, setListeCartesMarquees] = useState([]);
         console.log('currentDraftKeyforge', currentDraftKeyforge);
         console.log('draftEnCoursParJoueurAouB', draftEnCoursParJoueurAouB);
         console.log('cadeDejaValidee', cartesValidees);
+        const couleurEtFactionsJoueurActif = useMemo(() => {
+                return [currentDraftKeyforge[0][`factionPickAJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
+                    currentDraftKeyforge[0][`couleurAJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
+                    currentDraftKeyforge[0][`factionPickBJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
+                    currentDraftKeyforge[0][`couleurBJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
+                    currentDraftKeyforge[0][`factionPickCJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
+                    currentDraftKeyforge[0][`couleurCJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],]
+        }, [currentDraftKeyforge[0].draftEnCoursPourJoueurAouB]);
 
-        const cartesValideesAvecQuantite = useMemo(() => {
+        const attributionCouleurFaction = (
+                codeFactionA,
+                colorFactionA,
+                codeFactionB,
+                colorFactionB,
+                codeFactionC,
+                colorFactionC,
+                idFaction
+            ) => {
+            switch(idFaction) {
+                    case codeFactionA:
+                        return colorFactionA;
+                    case codeFactionB:
+                        return colorFactionB;
+                    case codeFactionC:
+                        return colorFactionC;
+                    default:
+                        console.log('Couleur de faction non trouvée');
+                        return null;
+            }
+        }
 
-            const cartesRegroupees = cartesValidees.reduce((acc, carte) => {
 
-                const carteExistante = acc.find(
-                    current => current.idCarte === carte.idCarte
-                );
+        const cartesValideesAvecQuantiteJoueurActif = useMemo(() => {
 
-                if (carteExistante) {
-                    carteExistante.quantite += 1;
-                } else {
-                    acc.push({
-                        ...carte,
-                        quantite: 1
-                    });
-                }
+            const cartesRegroupees = cartesValidees
+                .filter(
+                    carte =>
+                        carte.joueurAouB == currentDraftKeyforge[0].draftEnCoursPourJoueurAouB
+                )
+                .reduce((acc, carte) => {
 
-                return acc;
+                    const carteExistante = acc.find(
+                        current => current.idCarte === carte.idCarte
+                    );
 
-            }, []);
+                    if (carteExistante) {
+                        carteExistante.quantite += 1;
+                    } else {
+                        acc.push({
+                            ...carte,
+                            quantite: 1,
+                            couleurFaction: attributionCouleurFaction(
+                                couleurEtFactionsJoueurActif[0],
+                                couleurEtFactionsJoueurActif[1],
+                                couleurEtFactionsJoueurActif[2],
+                                couleurEtFactionsJoueurActif[3],
+                                couleurEtFactionsJoueurActif[4],
+                                couleurEtFactionsJoueurActif[5],
+                                carte.idFaction
+                            )
+                        });
+                    }
+
+                    return acc;
+
+                }, []);
 
             return cartesRegroupees.sort(
                 (a, b) => (a.numero ?? 0) - (b.numero ?? 0)
             );
 
-        }, [cartesValidees]);
+        }, [
+            cartesValidees,
+            currentDraftKeyforge[0].draftEnCoursPourJoueurAouB,
+            couleurEtFactionsJoueurActif
+        ]);
+
+        const ajoutSuppMarqueCarte = (numeroCarte) => {
+            setListeCartesMarquees(prev => {
+                if (prev.includes(numeroCarte)) {
+                    return prev.filter(valeur => valeur !== numeroCarte);
+                } else {
+                    return [...prev, numeroCarte];
+                }
+            });
+        };
+
+        const verifSiCarteMarquee = (listeCartesMarquees, numeroCarteAVerif) => {
+            if (listeCartesMarquees.includes(numeroCarteAVerif)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
 
         return (
                 <>
@@ -59,17 +127,19 @@
                             </div>
                         </div>
                     </div>
-                    {cartesValideesAvecQuantite.map((current) => (
+                    {cartesValideesAvecQuantiteJoueurActif.map((current) => (
                         <TCGCardForList
                             key={current.idCarte}
                             quantite={current.quantite}
-                            couleurFactionCarte={currentDraftKeyforge[0].couleurAJ1}
+                            couleurFactionCarte={current.couleurFaction}
                             numeroCarte={current.numero}
                             nomCarte={current.libelleCarte}
                             imageCarte={current.cheminImgCarte?.replaceAll("\\", "/")}
                             rareteCarte={current.rarete}
                             lienImgFaction={current.lienImgFaction?.replaceAll("\\", "/")}
                             libelleType={current.libelleType}
+                            marquageCarte={ajoutSuppMarqueCarte}
+                            flagCarteMarquee={verifSiCarteMarquee(listeCartesMarquees, current.numero)}
                         />
                     ))}
                 </>

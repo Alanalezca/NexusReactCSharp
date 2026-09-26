@@ -43,7 +43,7 @@ const TCGCard = ({
                         ${imageLoaded ? styles.cardImageLoaded : ''}
                     `}
                     onLoad={() => setImageLoaded(true)}
-                    onClick={handleClicValiderCarte}
+                    onClick={imageLoaded ? handleClicValiderCarte : undefined}
                 />
             )}
         </div>

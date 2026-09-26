@@ -305,7 +305,7 @@
                     </div>
                 }
                 {/* Liste de cartes déjà validées */}
-                {phaseDeDraftParTrinomeEnCours(currentDraftKeyforge, draftEnCoursParJoueurAouB, etapeDraft) && 
+                {phaseDeDraftParTrinomeEnCours(currentDraftKeyforge, draftEnCoursParJoueurAouB, etapeDraft) || etapeDraft === 12 ? 
                     <div className={`${styles.EnteteDraft} mb-5`}>
                         <DraftKeyforgePartVueListeCartesValidees
                             currentDraftKeyforge={currentDraftKeyforge} 
@@ -317,6 +317,7 @@
                             setEtapeDraft={setEtapeDraft}
                         />
                     </div>
+                    : undefined
                 }
                 </div>
             {/* Bandeau d instruction du pick/ban factions bottom */}

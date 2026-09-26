@@ -1,12 +1,13 @@
     import styles from './draftKeyforgeResume.module.css';
     import DraftKeyforgeStats from '../../pages/keyforge/draftKeyforgeStats';
     import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeContext';
-    import { useMemo } from 'react';
+    import { useMemo, useState } from 'react';
     import { Button } from 'react-bootstrap';
 
     const DraftKeyforgeResume = ({ currentDraftKeyforge, focusSurJoueurAouBforStats, focusSurStat }) => {
         const {draftEnCoursParJoueurAouB, setDraftEnCoursParJoueurAouB} = useKeyforgeContext();
         const {draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC} = useKeyforgeContext();
+        const [statFocus, setStatFocus] = useState(0);
 
         const currentEtape = useMemo(() => {
             return currentDraftKeyforge?.[0].etat;
@@ -217,27 +218,34 @@
                                 currentDraft={currentDraftKeyforge} 
                                 focusSurJoueurAouBPhaseSelection={draftEnCoursParJoueurAouB} 
                                 focusSurJoueurAouBforStatsPostSelection={focusSurJoueurAouBforStats}
+                                statistiqueFocus={statFocus}
                             />
                         }
                     </div>
                     {draftEnCours &&
                     <div className="col-2 mt-2">
-                        <Button className={`btn btn-primary btn-ColorF w-100 mb-2`}>
-                            {draftCardsFinish ? "Pénalités" : "Avancée"}
+                        <Button className={`btn btn-primary ${statFocus === 0 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
+                            onClick={()=> setStatFocus(0)}>
+                                {draftCardsFinish ? "Pénalités" : "Avancée"}
                         </Button>
-                        <Button className={`btn btn-primary btn-ColorF w-100 mb-2`}>
+                        <Button className={`btn btn-primary ${statFocus === 1 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
+                            onClick={()=> setStatFocus(1)}>
                             Répartition générale
                         </Button>
-                        <Button className={`btn btn-primary btn-ColorF w-100 mb-2`}>
+                        <Button className={`btn btn-primary ${statFocus === 2 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
+                            onClick={()=> setStatFocus(2)}>
                             Répartition par faction
                         </Button>
-                        <Button className={`btn btn-primary btn-ColorF w-100 mb-2`}>
+                        <Button className={`btn btn-primary ${statFocus === 3 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
+                            onClick={()=> setStatFocus(3)}>
                             Présence / puissance
                         </Button>
-                        <Button className={`btn btn-primary btn-ColorF w-100 mb-2`}>
+                        <Button className={`btn btn-primary ${statFocus === 4 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
+                            onClick={()=> setStatFocus(4)}>
                             Aombre généré
                         </Button>
-                        <Button className={`btn btn-primary btn-ColorF w-100 mb-2`}>
+                        <Button className={`btn btn-primary ${statFocus === 5 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
+                            onClick={()=> setStatFocus(5)}>
                             Raretés
                         </Button>
                     </div>
