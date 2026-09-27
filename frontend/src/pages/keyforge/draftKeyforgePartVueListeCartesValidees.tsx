@@ -3,7 +3,8 @@
     //import CardForList from '../../components/others/CardForList';
     import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeContext';
     import useApiFetch from "../../api/useApiFetch";
-    import TCGCardForList from "../../components/others/TCGCardForList"
+    import TCGCardForList from "../../components/others/TCGCardForList";
+    import TCGCardVisuForList from "../../components/others/TCGCardVisuForList"
 
 
     const DraftKeyforgePartVueListeCartesValidees = ({currentDraftKeyforge, setCurrentDraftKeyforge, draftEnCoursParJoueurAouB, setdraftEnCoursParJoueurAouB, draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC, setEtapeDraft}) => {
@@ -136,26 +137,50 @@
                     <div className="row mb-2">
                         <div className="col-12 d-flex justify-content-center">
                             <div className={styles.btnLogo}>
-                                <button className={`bx bx-list-ul ${showListSimpleActive ? "bxNormalOrange" : "bxNormalGrey"}`}></button>
-                                <button className={`bx bxs-grid ${showListSimpleActive ? "bxNormalGrey" : "bxNormalOrange"}`}></button>
+                                <button 
+                                    className={`bx bx-list-ul ${showListSimpleActive ? "bxNormalOrange" : "bxNormalGrey"}`}
+                                    onClick={() => setShowListSimpleActive(true)}>
+                                </button>
+                                <button 
+                                    className={`bx bxs-grid ${!showListSimpleActive ? "bxNormalOrange" : "bxNormalGrey"}`}
+                                    onClick={() => setShowListSimpleActive(false)}>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    {cartesValideesAvecQuantiteJoueurActif.map((current) => (
-                        <TCGCardForList
-                            key={current.idCarte}
-                            quantite={current.quantite}
-                            couleurFactionCarte={current.couleurFaction}
-                            numeroCarte={current.numero}
-                            nomCarte={current.libelleCarte}
-                            imageCarte={current.cheminImgCarte?.replaceAll("\\", "/")}
-                            rareteCarte={current.rarete}
-                            lienImgFaction={current.lienImgFaction?.replaceAll("\\", "/")}
-                            libelleType={current.libelleType}
-                            marquageCarte={ajoutSuppMarqueCarte}
-                            flagCarteMarquee={verifSiCarteMarquee(listeCartesMarquees, current.numero)}
-                        />
-                    ))}
+                    {showListSimpleActive ?
+                        cartesValideesAvecQuantiteJoueurActif.map((current) => (
+                            <TCGCardForList
+                                key={current.idCarte}
+                                quantite={current.quantite}
+                                couleurFactionCarte={current.couleurFaction}
+                                numeroCarte={current.numero}
+                                nomCarte={current.libelleCarte}
+                                imageCarte={current.cheminImgCarte?.replaceAll("\\", "/")}
+                                rareteCarte={current.rarete}
+                                lienImgFaction={current.lienImgFaction?.replaceAll("\\", "/")}
+                                libelleType={current.libelleType}
+                                marquageCarte={ajoutSuppMarqueCarte}
+                                flagCarteMarquee={verifSiCarteMarquee(listeCartesMarquees, current.numero)}
+                            />
+                        ))
+                    :
+                        <div className="row g-3">
+                            {cartesValideesAvecQuantiteJoueurActif.map(current => (
+                                <div
+                                    key={current.idCarte}
+                                    className="col-6 col-md-4 col-lg-3 col-xl-2"
+                                >
+                                    <TCGCardVisuForList
+                                        nomCarte={current.libelleCarte}
+                                        imageCarte={
+                                            current.cheminImgCarte?.replaceAll("\\", "/")
+                                        }
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    }
                 </>
         )
     };

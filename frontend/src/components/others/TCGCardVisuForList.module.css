@@ -1,0 +1,96 @@
+/* ===================================
+   CONTENEUR CARTE
+=================================== */
+
+.cardWrapper {
+    position: relative;
+
+    /*
+        La largeur est entièrement déterminée
+        par la colonne Bootstrap du parent.
+    */
+    width: 100%;
+
+    /*
+        Conservation des proportions
+        d'une carte KeyForge.
+    */
+    aspect-ratio: 300 / 420;
+
+    border-radius: 12px;
+    overflow: hidden;
+
+    box-sizing: border-box;
+
+    transition: transform 0.2s ease;
+
+    /*
+        Permet au scale du hover de passer
+        visuellement devant les cartes voisines.
+    */
+    z-index: 1;
+}
+
+
+/* ===================================
+   SURVOL
+=================================== */
+
+.cardWrapper:hover {
+    transform: scale(1.03);
+    z-index: 2;
+}
+
+
+/* ===================================
+   PLACEHOLDER
+=================================== */
+
+.cardPlaceholder {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+/* ===================================
+   IMAGE CARTE
+=================================== */
+
+.cardImage {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+/* ===================================
+   IMAGE CHARGEE
+=================================== */
+
+.cardImageLoaded {
+    opacity: 1;
+}
+
+
+/* ===================================
+   EFFET AU SURVOL
+=================================== */
+
+.cardWrapper:hover .cardImage {
+    filter: brightness(1.08) saturate(1.05);
+}
