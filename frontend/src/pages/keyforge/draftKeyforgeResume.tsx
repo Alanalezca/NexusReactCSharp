@@ -226,11 +226,11 @@
                     <div className="col-2 mt-2">
                         <Button className={`btn btn-primary ${statFocus === 0 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(0)}>
-                                {draftCardsFinish ? "Pénalités" : "Avancée"}
+                                {draftCardsFinish ? "Pénalités" : "Progression"}
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 1 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(1)}>
-                            Répartition générale
+                            Répartition par type
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 2 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(2)}>

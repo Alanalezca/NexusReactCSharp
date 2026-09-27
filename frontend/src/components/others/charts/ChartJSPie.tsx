@@ -1,37 +1,35 @@
-import styles from './ChartJSBar.module.css';
+import styles from './ChartJSPie.module.css';
 
 import {
     Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend
 } from 'chart.js';
 
-import { Bar } from 'react-chartjs-2';
+import { Pie } from 'react-chartjs-2';
 
 ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
+    ArcElement,
     Title,
     Tooltip,
     Legend
 );
 
-interface ChartJSBarProps {
+interface ChartJSPieProps {
     labels: string[];
     values: number[];
     colors: string[];
+    title: string;
 }
 
-const ChartJSBar = ({
+const ChartJSPie = ({
     labels,
     values,
-    colors
-}: ChartJSBarProps) => {
+    colors,
+    title
+}: ChartJSPieProps) => {
 
     const data = {
         labels,
@@ -57,34 +55,20 @@ const ChartJSBar = ({
 
             title: {
                 display: true,
-                text: "Cartes validées par maison",
+                text: title,
                 color: "white"
-            },
-        },
-
-        scales: {
-            x: {
-                ticks: {
-                    color: "white"
-                }
-            },
-
-            y: {
-                beginAtZero: true,
-
-                ticks: {
-                    stepSize: 1,
-                    color: "white"
-                }
             }
         }
     };
 
     return (
         <div className={styles.chartContainer}>
-            <Bar data={data} options={options} />
+            <Pie
+                data={data}
+                options={options}
+            />
         </div>
     );
 };
 
-export default ChartJSBar;
+export default ChartJSPie;

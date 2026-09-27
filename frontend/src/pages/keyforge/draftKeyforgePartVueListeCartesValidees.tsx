@@ -90,6 +90,20 @@
             couleurEtFactionsJoueurActif
         ]);
 
+        const nbLegendairesValideesJoueurActif = useMemo(() => {
+
+            const nbLegendaires = cartesValideesAvecQuantiteJoueurActif
+                .filter(
+                    carte =>
+                        carte.rarete === "Légendaire"
+                )
+
+            return nbLegendaires.length;
+
+        }, [
+            cartesValideesAvecQuantiteJoueurActif
+        ]);
+
         const ajoutSuppMarqueCarte = (numeroCarte) => {
             setListeCartesMarquees(prev => {
                 if (prev.includes(numeroCarte)) {
@@ -112,11 +126,11 @@
                 <>
                     <div className="row mb-2">
                         <div className="col-12 
-                        mt-2 
-                        d-flex 
+                        mt-2  
                         justify-content-center"
                         >
-                            <h4 className="text-center txtColorWhite">Liste des cartes validées</h4>
+                            <p><h4 className="text-center txtColorWhite">Liste des cartes validées</h4></p>
+                            <p><h6 className="text-center txtColorWhite">(<span className="colorRareteLegendaire">{nbLegendairesValideesJoueurActif} légendaires</span>)</h6></p>
                         </div>
                     </div>
                     <div className="row mb-2">
