@@ -7,13 +7,10 @@
     import TCGCardVisuForList from "../../components/others/TCGCardVisuForList"
 
 
-    const DraftKeyforgePartVueListeCartesValidees = ({currentDraftKeyforge, setCurrentDraftKeyforge, draftEnCoursParJoueurAouB, setdraftEnCoursParJoueurAouB, draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC, setEtapeDraft}) => {
+    const DraftKeyforgePartVueListeCartesValidees = ({currentDraftKeyforge}) => {
         const { cartesValidees, setCartesValidees } = useKeyforgeContext();
         const [showListSimpleActive, setShowListSimpleActive] = useState(true);
         const [listeCartesMarquees, setListeCartesMarquees] = useState([]);
-        console.log('currentDraftKeyforge', currentDraftKeyforge);
-        console.log('draftEnCoursParJoueurAouB', draftEnCoursParJoueurAouB);
-        console.log('cadeDejaValidee', cartesValidees);
         const couleurEtFactionsJoueurActif = useMemo(() => {
                 return [currentDraftKeyforge[0][`factionPickAJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
                     currentDraftKeyforge[0][`couleurAJ${currentDraftKeyforge[0].draftEnCoursPourJoueurAouB + 1}`],
@@ -130,8 +127,15 @@
                         mt-2  
                         justify-content-center"
                         >
-                            <p><h4 className="text-center txtColorWhite">Liste des cartes validées</h4></p>
-                            <p><h6 className="text-center txtColorWhite">(<span className="colorRareteLegendaire">{nbLegendairesValideesJoueurActif} légendaires</span>)</h6></p>
+                        <h4 className="text-center txtColorWhite">
+                            Liste des cartes validées
+                        </h4>
+
+                        <h6 className="text-center txtColorWhite">
+                            (<span className="colorRareteLegendaire">
+                                {nbLegendairesValideesJoueurActif} légendaires
+                            </span>)
+                        </h6>
                         </div>
                     </div>
                     <div className="row mb-2">

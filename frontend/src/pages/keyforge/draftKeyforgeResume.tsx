@@ -216,8 +216,7 @@
                         {showStats &&
                             <DraftKeyforgeStats 
                                 currentDraft={currentDraftKeyforge} 
-                                focusSurJoueurAouBPhaseSelection={draftEnCoursParJoueurAouB} 
-                                focusSurJoueurAouBforStatsPostSelection={focusSurJoueurAouBforStats}
+                                focusSurJoueurAouBPhaseSelection={currentDraftKeyforge.draftEnCoursParJoueurAouB} 
                                 statistiqueFocus={statFocus}
                             />
                         }
@@ -234,7 +233,7 @@
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 2 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(2)}>
-                            Répartition par faction
+                            Répart. type/faction
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 3 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(3)}>

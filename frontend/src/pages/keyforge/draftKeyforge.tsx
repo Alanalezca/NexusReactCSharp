@@ -309,12 +309,6 @@
                     <div className={`${styles.EnteteDraft} mb-5`}>
                         <DraftKeyforgePartVueListeCartesValidees
                             currentDraftKeyforge={currentDraftKeyforge} 
-                            setCurrentDraftKeyforge={setCurrentDraftKeyforge} 
-                            draftEnCoursParJoueurAouB={draftEnCoursParJoueurAouB} 
-                            setdraftEnCoursParJoueurAouB={setDraftEnCoursParJoueurAouB} 
-                            draftEnCoursSurFactionAouBouC={draftEnCoursSurFactionAouBouC} 
-                            setDraftEnCoursSurFactionAouBouC={setDraftEnCoursSurFactionAouBouC}
-                            setEtapeDraft={setEtapeDraft}
                         />
                     </div>
                     : undefined

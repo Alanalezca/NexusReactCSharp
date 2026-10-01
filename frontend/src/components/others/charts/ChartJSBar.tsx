@@ -25,19 +25,23 @@ interface ChartJSBarProps {
     labels: string[];
     values: number[];
     colors: string[];
+    title: string;
+    labelTitreData: string;
 }
 
 const ChartJSBar = ({
     labels,
     values,
-    colors
+    colors,
+    title,
+    labelTitreData
 }: ChartJSBarProps) => {
 
     const data = {
         labels,
         datasets: [
             {
-                label: 'Nombre de cartes',
+                label: labelTitreData,
                 data: values,
                 backgroundColor: colors,
             },
@@ -46,18 +50,34 @@ const ChartJSBar = ({
 
     const options = {
         responsive: true,
+        maintainAspectRatio: false,
 
         plugins: {
             legend: {
                 position: "top" as const,
+
                 labels: {
-                    color: "white"
+                    color: "white",
+
+                    generateLabels: (chart: any) => {
+                        const dataset = chart.data.datasets[0];
+
+                        return chart.data.labels.map(
+                            (label: string, index: number) => ({
+                                text: `${label} : ${dataset.data[index]}`,
+                                fillStyle: dataset.backgroundColor[index],
+                                strokeStyle: dataset.backgroundColor[index],
+                                fontColor: "white",
+                                index
+                            })
+                        );
+                    }
                 }
             },
 
             title: {
                 display: true,
-                text: "Cartes validées par maison",
+                text: title,
                 color: "white"
             },
         },
@@ -82,7 +102,10 @@ const ChartJSBar = ({
 
     return (
         <div className={styles.chartContainer}>
-            <Bar data={data} options={options} />
+            <Bar
+                data={data}
+                options={options}
+            />
         </div>
     );
 };

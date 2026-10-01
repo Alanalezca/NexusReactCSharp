@@ -46,17 +46,54 @@ const ChartJSPie = ({
         responsive: true,
 
         plugins: {
+
+            // ===================================
+            // LEGENDE
+            // ===================================
             legend: {
                 position: "top" as const,
+
                 labels: {
-                    color: "white"
+                    color: "white",
+
+                    generateLabels: (chart: any) => {
+                        const dataset = chart.data.datasets[0];
+
+                        return chart.data.labels.map(
+                            (label: string, index: number) => ({
+                                text: `${label} : ${dataset.data[index]}`,
+
+                                fillStyle:
+                                    dataset.backgroundColor[index],
+
+                                strokeStyle:
+                                    dataset.backgroundColor[index],
+
+                                // Important pour le texte
+                                fontColor: "white",
+
+                                // Index de la portion
+                                index
+                            })
+                        );
+                    }
                 }
             },
 
+            // ===================================
+            // TITRE
+            // ===================================
             title: {
                 display: true,
                 text: title,
                 color: "white"
+            },
+
+            // ===================================
+            // TOOLTIP
+            // ===================================
+            tooltip: {
+                enabled: true
             }
         }
     };

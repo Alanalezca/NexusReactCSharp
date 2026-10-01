@@ -34,7 +34,7 @@ const TCGCardForList = ({
                 return null;
         }
     };
-    console.log(flagCarteMarquee);
+
     return (
         <div className="col-12 mb-1 d-flex justify-content-center">
 
