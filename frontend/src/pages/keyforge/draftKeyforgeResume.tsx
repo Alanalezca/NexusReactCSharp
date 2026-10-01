@@ -216,7 +216,6 @@
                         {showStats &&
                             <DraftKeyforgeStats 
                                 currentDraft={currentDraftKeyforge} 
-                                focusSurJoueurAouBPhaseSelection={currentDraftKeyforge.draftEnCoursParJoueurAouB} 
                                 statistiqueFocus={statFocus}
                             />
                         }

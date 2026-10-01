@@ -105,7 +105,7 @@
             <>
                 {/* Comptage des cartes en cours de draft (0) */}
                 {currentDraft[0]?.etat >= 10 && currentDraft[0]?.etat < 12 && statistiqueFocus === 0 &&
-                    <ChartJSBar labels={labelsGraph0DraftEnCours} values={valuesGraph0DraftEnCours} colors={colorsGraph0DraftEnCours} />
+                    <ChartJSBar labels={labelsGraph0DraftEnCours} values={valuesGraph0DraftEnCours} colors={colorsGraph0DraftEnCours} title={""} labelTitreData={""}/>
                 }
 
                 {/* Etat (0) pénalités */}
@@ -159,28 +159,28 @@
                 {/* Etat (2) Répartition par faction */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 2 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    <ChartJSBar labels={labelsGraph0} values={valuesGraph0} colors={colorsGraph0} />
+                    
                 </div>
                 }
 
                 {/* Etat (3) Puissance */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 3 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    <ChartJSBar labels={labelsGraph0} values={valuesGraph0} colors={colorsGraph0} />
+                    
                 </div>
                 }
 
                 {/* Etat (4) Aombre généré */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 4 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    <ChartJSBar labels={labelsGraph0} values={valuesGraph0} colors={colorsGraph0} />
+                    
                 </div>
                 }
 
                 {/* Etat (5) Raretés */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 5 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    <ChartJSBar labels={labelsGraph0} values={valuesGraph0} colors={colorsGraph0} />
+                    
                 </div>
                 }
             </>
