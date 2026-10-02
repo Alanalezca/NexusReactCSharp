@@ -75,6 +75,8 @@ public interface IKeyforgeService
         CreateKeyforgeCarteValideeDto dto,
         int userId
     );
+
+    Task<List<KeyforgeTypeCarteDto>> GetTypesCartesAsync();
 }
 
 public class KeyforgeService : IKeyforgeService
@@ -211,5 +213,10 @@ public class KeyforgeService : IKeyforgeService
             dto,
             userId
         );
+    }
+
+    public async Task<List<KeyforgeTypeCarteDto>> GetTypesCartesAsync()
+    {
+        return await _keyforgeRepository.GetTypesCartesAsync();
     }
 }

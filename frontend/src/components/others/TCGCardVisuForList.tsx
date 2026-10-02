@@ -1,28 +1,38 @@
 import { useEffect, useState } from 'react';
 import styles from './TCGCardVisuForList.module.css';
 
-interface TCGCardMiniProps {
+interface TCGCardVisuForListProps {
+    numeroCarte: number;
     nomCarte: string | null;
     imageCarte: string | null;
+    marquageCarte: (numeroCarte: number) => void;
+    flagCarteMarquee: boolean;
 }
 
-const TCGCardMini = ({
+const TCGCardVisuForList = ({
+    numeroCarte,
     nomCarte,
-    imageCarte
-}: TCGCardMiniProps) => {
+    imageCarte,
+    marquageCarte,
+    flagCarteMarquee
+}: TCGCardVisuForListProps) => {
 
     const placeholder = "/images/keyforge/KeyforgeNC.png";
 
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    // Si l'image change, on repasse temporairement
-    // sur le placeholder pendant son chargement.
     useEffect(() => {
         setImageLoaded(false);
     }, [imageCarte]);
 
     return (
-        <div className={styles.cardWrapper}>
+        <div
+            className={`
+                ${styles.cardWrapper}
+                ${flagCarteMarquee ? styles.carteMarquee : ''}
+            `}
+            onClick={() => marquageCarte(numeroCarte)}
+        >
 
             {/* Image temporaire */}
             <img
@@ -45,8 +55,18 @@ const TCGCardMini = ({
                 />
             )}
 
+            {/* Indicateur carte récupérée */}
+            <span
+                className={`
+                    ${styles.carteMarqueeIcon}
+                    ${flagCarteMarquee ? styles.carteMarqueeIconVisible : ''}
+                `}
+            >
+                <i className="bx bx-check"></i>
+            </span>
+
         </div>
     );
 };
 
-export default TCGCardMini;
+export default TCGCardVisuForList;

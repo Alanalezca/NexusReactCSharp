@@ -176,9 +176,14 @@
                                     className="col-6 col-md-4 col-lg-3 col-xl-2"
                                 >
                                     <TCGCardVisuForList
+                                        numeroCarte={current.numero}
                                         nomCarte={current.libelleCarte}
                                         imageCarte={
                                             current.cheminImgCarte?.replaceAll("\\", "/")
+                                        }
+                                        marquageCarte={ajoutSuppMarqueCarte}
+                                        flagCarteMarquee={
+                                            listeCartesMarquees.includes(current.numero)
                                         }
                                     />
                                 </div>

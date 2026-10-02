@@ -1,13 +1,42 @@
     import styles from './draftKeyforgeStats.module.css';
-    import { useMemo } from 'react';
+    import { useMemo, useState, useEffect } from 'react';
     import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeContext';
     import ChartJSBar from '../../components/others/charts/ChartJSBar';
+    import ChartJSBarStacked from '../../components/others/charts/ChartJSBarStacked';
     import ChartJSPie from '../../components/others/charts/ChartJSPie';
     import DraftKeyforgeStatsResume from '../../pages/keyforge/draftKeyforgeStatsResume';
+    import useApiFetch from "../../api/useApiFetch";
     
+    interface KeyforgeTypeCarte {
+        id: string;
+        libelle: string | null;
+        colorRGB: string | null;
+    }
+
     const DraftKeyforgeStats = ({ currentDraft, statistiqueFocus }) => {
 
+        const [typesCartes, setTypesCartes] = useState<KeyforgeTypeCarte[]>([]);
         const { cartesValidees, setCartesValidees } = useKeyforgeContext();
+        const { callApiFetch } = useApiFetch();
+
+        useEffect(() => {
+
+            const fetchTypesCartes = async () => {
+
+                const data = await callApiFetch<KeyforgeTypeCarte[]>(
+                    "/api/keyforge/types-cartes",
+                    "Erreur lors du chargement des types de cartes KeyForge"
+                );
+
+                if (data) {
+                    setTypesCartes(data);
+                }
+            };
+
+            fetchTypesCartes();
+
+        }, []);
+
 
         const cartesValideesJoueurFocus = useMemo(() => {
             return cartesValidees.filter(item => item.joueurAouB == currentDraft[0].draftEnCoursPourJoueurAouB)
@@ -100,7 +129,69 @@
         const labelTitreData0 = 
             "Nombre de légendaires"
         ;
-        console.log('currentDraft[0].draftEnCoursPourJoueurAouB', currentDraft[0].draftEnCoursPourJoueurAouB);
+
+        const comptageParTypeParFactionPourJoueurFocus = (cartesValidees, joueurAouB, factionAouBouC) => {
+            const cartesFactionA = cartesValidees.filter(carte =>
+                carte.joueurAouB == joueurAouB
+                &&
+                carte.idFaction === currentDraft[0][
+                    `factionPick${factionAouBouC}J${joueurAouB + 1}`
+                ]
+            );
+
+            const comptageParType = cartesFactionA.reduce((acc, carte) => {
+
+                const type = carte.libelleType;
+
+                acc[type] = (acc[type] || 0) + 1;
+
+                return acc;
+
+            }, {});
+
+            return comptageParType;
+        };
+
+        const datasetGraph2Base = useMemo(() => {
+
+            const [comptageFactionA, comptageFactionB, comptageFactionC] = 
+                [comptageParTypeParFactionPourJoueurFocus(
+                    cartesValidees, 
+                    currentDraft[0].draftEnCoursPourJoueurAouB, 
+                    'A'),
+                comptageParTypeParFactionPourJoueurFocus(
+                    cartesValidees, 
+                    currentDraft[0].draftEnCoursPourJoueurAouB, 
+                    'B'),
+                comptageParTypeParFactionPourJoueurFocus(
+                    cartesValidees, 
+                    currentDraft[0].draftEnCoursPourJoueurAouB, 
+                'C')];
+            
+            return [comptageFactionA, comptageFactionB, comptageFactionC];
+        }, [cartesValidees, currentDraft]);
+
+        const datasetsGraph2ForChart = useMemo(() => {
+
+            return typesCartes.map(type => ({
+                label: type.libelle ?? "",
+
+                values: datasetGraph2Base.map(faction =>
+                    faction[type.libelle ?? ""] ?? 0
+                ),
+
+                color: type.colorRGB ?? "rgba(255, 255, 255, 0.75)"
+            }));
+
+        }, [datasetGraph2Base]);
+
+        const labelsGraph2 = useMemo (() => {
+            return [currentDraft[0][`libelleFactionAJ${currentDraft[0].draftEnCoursPourJoueurAouB + 1}`],
+                currentDraft[0][`libelleFactionBJ${currentDraft[0].draftEnCoursPourJoueurAouB + 1}`],
+                currentDraft[0][`libelleFactionCJ${currentDraft[0].draftEnCoursPourJoueurAouB + 1}`]];
+
+        }, [datasetsGraph2ForChart])
+
         return (
             <>
                 {/* Comptage des cartes en cours de draft (0) */}
@@ -156,10 +247,14 @@
                 </div>
                 }
 
-                {/* Etat (2) Répartition par faction */}
+                {/* Etat (2) Répartition types par faction */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 2 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    
+                    {currentDraft[0].draftEnCoursPourJoueurAouB !== null ?
+                        <ChartJSBarStacked labels={labelsGraph2} datasets={datasetsGraph2ForChart} title={"Répartition types par faction"} />
+                    :
+                        <div>Choisissez la liste de cartes d'un joueur</div>
+                    }
                 </div>
                 }
 

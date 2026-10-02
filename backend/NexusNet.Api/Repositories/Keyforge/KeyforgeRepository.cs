@@ -32,6 +32,7 @@ public interface IKeyforgeRepository
 
     Task<bool> UpdateFocusFactionAsync(string idDraft, string factionAouBouC, int userId);
     Task<bool> EnregistrerCarteValideeAsync(string idDraft, CreateKeyforgeCarteValideeDto dto, int userId);
+    Task<List<KeyforgeTypeCarteDto>> GetTypesCartesAsync();
 }
 
 public class KeyforgeRepository : IKeyforgeRepository
@@ -760,6 +761,49 @@ public class KeyforgeRepository : IKeyforgeRepository
             await transaction.RollbackAsync();
             throw;
         }
+    }
+
+    public async Task<List<KeyforgeTypeCarteDto>> GetTypesCartesAsync()
+    {
+        var result = new List<KeyforgeTypeCarteDto>();
+
+        var connection = _context.Database.GetDbConnection();
+
+        await connection.OpenAsync();
+
+        try
+        {
+            using var command = connection.CreateCommand();
+
+            command.CommandText = @"
+                SELECT
+                    ""ID"",
+                    ""Libelle"",
+                    ""ColorRGB""
+                FROM l_keyforge_types
+                ORDER BY ""ID"";
+            ";
+
+            using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                result.Add(new KeyforgeTypeCarteDto
+                {
+                    ID = reader["ID"]?.ToString() ?? string.Empty,
+
+                    Libelle = reader["Libelle"]?.ToString(),
+
+                    ColorRGB = reader["ColorRGB"]?.ToString()
+                });
+            }
+        }
+        finally
+        {
+            await connection.CloseAsync();
+        }
+
+        return result;
     }
 }
 

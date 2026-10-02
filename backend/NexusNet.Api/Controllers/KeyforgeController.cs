@@ -701,4 +701,37 @@ public class KeyforgeController : ControllerBase
             );
         }
     }
+
+    // ============================================================
+    // TYPES DE CARTES
+    // ============================================================
+
+    [HttpGet("types-cartes")]
+    public async Task<IActionResult> GetTypesCartes()
+    {
+        try
+        {
+            var types = await _keyforgeService.GetTypesCartesAsync();
+
+            if (types.Count == 0)
+            {
+                return NotFound(
+                    new { message = "Types de cartes KeyForge introuvables" }
+                );
+            }
+
+            return Ok(types);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Erreur lors de la récupération des types de cartes KeyForge : {ex.Message}"
+            );
+
+            return StatusCode(
+                500,
+                new { error = "Erreur serveur" }
+            );
+        }
+    }
 }

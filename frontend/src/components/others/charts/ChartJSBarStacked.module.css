@@ -1,0 +1,38 @@
+/* ===================================
+   CONTENEUR DU GRAPHIQUE
+=================================== */
+
+.chartContainer {
+    position: relative;
+
+    width: 100%;
+    height: 350px;
+
+    box-sizing: border-box;
+}
+
+
+/* ===================================
+   TABLETTE
+=================================== */
+
+@media (max-width: 992px) {
+
+    .chartContainer {
+        height: 320px;
+    }
+
+}
+
+
+/* ===================================
+   MOBILE
+=================================== */
+
+@media (max-width: 576px) {
+
+    .chartContainer {
+        height: 280px;
+    }
+
+}
