@@ -36,6 +36,7 @@ interface ChartJSBarStackedProps {
     labels: string[];
     datasets: ChartJSBarStackedDataset[];
     title: string;
+    titleToolTip?: string | null;
 }
 
 
@@ -46,7 +47,8 @@ interface ChartJSBarStackedProps {
 const ChartJSBarStacked = ({
     labels,
     datasets,
-    title
+    title,
+    titleToolTip
 }: ChartJSBarStackedProps) => {
 
 
@@ -107,7 +109,15 @@ const ChartJSBarStacked = ({
             =================================== */
 
             tooltip: {
-                enabled: true
+                enabled: true,
+
+                callbacks: titleToolTip
+                    ? {
+                        title: (context: any) => {
+                            return `${titleToolTip}${context[0].label}`;
+                        }
+                    }
+                    : undefined
             }
         },
 

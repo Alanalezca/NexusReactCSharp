@@ -228,15 +228,15 @@
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 1 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(1)}>
-                            Répartition par type
+                            Types
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 2 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(2)}>
-                            Répart. type/faction
+                            Types par faction
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 3 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(3)}>
-                            Présence / puissance
+                            Créatures
                         </Button>
                         <Button className={`btn btn-primary ${statFocus === 4 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
                             onClick={()=> setStatFocus(4)}>

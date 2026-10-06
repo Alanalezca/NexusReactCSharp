@@ -84,12 +84,20 @@
 
         }, [cartesValidees, currentDraft]);
 
-        const colorsGraph1 = [
-            'rgba(153, 102, 255, 0.75)',
-            'rgba(255, 206, 86, 0.75)', 
-            'rgba(255, 99, 132, 0.75)',
-            'rgba(75, 192, 145, 0.75)',
-        ];
+        const colorsGraph1 = useMemo(() => {
+            const couleurs = dataGraph1[0].map(libelle => {
+
+                const typeTrouve = typesCartes.find(
+                    type => type.libelle === libelle
+                );
+
+                return typeTrouve?.colorRGB;
+            });
+
+            return couleurs;
+        }, [dataGraph1]); 
+
+        console.log('colorsGraph0DraftEnCours', colorsGraph0DraftEnCours, labelsGraph0DraftEnCours);
 
         const dataGraph0 = useMemo(() => {
             if (!currentDraft) return [0, 0];
@@ -192,6 +200,50 @@
 
         }, [datasetsGraph2ForChart])
 
+        const labelsGraph3 = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"];
+
+        const comptageCarteSelonPuissance = (libelleFaction, colorFaction) => {
+            const arrayValues = cartesValidees
+                .filter(current =>
+                    current.libelleFaction === libelleFaction && current.libelleType === "Créature"
+                )
+                .reduce(
+                    (acc, carte) => {
+
+                        if (carte.puissance === null) {
+                            return acc;
+                        }
+
+                        const index = carte.puissance;
+
+                        if (index < 9) {
+                            acc[index] += 1;
+                        } else {
+                            acc[9] += 1;
+                        }
+
+                        return acc;
+                    },
+                    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+                );
+            
+            return {color: colorFaction, label: libelleFaction, values: arrayValues}
+        };
+
+        const datasetsGraph3ForChart = useMemo(() => {
+           
+            return [
+                comptageCarteSelonPuissance(currentDraft[0]?.[`libelleFactionAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], 
+                'rgba(' + currentDraft[0]?.[`couleurAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6'),
+                comptageCarteSelonPuissance(currentDraft[0]?.[`libelleFactionBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], 
+                'rgba(' + currentDraft[0]?.[`couleurBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6'),
+                comptageCarteSelonPuissance(currentDraft[0]?.[`libelleFactionCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], 
+                'rgba(' + currentDraft[0]?.[`couleurCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6')
+            ];
+
+        }, [cartesValidees, currentDraft]);
+        console.log('exemple', datasetsGraph2ForChart);
+        console.log('tartare', cartesValidees, datasetsGraph3ForChart);
         return (
             <>
                 {/* Comptage des cartes en cours de draft (0) */}
@@ -261,7 +313,11 @@
                 {/* Etat (3) Puissance */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 3 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    
+                    {currentDraft[0].draftEnCoursPourJoueurAouB !== null ?
+                        <ChartJSBarStacked labels={labelsGraph3} datasets={datasetsGraph3ForChart} title={"Créatures par puissance"}  titleToolTip="Créature avec une puissance de "/>
+                    :
+                        <div>Choisissez la liste de cartes d'un joueur</div>
+                    }
                 </div>
                 }
 
