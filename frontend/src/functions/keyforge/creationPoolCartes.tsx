@@ -185,9 +185,12 @@ const creationPoolCartes = async (
 
             // Si c'est une carte hors ensemble
             if (!carte.ensemble) {
-                carte.playerAorB = joueurAorB;
                 carte.qteDispo = (carte.qteDispo ?? 0) - 1;
-                arrayFinal.push(carte);
+
+                arrayFinal.push({
+                    ...carte,
+                    playerAorB: joueurAorB
+                });
             } 
             // Sinon c'est une carte d'ensemble
             else {
@@ -203,9 +206,12 @@ const creationPoolCartes = async (
                 // On vérifie qu'il reste assez de slots pour tout l'ensemble
                 if (arrayFinal.length + cartesEnsemble.length <= 36) {
                     cartesEnsemble.forEach(current => {
-                        current.playerAorB = joueurAorB;
                         current.qteDispo = (current.qteDispo ?? 0) - 1;
-                        arrayFinal.push(current);
+
+                        arrayFinal.push({
+                            ...current,
+                            playerAorB: joueurAorB
+                        });
                     });
                 }
             }
@@ -220,6 +226,7 @@ const creationPoolCartes = async (
 
     const generationPoolCartesDouble = (poolCartesOriginal) => {
         // copie du pool pour ne jamais modifier l’original
+        console.log('poolCartesOriginal', poolCartesOriginal);
         const poolCartesReady = poolCartesOriginal.map(carte => ({ ...carte }));
         const arrayFinal = [[], []]; // pour les 2 joueurs
         let securite = 0;
@@ -241,9 +248,12 @@ const creationPoolCartes = async (
 
                 if (!carte.ensemble) {
                     // carte hors ensemble
-                    carte.playerAorB = j;
                     carte.qteDispo = (carte.qteDispo ?? 0) - 1;
-                    arrayFinal[j].push(carte);
+
+                    arrayFinal[j].push({
+                        ...carte,
+                        playerAorB: j
+                    });
                 } else {
                     // carte d'ensemble
                     const currentEnsemble = carte.ensemble;
@@ -251,9 +261,13 @@ const creationPoolCartes = async (
 
                     if (arrayFinal[j].length + cartesEnsemble.length <= 36) {
                         cartesEnsemble.forEach(current => {
-                            current.playerAorB = j;
+
                             current.qteDispo = (current.qteDispo ?? 0) - 1;
-                            arrayFinal[j].push(current);
+
+                            arrayFinal[j].push({
+                                ...current,
+                                playerAorB: j
+                            });
                         });
                     }
                     // sinon, on saute cette itération pour ce joueur
@@ -264,7 +278,8 @@ const creationPoolCartes = async (
         if (securite >= 1000) {
             console.warn("Pool incomplet pour l'un ou les deux joueurs :", arrayFinal.map(currentArray => currentArray.length));
         }
-
+        console.log('poolCartesReady', poolCartesReady);
+        console.log('arrayFinal', arrayFinal);
         return arrayFinal;
     };
 
