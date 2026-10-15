@@ -16,6 +16,133 @@
   margin-top: -4px;
 }
 
+.draftRow {
+  align-items: center;
+  margin-top: 4px;
+}
+
+.draftTitle {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.draftHouses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.draftHouses .logoFaction {
+  width: 25px;
+  height: 25px;
+  margin-top: 0;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.mobileLabel {
+  flex-basis: 100%;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.draftActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deleteDraftButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+button.deleteDraftButton:hover,
+button.deleteDraftButton:active,
+button.deleteDraftButton:focus {
+  background: transparent;
+  box-shadow: none;
+}
+
+.draftActionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.draftStatus {
+  font-size: 32px;
+}
+
+.statusPending {
+  color: #a8b0bd;
+}
+
+.statusPreparing {
+  color: #f5cf58;
+}
+
+.statusReady {
+  color: #69b9ff;
+}
+
+.statusInProgress {
+  color: #ff9901;
+}
+
+.statusFinished {
+  color: #66d995;
+}
+
+.deleteDraftButton:focus-visible {
+  outline: 2px solid var(--ColorA);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (max-width: 991.98px) {
+  .draftRow {
+    position: relative;
+    margin: 0 0 12px;
+    padding: 12px 0;
+    row-gap: 12px;
+    border: 1px solid var(--backgroundColorD);
+    border-radius: 8px;
+    background-color: var(--backgroundColorB);
+  }
+
+  .draftTitle {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-right: 108px;
+    font-weight: 600;
+  }
+
+  .draftActions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: auto;
+    padding: 0;
+    justify-content: flex-end;
+  }
+
+  .deleteDraftButton {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 .logoFactionBig {
   max-height: 45px;
   margin-left: 5px;

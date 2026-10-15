@@ -371,9 +371,15 @@ public class AuthController : ControllerBase
             new Claim("grade", user.grade ?? "")
         };
 
+        var sessionDurationHours = _configuration.GetValue<int>("Jwt:SessionDurationHours", 168);
+        if (sessionDurationHours <= 0)
+            return StatusCode(500, "JWT session duration must be positive");
+
+        var expiresAt = DateTime.UtcNow.AddHours(sessionDurationHours);
+
         var tokenDescriptor = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(2),
+            expires: expiresAt,
             signingCredentials: credentials
         );
 
@@ -385,7 +391,7 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = false,
             SameSite = SameSiteMode.Lax,
-            Expires = DateTime.UtcNow.AddHours(2)
+            Expires = expiresAt
         });
 
         return Ok(new

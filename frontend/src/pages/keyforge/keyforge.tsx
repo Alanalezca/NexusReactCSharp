@@ -12,6 +12,9 @@ import useApiFetch from "../../api/useApiFetch";
 type KeyforgeDraftSummary = {
     id: string;
     titre: string;
+    etat?: number | null;
+    draftJ1Finished?: boolean | null;
+    draftJ2Finished?: boolean | null;
     lienImgFactionPickAJ1?: string | null;
     lienImgFactionPickBJ1?: string | null;
     lienImgFactionPickCJ1?: string | null;
@@ -22,18 +25,58 @@ type KeyforgeDraftSummary = {
     dateDerModif?: string | null;
 };
 
+const DraftStatus = ({ draft }: { draft: KeyforgeDraftSummary }) => {
+    const etat = draft.etat ?? 0;
+    let icon = 'bx-circle';
+    let colorClass = styles.statusPending;
+    let label = 'Maisons à choisir';
+
+    if (etat >= 12) {
+        colorClass = styles.statusFinished;
+        icon = 'bxs-circle';
+        label = 'Draft terminé';
+    } else if (etat >= 10 && (draft.draftJ1Finished || draft.draftJ2Finished)) {
+        colorClass = styles.statusInProgress;
+        icon = 'bxs-circle-three-quarter';
+        label = 'Draft en cours : un joueur a terminé';
+    } else if (etat === 11) {
+        colorClass = styles.statusInProgress;
+        icon = 'bxs-circle-half';
+        label = 'Draft en cours';
+    } else if (etat === 10) {
+        colorClass = styles.statusReady;
+        icon = 'bxs-circle-quarter';
+        label = 'Draft prêt';
+    } else if (etat === 9) {
+        colorClass = styles.statusPreparing;
+        label = 'Génération du pool de cartes';
+    } else if (etat >= 1) {
+        colorClass = styles.statusPreparing;
+        label = 'Choix des maisons en cours';
+    }
+
+    return <i className={`bx ${icon} ${styles.draftStatus} ${styles.draftActionIcon} ${colorClass}`} role="img" aria-label={label} title={label} />;
+};
+
 const Keyforge = () => {
     const { callApiFetch } = useApiFetch();
     const { showOngletAlerte } = useOngletAlerteContext();
     const [isLoading, setIsLoading] = useState(true);
     const [listeMyDrafts, setListeMyDrafts] = useState<KeyforgeDraftSummary[]>([]);
     const [showFormCreateNewDraft, setShowFormCreateNewDraft] = useState(false);
-    const inputsRef = useRef({});
+
     const {sessionUser} = useSessionUserContext();
     // Pagination : Début //
     const nbElementsParPage = 10;
     const [numCurrentPagePaginationActive, setNumCurrentPagePaginationActive] = useState(1);
     // Pagination : Fin //
+
+    const nbPages = Math.max(1, Math.ceil(listeMyDrafts.length / nbElementsParPage));
+
+    // Une suppression peut faire disparaître la page actuellement affichée.
+    if (numCurrentPagePaginationActive > nbPages) {
+        setNumCurrentPagePaginationActive(nbPages);
+    }
 
     const indiceFirstElement = (nbElementsParPage * numCurrentPagePaginationActive) - nbElementsParPage;
     const indiceLastElement = ((nbElementsParPage * numCurrentPagePaginationActive));
@@ -113,7 +156,7 @@ const Keyforge = () => {
                         <div className="col-12 mt-4">
                             <h2 className="text-center txtColorWhite mb-4">Mes drafts</h2>
                             <i className={`bx bx-list-plus bxNormalOrange`} onClick={() => {setShowFormCreateNewDraft(true)}}></i>
-                            <div className="row">
+                            <div className="row d-none d-lg-flex">
                                 <div className="col-4 col-lg-4">
                                     <b>Draft</b>
                                 </div>
@@ -142,13 +185,14 @@ const Keyforge = () => {
                         <Loader/> : <>
                         {listeMyDrafts?.length > 0 ? (
                             listeMyDrafts.slice(indiceFirstElement, indiceLastElement).map((currentDraft) => (
-                            <div key={currentDraft.id} className="row mt-1">
-                                <div className="col-4 col-lg-4">
+                            <div key={currentDraft.id} className={`row ${styles.draftRow}`}>
+                                <div className={`col-12 col-lg-4 ${styles.draftTitle}`}>
                                     <Link to={`/draftKeyforge/${currentDraft.id}`}>
                                         <span className="cPointer txtColorWhiteToTxtColorB">{currentDraft?.titre}</span>
                                     </Link>
                                 </div>
-                                <div className="col-1 col-lg-2">
+                                <div className={`col-6 col-lg-2 ${styles.draftHouses}`}>
+                                    <span className={`d-lg-none ${styles.mobileLabel}`}>Maisons J1</span>
                                     <img 
                                         src={currentDraft.lienImgFactionPickAJ1 || "/images/keyforge/NC.png"} 
                                         alt="Logo de la faction A du joueur 1" 
@@ -165,20 +209,21 @@ const Keyforge = () => {
                                         className={styles.logoFaction}
                                     />
                                 </div>
-                                <div className="col-1 col-lg-2">
+                                <div className={`col-6 col-lg-2 ${styles.draftHouses}`}>
+                                    <span className={`d-lg-none ${styles.mobileLabel}`}>Maisons J2</span>
                                     <img 
                                         src={currentDraft.lienImgFactionPickAJ2 || "/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction A du joueur 1" 
+                                        alt="Logo de la faction A du joueur 2"
                                         className={styles.logoFaction}
                                     />
                                     <img 
                                         src={currentDraft.lienImgFactionPickBJ2 || "/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction A du joueur 1" 
+                                        alt="Logo de la faction B du joueur 2"
                                         className={styles.logoFaction}
                                     />
                                     <img 
                                         src={currentDraft.lienImgFactionPickCJ2 || "/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction A du joueur 1" 
+                                        alt="Logo de la faction C du joueur 2"
                                         className={styles.logoFaction}
                                     />
                                 </div>
@@ -188,9 +233,17 @@ const Keyforge = () => {
                                 <div className="d-none d-lg-block col-lg-1">
                                 <span>{new Date(currentDraft?.dateDerModif).toLocaleDateString('fr-FR')}</span>
                                 </div>
-                                <div className="col-3 col-lg-2">
-                                    <div className="d-inline"><i className="bx bx-circle-quarter bxNormalOrangeWithoutHover topMinus3"></i></div>
-                                    <div className="d-inline"><i className="bx bx-message-square-x bxNormalOrange topMinus3 cPointer" onClick={() => handleDeleteDraft(currentDraft.id, currentDraft.titre)}></i></div>
+                                <div className={`col-12 col-lg-2 ${styles.draftActions}`}>
+                                    <DraftStatus draft={currentDraft} />
+                                    <button
+                                        type="button"
+                                        className={`${styles.deleteDraftButton}`}
+                                        aria-label={`Supprimer le draft ${currentDraft.titre}`}
+                                        title="Supprimer le draft"
+                                        onClick={() => handleDeleteDraft(currentDraft.id, currentDraft.titre)}
+                                    >
+                                        <i className={`bx bx-message-square-x bxNormalOrange ${styles.draftActionIcon}`} aria-hidden="true"></i>
+                                    </button>
                                 </div>
                             </div>
                             ))

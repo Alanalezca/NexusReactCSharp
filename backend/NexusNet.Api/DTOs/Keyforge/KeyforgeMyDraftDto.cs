@@ -37,6 +37,8 @@ public class KeyforgeMyDraftDto
 
     public bool? AvecAnomalies { get; set; }
     public int? Etat { get; set; }
+    public bool? DraftJ1Finished { get; set; }
+    public bool? DraftJ2Finished { get; set; }
     public string? Commentaire { get; set; }
 
     public DateTime? DateCreation { get; set; }

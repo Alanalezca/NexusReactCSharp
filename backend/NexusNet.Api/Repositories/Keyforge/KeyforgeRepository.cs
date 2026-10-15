@@ -199,6 +199,8 @@ public class KeyforgeRepository : IKeyforgeRepository
             .SqlQueryRaw<KeyforgeMyDraftDto>(@"
                 SELECT
                     d.""ID"" AS ""ID"",
+                    d.""DraftJ1Finished"" AS ""DraftJ1Finished"",
+                    d.""DraftJ2Finished"" AS ""DraftJ2Finished"",
                     d.""PseudoJ1"" AS ""PseudoJ1"",
                     d.""PseudoJ2"" AS ""PseudoJ2"",
 

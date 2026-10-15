@@ -1,256 +1,78 @@
-    import styles from './draftKeyforgeResume.module.css';
-    import DraftKeyforgeStats from '../../pages/keyforge/draftKeyforgeStats';
-    import { useKeyforgeContext } from '../../../src/components/contexts/keyforgeContext';
-    import { useMemo, useState } from 'react';
-    import { Button } from 'react-bootstrap';
+﻿import styles from './draftKeyforgeResume.module.css';
+import DraftKeyforgeStats from './draftKeyforgeStats';
+import { useState } from 'react';
+import { Button } from 'react-bootstrap';
 
-    const DraftKeyforgeResume = ({ currentDraftKeyforge, focusSurJoueurAouBforStats, focusSurStat }) => {
-        const {draftEnCoursParJoueurAouB, setDraftEnCoursParJoueurAouB} = useKeyforgeContext();
-        const {draftEnCoursSurFactionAouBouC, setDraftEnCoursSurFactionAouBouC} = useKeyforgeContext();
-        const [statFocus, setStatFocus] = useState(0);
-
-        const currentEtape = useMemo(() => {
-            return currentDraftKeyforge?.[0].etat;
-        }, [currentDraftKeyforge]);
-
-        const etatLibelleEtClass = {
-        0: { etatLibelle: "Maisons à pick/ban", etatClass: "txtColorYellow" },
-        10: { etatLibelle: "Draft prêt", etatClass: "txtColorGreen" },
-        11: { etatLibelle: "Draft en cours", etatClass: "txtColorYellow" },
-        12: { etatLibelle: "Draft terminé", etatClass: "txtColorGreen" },
-        };
-
-        const { etatLibelle, etatClass } = etatLibelleEtClass[currentEtape] || {
-        label: "NC",
-        className: "",
-        };
-
-        const draftEnCours = currentEtape >= 10;
-        const draftCardsFinish = currentEtape >= 12;
-        const titre = currentDraftKeyforge?.[0]?.titre ?? "---";
-
-        const getFactionImg = (img) =>
-            img || "/images/keyforge/NC.png";
-
-        const currentDraft = currentDraftKeyforge?.[0];
-        
-        const factionsJ1 = {
-        A: getFactionImg(currentDraft?.lienImgAJ1),
-        B: getFactionImg(currentDraft?.lienImgBJ1),
-        C: getFactionImg(currentDraft?.lienImgCJ1),
-        };
-
-        const factionsJ2 = {
-        A: getFactionImg(currentDraft?.lienImgAJ2),
-        B: getFactionImg(currentDraft?.lienImgBJ2),
-        C: getFactionImg(currentDraft?.lienImgCJ2),
-        };
-
-        const showStats = currentEtape >= 10;
-        
-        return (
-            <div className={`mb-4 ${styles.EnteteDraft}`}>
-                <div className="col-12 d-flex justify-content-center">
-                    <h4 className="text-center txtColorWhite">{titre}</h4>
-                </div>
-                <div className="row">
-                    {/* Labels du draft en cours */}
-                    <div className="col-2 mt-2">
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Date de création</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Date de mise à jour</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Joueur A</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Maisons joueur A</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Joueur B</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Maisons joueur B</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Set</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Anomalies</p>
-                        </div>
-                        <div className="col-12 ps-4">
-                            <p className="txtBold">Avancement</p>
-                        </div>
-                    </div>
-                    <div className="col-2 mt-2">
-                        {/* Infos du draft en cours */}
-                        {currentDraftKeyforge ? 
-                        <>
-                        {currentDraftKeyforge?.map((current, index) => (
-                        <div key={current.id}>
-                            <div className="col-12,">
-                                <p className="txtColorWhite">{new Date(current.dateCreation).toLocaleDateString('fr-FR')}</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">{new Date(current.dateDerModif).toLocaleDateString('fr-FR')}</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorPlayerRed">{current.pseudoJ1}</p>
-                            </div>
-                                <p>
-                                    <img 
-                                        src={factionsJ1.A} 
-                                        alt="Logo de la faction A du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={factionsJ1.B} 
-                                        alt="Logo de la faction B du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={factionsJ1.C} 
-                                        alt="Logo de la faction C du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                </p>
-                            <div className="col-12">
-                                <p className="txtColorPlayerBlue">{current.pseudoJ2}</p>
-                            </div>
-                            <div className="col-12">
-                                <p>
-                                    <img 
-                                        src={factionsJ2.A} 
-                                        alt="Logo de la faction A du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={factionsJ2.B} 
-                                        alt="Logo de la faction B du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={factionsJ2.C} 
-                                        alt="Logo de la faction C du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                </p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">{current.libelle + " (" + current.numero + ")"}</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">{current.avecAnomalies ? "Avec" : "Sans"}</p>
-                            </div>
-                            <div className="col-12">
-                                <p className={etatClass}>{etatLibelle}</p>
-                            </div>
-                        </div>
-                    ))}</>
-                    :
-                        <div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                                <p>
-                                    <img 
-                                        src={"/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction A du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={"/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction B du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={"/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction C du joueur 1" 
-                                        className={styles.logoFaction}
-                                    />
-                                </p>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                            <div className="col-12">
-                                <p>
-                                    <img 
-                                        src={"/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction A du joueur 2" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={"/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction B du joueur 2" 
-                                        className={styles.logoFaction}
-                                    />
-                                    <img 
-                                        src={"/images/keyforge/NC.png"} 
-                                        alt="Logo de la faction C du joueur 2" 
-                                        className={styles.logoFaction}
-                                    />
-                                </p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                            <div className="col-12">
-                                <p className="txtColorWhite">---</p>
-                            </div>
-                        </div>
-                    }
-
-                    </div>
-                    <div className="col-6 mt-2 borderLeft1pxColE">
-                        {showStats &&
-                            <DraftKeyforgeStats 
-                                currentDraft={currentDraftKeyforge} 
-                                statistiqueFocus={statFocus}
-                            />
-                        }
-                    </div>
-                    {draftEnCours &&
-                    <div className="col-2 mt-2">
-                        <Button className={`btn btn-primary ${statFocus === 0 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
-                            onClick={()=> setStatFocus(0)}>
-                                {draftCardsFinish ? "Pénalités" : "Progression"}
-                        </Button>
-                        <Button className={`btn btn-primary ${statFocus === 1 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
-                            onClick={()=> setStatFocus(1)}>
-                            Types
-                        </Button>
-                        <Button className={`btn btn-primary ${statFocus === 2 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
-                            onClick={()=> setStatFocus(2)}>
-                            Types par faction
-                        </Button>
-                        <Button className={`btn btn-primary ${statFocus === 3 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
-                            onClick={()=> setStatFocus(3)}>
-                            Créatures
-                        </Button>
-                        <Button className={`btn btn-primary ${statFocus === 4 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
-                            onClick={()=> setStatFocus(4)}>
-                            Aombre généré
-                        </Button>
-                        <Button className={`btn btn-primary ${statFocus === 5 ? "btn-ColorFFocused" : "btn-ColorF"} w-100 mb-2`}
-                            onClick={()=> setStatFocus(5)}>
-                            Raretés
-                        </Button>
-                    </div>
-                    }
-                </div>
-            </div>
-        )
+const DraftKeyforgeResume = ({ currentDraftKeyforge, focusSurJoueurAouBforStats, focusSurStat }) => {
+    const [statFocus, setStatFocus] = useState(0);
+    const draft = currentDraftKeyforge?.[0];
+    const etape = draft?.etat;
+    const showStats = etape >= 10;
+    const statLabels = [etape >= 12 ? 'Pénalités' : 'Progression', 'Types', 'Types par faction', 'Créatures', 'Aombre généré', 'Raretés'];
+    const statuts = {
+        0: { label: 'Maisons à pick/ban', className: 'txtColorYellow' },
+        10: { label: 'Draft prêt', className: 'txtColorGreen' },
+        11: { label: 'Draft en cours', className: 'txtColorYellow' },
+        12: { label: 'Draft terminé', className: 'txtColorGreen' },
     };
+    const statut = statuts[etape] ?? {
+        label: etape >= 1 && etape <= 8 ? 'Choix des maisons en cours' : etape === 9 ? 'Génération du pool' : '---',
+        className: 'txtColorYellow',
+    };
+    const formatDate = (value) => value ? new Date(value).toLocaleDateString('fr-FR') : '---';
+    const renderFactions = (player: number) => (
+        <div className={styles.factions}>
+            {['A', 'B', 'C'].map(faction => (
+                <img key={faction}
+                    src={draft?.[`lienImg${faction}J${player}`] || '/images/keyforge/NC.png'}
+                    alt={`Logo de la faction ${faction} du joueur ${player}`}
+                    className={styles.logoFaction} />
+            ))}
+        </div>
+    );
 
-    export default DraftKeyforgeResume;
+    return (
+        <div className={`mb-4 ${styles.EnteteDraft}`}>
+            <h4 className={`text-center txtColorWhite ${styles.title}`}>{draft?.titre ?? '---'}</h4>
+            <div className={`${styles.summaryLayout} ${!showStats ? styles.summaryWithoutStats : ''}`}>
+                <dl className={styles.draftDetails}>
+                    <dt>Date de création</dt>
+                    <dd className="txtColorWhite">{formatDate(draft?.dateCreation)}</dd>
+                    <dt>Date de mise à jour</dt>
+                    <dd className="txtColorWhite">{formatDate(draft?.dateDerModif)}</dd>
+                    <dt>Joueur A</dt>
+                    <dd className="txtColorPlayerRed">{draft?.pseudoJ1 ?? '---'}</dd>
+                    <dt>Maisons joueur A</dt>
+                    <dd>{renderFactions(1)}</dd>
+                    <dt>Joueur B</dt>
+                    <dd className="txtColorPlayerBlue">{draft?.pseudoJ2 ?? '---'}</dd>
+                    <dt>Maisons joueur B</dt>
+                    <dd>{renderFactions(2)}</dd>
+                    <dt>Set</dt>
+                    <dd className="txtColorWhite">{draft ? `${draft.libelle ?? '---'} (${draft.numero ?? '---'})` : '---'}</dd>
+                    <dt>Anomalies</dt>
+                    <dd className="txtColorWhite">{draft ? (draft.avecAnomalies ? 'Avec' : 'Sans') : '---'}</dd>
+                    <dt>Avancement</dt>
+                    <dd className={statut.className}>{statut.label}</dd>
+                </dl>
+                {showStats && <>
+                    <div className={styles.statsPanel}>
+                        <DraftKeyforgeStats currentDraft={currentDraftKeyforge} statistiqueFocus={statFocus} />
+                    </div>
+                    <div className={styles.statsControls} role="group" aria-label="Statistiques du draft">
+                        {statLabels.map((label, index) => (
+                            <Button key={index}
+                                className={`btn btn-primary ${statFocus === index ? 'btn-ColorFFocused' : 'btn-ColorF'}`}
+                                aria-pressed={statFocus === index}
+                                onClick={() => setStatFocus(index)}>
+                                {label}
+                            </Button>
+                        ))}
+                    </div>
+                </>}
+            </div>
+        </div>
+    );
+};
+
+export default DraftKeyforgeResume;

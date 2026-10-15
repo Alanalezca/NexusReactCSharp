@@ -1,35 +1,102 @@
-.EnteteDraft {
-    background-color: var(--backgroundColorB);
-    border-radius: 6px;
-    border: 2px solid var(--backgroundColorD);
-    padding: 15px;
+﻿.EnteteDraft {
+  background-color: var(--backgroundColorB);
+  border-radius: 6px;
+  border: 2px solid var(--backgroundColorD);
+  padding: 15px;
+}
+
+.title {
+  margin-bottom: 20px;
+  overflow-wrap: anywhere;
+}
+
+.summaryLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.summaryWithoutStats {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.draftDetails {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  margin: 0;
+}
+
+.draftDetails dt,
+.draftDetails dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.factions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
 }
 
 .logoFaction {
-  max-height: 25px;
-  margin-top: -4px;
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
 }
 
-.logoFactionBig {
-  max-height: 45px;
-  margin-left: 5px;
+.statsPanel {
+  min-width: 0;
+  padding-left: 16px;
+  border-left: 1px solid var(--backgroundColorD);
 }
 
-.bandeauInstructionDraft {
-  position: fixed;
-  width: 100%;
-  height: 60px;
-  padding-top: 8px;
-  bottom: 2vh;
-  background-color: var(--backgroundColorD);
-  border-top: 3px solid var(--ColorB);
-  border-bottom: 3px solid var(--ColorB);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.statsControls {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
 }
 
-.logoFactionKeyforge {
-  border-radius: 6px;
+.statsControls > button {
+  min-width: 0;
+  min-height: 44px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 991.98px) {
+  .summaryLayout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .statsPanel {
+    padding-left: 0;
+    padding-top: 16px;
+    border-left: 0;
+    border-top: 1px solid var(--backgroundColorD);
+  }
+
+  .statsControls {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .EnteteDraft {
+    padding: 12px;
+  }
+
+  .draftDetails {
+    column-gap: 10px;
+  }
+
+  .statsControls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
