@@ -242,7 +242,111 @@
             ];
 
         }, [cartesValidees, currentDraft]);
-        console.log('exemple', datasetsGraph2ForChart);
+
+        const labelsGraph4DraftEnCours = useMemo(() => {
+            if (!currentDraft) return [];
+            const factionsUniques = [currentDraft[0]?.[`libelleFactionAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], currentDraft[0]?.[`libelleFactionBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], currentDraft[0]?.[`libelleFactionCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`]];
+            return factionsUniques;
+        
+        }, [cartesValidees, currentDraft]);
+
+        const valuesGraph4DraftEnCours = useMemo(() => {
+            if (!currentDraft?.[0]) return [];
+
+            const joueurActif = currentDraft[0].draftEnCoursPourJoueurAouB;
+
+            const calculAombreFaction = (faction: string) => {
+                return cartesValidees
+                    .filter(item =>
+                        item.idFaction === faction &&
+                        item.joueurAouB == joueurActif
+                    )
+                    .reduce(
+                        (total, item) => total + (item.aombre ?? 0),
+                        0
+                    );
+            };
+
+            const valueFactionA = calculAombreFaction(
+                currentDraft[0][`factionPickAJ${joueurActif + 1}`]
+            );
+
+            const valueFactionB = calculAombreFaction(
+                currentDraft[0][`factionPickBJ${joueurActif + 1}`]
+            );
+
+            const valueFactionC = calculAombreFaction(
+                currentDraft[0][`factionPickCJ${joueurActif + 1}`]
+            );
+
+            return [valueFactionA, valueFactionB, valueFactionC];
+
+        }, [cartesValidees, currentDraft]);
+
+        const labelsGraph5 = useMemo(() => {
+
+            if (!currentDraft?.[0]) return [];
+
+            const joueurActif = currentDraft[0].draftEnCoursPourJoueurAouB + 1;
+
+            return [
+                currentDraft[0][`libelleFactionAJ${joueurActif}`],
+                currentDraft[0][`libelleFactionBJ${joueurActif}`],
+                currentDraft[0][`libelleFactionCJ${joueurActif}`]
+            ];
+
+        }, [currentDraft]);
+
+        const raretes = [
+            "Commune",
+            "Rare",
+            "Légendaire"
+        ];
+
+        const datasetsGraph5ForChart = useMemo(() => {
+
+            if (!currentDraft?.[0]) return [];
+
+            const joueurActif = currentDraft[0].draftEnCoursPourJoueurAouB;
+
+            const factions = [
+                currentDraft[0][`factionPickAJ${joueurActif + 1}`],
+                currentDraft[0][`factionPickBJ${joueurActif + 1}`],
+                currentDraft[0][`factionPickCJ${joueurActif + 1}`]
+            ];
+
+            const raretes = [
+                {
+                    label: "Commune",
+                    color: "rgba(176, 176, 176, 1)"
+                },
+                {
+                    label: "Rare",
+                    color: "rgba(79, 140, 255, 1)"
+                },
+                {
+                    label: "Légendaire",
+                    color: "rgba(180, 92, 255, 1)"
+                }
+            ];
+
+            return raretes.map(rarete => ({
+                label: rarete.label,
+
+                values: factions.map(faction =>
+                    cartesValidees.filter(carte =>
+                        carte.joueurAouB == joueurActif &&
+                        carte.idFaction === faction &&
+                        carte.rarete === rarete.label
+                    ).length
+                ),
+
+                color: rarete.color
+            }));
+
+        }, [cartesValidees, currentDraft]);
+
+        console.log('exemple', datasetsGraph5ForChart);
         console.log('tartare', cartesValidees, datasetsGraph3ForChart);
         return (
             <>
@@ -324,14 +428,18 @@
                 {/* Etat (4) Aombre généré */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 4 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    
+                    <ChartJSBar labels={labelsGraph4DraftEnCours} values={valuesGraph4DraftEnCours} colors={colorsGraph0DraftEnCours} title={""} labelTitreData={"Aombres générées"}/>
                 </div>
                 }
 
                 {/* Etat (5) Raretés */}
                 {currentDraft[0]?.etat >= 10 && statistiqueFocus === 5 &&
                 <div className="d-flex justify-content-center align-items-center h-100">
-                    
+                    {currentDraft[0].draftEnCoursPourJoueurAouB !== null ?
+                        <ChartJSBarStacked labels={labelsGraph5} datasets={datasetsGraph5ForChart} title={"Répartition types par faction"} />
+                    :
+                        <div>Choisissez la liste de cartes d'un joueur</div>
+                    }
                 </div>
                 }
             </>
