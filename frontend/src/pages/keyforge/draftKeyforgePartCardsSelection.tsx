@@ -2,6 +2,7 @@
     import styles from './draftKeyforgePartCardsSelection.module.css';
     import { useParams } from 'react-router-dom';
     import TCGCard from '../../components/others/TCGCard';
+    import TrinomeMobile from './TrinomeMobile';
     import updateFocusSurFactionAouBouC from '../../functions/callAPIx/keyforgeUpdateFocusSurFactionAouBouC';
     import updateEtapeDraft from '../../functions/callAPIx/keyforgeUpdateEtapeDraft';
     import { hasCardsForFaction } from '../keyforge/draftKeyforgeLogic.js';
@@ -252,7 +253,13 @@
                             </div>
                         </div>
                     }
-                    <div className="row">    
+                    <TrinomeMobile
+                        key={`${draftEnCoursParJoueurAouB}-${factionCourante}-${indexCarte}`}
+                        cards={currentTrinomeCards}
+                        isLoading={loaderCardisPicking}
+                        onValidate={card => {!loaderCardisPicking && handleClicValiderCard(currentTrinomeCards, card)}}
+                    />
+                    <div className="row d-none d-md-flex">
                         {poolCartesGlobalWithFilters?.slice(indexCarte, indexCarte + 3)?.map((current, index) => (
                             <div className={`col-4 d-flex justify-content-center`} key={current.idCarte + current.classement}>
                                 <TCGCard 

@@ -1,0 +1,102 @@
+.mobileChoices {
+    min-width: 0;
+    color: var(--bs-body-color, white);
+}
+
+.carousel {
+    position: relative;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    border-radius: 12px;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel::after {
+    content: '';
+    flex: 0 0 calc(12% - 12px);
+}
+
+.slide {
+    flex: 0 0 88%;
+    min-width: 0;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+.cardImage {
+    display: block;
+    width: 100%;
+    aspect-ratio: 300 / 420;
+    object-fit: contain;
+    border-radius: 12px;
+    background: var(--backgroundColorD);
+}
+
+.position {
+    margin: 10px 0;
+    text-align: center;
+    color: white;
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+}
+
+.thumbnails {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.thumbnail {
+    position: relative;
+    flex: 0 1 64px;
+    min-width: 44px;
+    padding: 3px;
+    border: 2px solid transparent;
+    border-radius: 7px;
+    background: var(--backgroundColorD);
+    cursor: pointer;
+}
+
+.thumbnail img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 300 / 420;
+    object-fit: contain;
+    border-radius: 3px;
+}
+
+.thumbnail span {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    min-width: 20px;
+    border-radius: 4px;
+    background: #111;
+    color: white;
+    font-size: 0.75rem;
+}
+
+.active {
+    border-color: var(--ColorB, #ff8c00);
+}
+
+.thumbnail:focus-visible,
+.carousel:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 2px;
+}
+
+.validate {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 14px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
