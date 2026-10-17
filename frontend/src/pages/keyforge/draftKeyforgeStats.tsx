@@ -61,9 +61,9 @@
         
         const colorsGraph0DraftEnCours = useMemo(() => {
             if (!currentDraft) return [];
-            const colorFactionA = 'rgba(' + currentDraft[0]?.[`couleurAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6';
-            const colorFactionB = 'rgba(' + currentDraft[0]?.[`couleurBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6';
-            const colorFactionC = 'rgba(' + currentDraft[0]?.[`couleurCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6';
+            const colorFactionA = 'rgba(' + currentDraft[0]?.[`couleurAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6)';
+            const colorFactionB = 'rgba(' + currentDraft[0]?.[`couleurBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6)';
+            const colorFactionC = 'rgba(' + currentDraft[0]?.[`couleurCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6)';
             return [colorFactionA, colorFactionB, colorFactionC];
         }, [cartesValidees, currentDraft]);
 
@@ -82,7 +82,7 @@
 
             return [typesUniques, comptage];
 
-        }, [cartesValidees, currentDraft]);
+        }, [cartesValideesJoueurFocus, currentDraft]);
 
         const colorsGraph1 = useMemo(() => {
             const couleurs = dataGraph1[0].map(libelle => {
@@ -91,13 +91,11 @@
                     type => type.libelle === libelle
                 );
 
-                return typeTrouve?.colorRGB;
+                return typeTrouve?.colorRGB ?? "rgba(255, 255, 255, 0.75)";
             });
 
             return couleurs;
-        }, [dataGraph1]); 
-
-        console.log('colorsGraph0DraftEnCours', colorsGraph0DraftEnCours, labelsGraph0DraftEnCours);
+        }, [dataGraph1, typesCartes]);
 
         const dataGraph0 = useMemo(() => {
             if (!currentDraft) return [0, 0];
@@ -191,19 +189,19 @@
                 color: type.colorRGB ?? "rgba(255, 255, 255, 0.75)"
             }));
 
-        }, [datasetGraph2Base]);
+        }, [datasetGraph2Base, typesCartes]);
 
         const labelsGraph2 = useMemo (() => {
             return [currentDraft[0][`libelleFactionAJ${currentDraft[0].draftEnCoursPourJoueurAouB + 1}`],
                 currentDraft[0][`libelleFactionBJ${currentDraft[0].draftEnCoursPourJoueurAouB + 1}`],
                 currentDraft[0][`libelleFactionCJ${currentDraft[0].draftEnCoursPourJoueurAouB + 1}`]];
 
-        }, [datasetsGraph2ForChart])
+        }, [currentDraft]);
 
         const labelsGraph3 = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9+"];
 
         const comptageCarteSelonPuissance = (libelleFaction, colorFaction) => {
-            const arrayValues = cartesValidees
+            const arrayValues = cartesValideesJoueurFocus
                 .filter(current =>
                     current.libelleFaction === libelleFaction && current.libelleType === "Créature"
                 )
@@ -234,14 +232,14 @@
            
             return [
                 comptageCarteSelonPuissance(currentDraft[0]?.[`libelleFactionAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], 
-                'rgba(' + currentDraft[0]?.[`couleurAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6'),
+                'rgba(' + currentDraft[0]?.[`couleurAJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6)'),
                 comptageCarteSelonPuissance(currentDraft[0]?.[`libelleFactionBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], 
-                'rgba(' + currentDraft[0]?.[`couleurBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6'),
+                'rgba(' + currentDraft[0]?.[`couleurBJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6)'),
                 comptageCarteSelonPuissance(currentDraft[0]?.[`libelleFactionCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`], 
-                'rgba(' + currentDraft[0]?.[`couleurCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6')
+                'rgba(' + currentDraft[0]?.[`couleurCJ${currentDraft[0].draftEnCoursPourJoueurAouB +1}`] + ',0.6)')
             ];
 
-        }, [cartesValidees, currentDraft]);
+        }, [cartesValideesJoueurFocus, currentDraft]);
 
         const labelsGraph4DraftEnCours = useMemo(() => {
             if (!currentDraft) return [];
@@ -346,8 +344,6 @@
 
         }, [cartesValidees, currentDraft]);
 
-        console.log('exemple', datasetsGraph5ForChart);
-        console.log('tartare', cartesValidees, datasetsGraph3ForChart);
         return (
             <>
                 {/* Comptage des cartes en cours de draft (0) */}

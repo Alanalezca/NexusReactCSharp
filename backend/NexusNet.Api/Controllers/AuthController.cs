@@ -99,7 +99,7 @@ public class AuthController : ControllerBase
         Response.Cookies.Delete("jwt", new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, // true en prod HTTPS
+            Secure = true,
             SameSite = SameSiteMode.Lax
         });
 
@@ -389,7 +389,7 @@ public class AuthController : ControllerBase
         Response.Cookies.Append("jwt", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false,
+            Secure = true,
             SameSite = SameSiteMode.Lax,
             Expires = expiresAt
         });
