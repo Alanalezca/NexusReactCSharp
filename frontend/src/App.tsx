@@ -17,6 +17,7 @@ import Keyforge from "./pages/keyforge/keyforge";
 import DraftKeyforge from "./pages/keyforge/draftKeyforge";
 import Patchnotes from '../src/pages/others/patchnotes';
 import ValidationAccount from './pages/user/validationAccount'; 
+import ResetPassword from './pages/user/resetPassword';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/draftKeyforge/:slug" element={<KeyforgeContextProvider><DraftKeyforge /></KeyforgeContextProvider>} />
                 <Route path="/release/patchnotes" element={<Patchnotes />} />
                 <Route path="/validation-email" element={<ValidationAccount />} />
+                <Route path="/reinitialisation-mot-de-passe" element={<ResetPassword />} />
                 <Route path="/dashboard"
                   element={
                     <PrivateRoute>

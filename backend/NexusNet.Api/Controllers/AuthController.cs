@@ -169,6 +169,58 @@ public class AuthController : ControllerBase
     }
 
     // -----------------------------------
+    // MODIFICATION DU MOT DE PASSE PAR LIEN EMAIL
+    // -----------------------------------
+    [AllowAnonymous]
+    [HttpPost("reset-password")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        const string invalidLink = "Ce lien est invalide, expiré ou déjà utilisé. Veuillez demander un nouveau lien de réinitialisation.";
+
+        if (dto == null || dto.token == null || dto.token.Length != 64 ||
+            !dto.token.All(Uri.IsHexDigit))
+            return BadRequest(new { message = invalidLink });
+
+        if (string.IsNullOrWhiteSpace(dto.password) || dto.password.Length < 8)
+            return BadRequest(new { message = "Le mot de passe doit contenir au moins 8 caractères." });
+
+        // BCrypt ne prend en compte que les 72 premiers octets.
+        if (Encoding.UTF8.GetByteCount(dto.password) > 72)
+            return BadRequest(new { message = "Le mot de passe est trop long. Veuillez le raccourcir." });
+
+        if (dto.password != dto.passwordConfirmation)
+            return BadRequest(new { message = "Les deux mots de passe doivent être identiques." });
+
+        var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(dto.token)));
+        var now = DateTime.UtcNow;
+        var validToken = await _db.Users.AsNoTracking().AnyAsync(x =>
+            x.hashtokenreinitialisationpassword == tokenHash &&
+            x.expirationtokenreinitialisationpassword > now);
+
+        if (!validToken)
+            return BadRequest(new { message = invalidLink });
+
+        var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.password);
+        now = DateTime.UtcNow;
+
+        // Vérification et consommation dans la même requête : deux validations
+        // simultanées du même lien ne peuvent pas changer le mot de passe deux fois.
+        var updated = await _db.Users
+            .Where(x => x.hashtokenreinitialisationpassword == tokenHash &&
+                x.expirationtokenreinitialisationpassword > now)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(x => x.password, passwordHash)
+                .SetProperty(x => x.hashtokenreinitialisationpassword, (string?)null)
+                .SetProperty(x => x.expirationtokenreinitialisationpassword, (DateTime?)null));
+
+        if (updated == 0)
+            return BadRequest(new { message = invalidLink });
+
+        return Ok(new { message = "Votre mot de passe a été modifié. Vous pouvez à présent vous connecter." });
+    }
+
+    // -----------------------------------
     // DISCONNECT
     // -----------------------------------
     [HttpPost("logout")]

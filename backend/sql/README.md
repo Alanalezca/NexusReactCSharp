@@ -22,10 +22,26 @@ l’API. Sans cette option, les liens pointent vers `https://alanalezca.fr`.
   permettre une nouvelle tentative. La réponse reste générique pour ne pas révéler
   l’existence d’un compte.
 
-## Étape suivante
+## Changement du mot de passe
 
-La page `/reinitialisation-mot-de-passe` et l’API de changement de mot de passe
-ne sont pas encore implémentées. Le lien envoyé ne permet donc pas encore de
-modifier le mot de passe. L’étape suivante devra vérifier le hash et l’expiration,
-enregistrer le nouveau mot de passe haché et consommer le jeton de façon atomique
-pour garantir son usage unique.
+La page `/reinitialisation-mot-de-passe?token=…` soumet le jeton, le mot de passe
+et sa confirmation à `POST /api/Auth/reset-password`. Le minimum est de huit
+caractères et le maximum de 72 octets UTF-8 (limite BCrypt).
+
+L’API contrôle le hash et l’expiration UTC, puis change le mot de passe et efface
+le jeton dans une seule mise à jour conditionnelle. Une seconde soumission,
+y compris simultanée, est refusée. Aucun changement SQL supplémentaire n’est nécessaire.
+
+Sur un compte de test, vérifier :
+
+- Lien absent ou mal formé : message explicite, aucun changement.
+- Confirmation différente ou mot de passe trop court : formulaire bloqué et API en 400.
+- Jeton inconnu, expiré ou déjà utilisé : API en 400, mot de passe inchangé.
+- Jeton valide : API en 200, jeton effacé, nouveau mot de passe haché avec BCrypt.
+- Après succès : connexion possible avec le nouveau mot de passe et refus de l’ancien.
+- Deux soumissions simultanées du même jeton : une seule réussit.
+- L’ouverture du lien seule ne consomme pas le jeton.
+
+La réinitialisation ne valide pas l’adresse email, ne débloque pas un compte et
+ne connecte pas automatiquement l’utilisateur. Les sessions JWT déjà émises
+conservent leur durée de validité actuelle.
