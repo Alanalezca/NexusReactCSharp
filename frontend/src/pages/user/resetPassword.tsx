@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { apiFetch, ApiError } from '../../api/client';
 import styles from './resetPassword.module.css';
+import inputStyles from '../../components/inputs/InputStandard.module.css';
 
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -70,13 +71,13 @@ function ResetPasswordForm({ token, finish }: { token: string; finish: () => voi
             <p className={styles.hint}>Choisissez votre nouveau mot de passe (au moins 8 caractères).</p>
             <div className="mb-3">
               <label htmlFor="new-password" className="form-label">Nouveau mot de passe</label>
-              <input id="new-password" className="form-control" type="password" autoComplete="new-password"
+              <input id="new-password" className={inputStyles.input} type="password" autoComplete="new-password"
                 required minLength={8} value={password} disabled={loading}
                 onChange={(event) => { setPassword(event.target.value); setError(''); }} />
             </div>
             <div className="mb-3">
               <label htmlFor="confirm-password" className="form-label">Confirmer le nouveau mot de passe</label>
-              <input id="confirm-password" className="form-control" type="password" autoComplete="new-password"
+              <input id="confirm-password" className={inputStyles.input} type="password" autoComplete="new-password"
                 required minLength={8} value={confirmation} disabled={loading}
                 aria-describedby="password-feedback"
                 onChange={(event) => { setConfirmation(event.target.value); setError(''); }} />
