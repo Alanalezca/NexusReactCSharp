@@ -28,4 +28,9 @@ public class User
     public string? hashtokenvalidationemail { get; set; }
 
     public DateTime? expirationtokenvalidationemail { get; set; }
+
+    // Réinitialisation du mot de passe (jeton brut envoyé uniquement par email)
+    public string? hashtokenreinitialisationpassword { get; set; }
+
+    public DateTime? expirationtokenreinitialisationpassword { get; set; }
 }

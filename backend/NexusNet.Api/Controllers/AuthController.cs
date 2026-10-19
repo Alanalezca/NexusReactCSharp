@@ -21,15 +21,18 @@ public class AuthController : ControllerBase
     private readonly AppDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
+    private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         AppDbContext db,
         IConfiguration configuration,
-        IEmailService emailService)
+        IEmailService emailService,
+        ILogger<AuthController> logger)
     {
         _db = db;
         _configuration = configuration;
         _emailService = emailService;
+        _logger = logger;
     }
 
     // -----------------------------------
@@ -88,6 +91,81 @@ public class AuthController : ControllerBase
         }
 
         return CreateAuthentication(user, "Login successful");
+    }
+
+    // -----------------------------------
+    // DEMANDE DE RÉINITIALISATION DU MOT DE PASSE
+    // -----------------------------------
+    [AllowAnonymous]
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        // Même réponse pour une adresse inconnue ou une demande trop récente.
+        const string confirmation = "Si un compte correspond à cette adresse, un email de réinitialisation vous sera envoyé. Pensez à vérifier vos courriers indésirables.";
+        var email = dto.email.Trim().ToLowerInvariant();
+        var user = await _db.Users.AsNoTracking()
+            .Where(x => x.email.ToLower() == email)
+            .Select(x => new { x.id, x.email, x.pseudo })
+            .FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            _logger.LogInformation("Réinitialisation du mot de passe : aucun compte correspondant dans la base utilisée par cette API.");
+            return Ok(new { message = confirmation });
+        }
+
+        var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+        var now = DateTime.UtcNow;
+        var expiresAt = now.AddHours(1);
+        var resendThreshold = now.AddMinutes(55);
+
+        // Mise à jour atomique : au plus un envoi par compte toutes les cinq minutes,
+        // même si plusieurs demandes arrivent simultanément.
+        var updated = await _db.Users
+            .Where(x => x.id == user.id &&
+                (x.expirationtokenreinitialisationpassword == null ||
+                 x.expirationtokenreinitialisationpassword <= resendThreshold))
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(x => x.hashtokenreinitialisationpassword, tokenHash)
+                .SetProperty(x => x.expirationtokenreinitialisationpassword, expiresAt));
+
+        if (updated == 0)
+        {
+            _logger.LogInformation("Réinitialisation du mot de passe : envoi ignoré pour le compte {UserId}, délai de cinq minutes entre deux demandes.", user.id);
+            return Ok(new { message = confirmation });
+        }
+
+        // URL issue de la configuration serveur, jamais du Host fourni par le client.
+        var frontendUrl = (_configuration["Frontend:BaseUrl"] ?? "https://alanalezca.fr").TrimEnd('/');
+        var resetUrl = $"{frontendUrl}/reinitialisation-mot-de-passe?token={token}";
+
+        try
+        {
+            await _emailService.SendPasswordResetAsync(user.email, user.pseudo, resetUrl);
+            _logger.LogInformation("Réinitialisation du mot de passe : email accepté par le serveur SMTP pour le compte {UserId}. La livraison en boîte de réception reste à confirmer.", user.id);
+        }
+        catch (Exception ex)
+        {
+            // Ne pas journaliser le jeton, le lien ou le contenu du mail.
+            _logger.LogError("Échec d’envoi de l’email de réinitialisation pour le compte {UserId} ({ErrorType}).",
+                user.id, ex.GetType().Name);
+
+            if (ex is MailKit.Net.Smtp.SmtpCommandException smtpError)
+            {
+                _logger.LogError("Réinitialisation du mot de passe : refus SMTP, statut {StatusCode}, catégorie {ErrorCode}.",
+                    (int)smtpError.StatusCode, smtpError.ErrorCode);
+            }
+
+            // Autoriser une nouvelle tentative sans effacer un éventuel jeton plus récent.
+            await _db.Users
+                .Where(x => x.id == user.id && x.hashtokenreinitialisationpassword == tokenHash)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.hashtokenreinitialisationpassword, (string?)null)
+                    .SetProperty(x => x.expirationtokenreinitialisationpassword, (DateTime?)null));
+        }
+
+        return Ok(new { message = confirmation });
     }
 
     // -----------------------------------
