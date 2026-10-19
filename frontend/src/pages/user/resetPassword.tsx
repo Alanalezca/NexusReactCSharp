@@ -67,7 +67,7 @@ function ResetPasswordForm({ token, finish }: { token: string; finish: () => voi
           </div>
         ) : (
           <form onSubmit={submit}>
-            <p>Choisissez votre nouveau mot de passe (au moins 8 caractères).</p>
+            <p className={styles.hint}>Choisissez votre nouveau mot de passe (au moins 8 caractères).</p>
             <div className="mb-3">
               <label htmlFor="new-password" className="form-label">Nouveau mot de passe</label>
               <input id="new-password" className="form-control" type="password" autoComplete="new-password"
@@ -88,10 +88,12 @@ function ResetPasswordForm({ token, finish }: { token: string; finish: () => voi
             </div>
             {error && <div className="text-danger mb-3" role="alert">{error}</div>}
             {error && <p>Si le lien a expiré ou a déjà été utilisé, demandez-en un nouveau via « Mot de passe oublié » dans la fenêtre de connexion.</p>}
-            <Button type="submit" className={validPassword && passwordsMatch && !loading ? 'btn-ColorA' : 'btn-ColorInactif'}
-              disabled={!validPassword || !passwordsMatch || loading}>
-              {loading ? 'Enregistrement en cours…' : 'Enregistrer le nouveau mot de passe'}
-            </Button>
+            <div className={styles.actions}>
+              <Button type="submit" className={validPassword && passwordsMatch && !loading ? 'btn-ColorA' : 'btn-ColorInactif'}
+                disabled={!validPassword || !passwordsMatch || loading}>
+                {loading ? 'Enregistrement en cours…' : 'Enregistrer le nouveau mot de passe'}
+              </Button>
+            </div>
           </form>
         )}
       </section>
