@@ -110,6 +110,50 @@ button.deleteDraftButton:focus {
   border-radius: 6px;
 }
 
+.draftCreationBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.draftQuota {
+  min-width: 0;
+  margin: 0;
+  color: var(--txtColorDarkTer);
+  overflow-wrap: anywhere;
+}
+
+.draftQuotaReached {
+  color: var(--txtColorDangerDark);
+}
+
+button.createDraftButton,
+button.createDraftButton:hover:not(:disabled),
+button.createDraftButton:active,
+button.createDraftButton:focus {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+button.createDraftButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.createDraftButton:disabled i {
+  pointer-events: none;
+}
+
+.createDraftButton:focus-visible {
+  outline: 2px solid var(--ColorA);
+  outline-offset: 2px;
+}
+
 @media (max-width: 991.98px) {
   .draftRow {
     position: relative;

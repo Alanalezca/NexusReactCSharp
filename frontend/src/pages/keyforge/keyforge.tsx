@@ -8,6 +8,8 @@ import { useSessionUserContext } from '../../components/contexts/sessionUserCont
 import { useOngletAlerteContext } from '../../components/contexts/ToastContext';
 import Loader from '../../components/others/Loader';
 import useApiFetch from "../../api/useApiFetch";
+import type { KeyforgeDraftQuota } from '../../api/keyforgeDraftQuota';
+import { getDraftLimitMessage } from '../../api/keyforgeDraftQuota';
 
 type KeyforgeDraftSummary = {
     id: string;
@@ -64,8 +66,21 @@ const Keyforge = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [listeMyDrafts, setListeMyDrafts] = useState<KeyforgeDraftSummary[]>([]);
     const [showFormCreateNewDraft, setShowFormCreateNewDraft] = useState(false);
+    const [draftQuota, setDraftQuota] = useState<KeyforgeDraftQuota | null>(null);
 
     const {sessionUser} = useSessionUserContext();
+    const canCreateDraft = !isLoading && draftQuota?.canCreate;
+
+    const refreshDraftQuota = async () => {
+        const quota = await callApiFetch<KeyforgeDraftQuota>(
+            '/api/keyforge/draft-quota',
+            'Erreur lors de la vérification de la limite de drafts',
+            undefined,
+            { cache: 'no-store' }
+        );
+        setDraftQuota(quota);
+        return quota;
+    };
     // Pagination : Début //
     const nbElementsParPage = 10;
     const [numCurrentPagePaginationActive, setNumCurrentPagePaginationActive] = useState(1);
@@ -82,6 +97,10 @@ const Keyforge = () => {
     const indiceLastElement = ((nbElementsParPage * numCurrentPagePaginationActive));
 
     useEffect(() => {
+        setDraftQuota(null);
+        setListeMyDrafts([]);
+        setIsLoading(true);
+        setShowFormCreateNewDraft(false);
         if (!sessionUser?.id) return;
 
         const fetchMyDrafts = async () => {
@@ -97,6 +116,11 @@ const Keyforge = () => {
         };
 
         fetchMyDrafts();
+        refreshDraftQuota();
+
+        const handleFocus = () => { refreshDraftQuota(); };
+        window.addEventListener('focus', handleFocus);
+        return () => window.removeEventListener('focus', handleFocus);
     }, [sessionUser?.id]);
 
     const handleDeleteDraft = async (
@@ -126,6 +150,7 @@ const Keyforge = () => {
         setListeMyDrafts(prev =>
             prev.filter(current => current.id !== codeDraft)
         );
+        await refreshDraftQuota();
     };
 
     return (
@@ -151,11 +176,30 @@ const Keyforge = () => {
                         </div>
                     </div>
                 {(sessionUser ?
-                <><ModalCreateNewDraftKeyforge show={showFormCreateNewDraft} handleClose={setShowFormCreateNewDraft} handleRefresh={setListeMyDrafts}/>
+                <><ModalCreateNewDraftKeyforge show={showFormCreateNewDraft} handleClose={setShowFormCreateNewDraft} handleRefresh={setListeMyDrafts} draftQuota={draftQuota} refreshDraftQuota={refreshDraftQuota}/>
                     <div className="row">
                         <div className="col-12 mt-4">
                             <h2 className="text-center txtColorWhite mb-4">Mes drafts</h2>
-                            <i className={`bx bx-list-plus bxNormalOrange`} onClick={() => {setShowFormCreateNewDraft(true)}}></i>
+                            <div className={styles.draftCreationBar}>
+                                <button
+                                    type="button"
+                                    className={styles.createDraftButton}
+                                    disabled={!canCreateDraft}
+                                    aria-label="Créer un draft KeyForge"
+                                    title={draftQuota && !draftQuota.canCreate
+                                        ? getDraftLimitMessage(draftQuota.limit)
+                                        : 'Créer un draft KeyForge'}
+                                    onClick={() => { if (canCreateDraft) setShowFormCreateNewDraft(true); }}
+                                >
+                                    <i className="bx bx-list-plus bxNormalOrange" aria-hidden="true"></i>
+                                </button>
+                                {draftQuota && (
+                                    <p className={`${styles.draftQuota} ${!draftQuota.canCreate ? styles.draftQuotaReached : ''}`} role="status">
+                                        {draftQuota.count} / {draftQuota.limit} drafts
+                                        {!draftQuota.canCreate && ` — ${getDraftLimitMessage(draftQuota.limit)}`}
+                                    </p>
+                                )}
+                            </div>
                             <div className="row d-none d-lg-flex">
                                 <div className="col-4 col-lg-4">
                                     <b>Draft</b>

@@ -6,6 +6,8 @@ import styles from './CreateNewDraftKeyforge.module.css';
 import convertDateToDateLong from '../../functions/getDateLong';
 import InputStandard from '../../components/inputs/InputStandard';
 import useApiFetch from "../../api/useApiFetch";
+import type { KeyforgeDraftQuota } from '../../api/keyforgeDraftQuota';
+import { getDraftLimitMessage } from '../../api/keyforgeDraftQuota';
 
 interface KeyforgeSet {
     id: string;
@@ -14,7 +16,15 @@ interface KeyforgeSet {
     selected?: boolean;
 }
 
-  const FormNewDraftKeyforge = ({ handleClose, show, handleRefresh}) => {
+type FormNewDraftKeyforgeProps = {
+    handleClose: (show: boolean) => void;
+    show: boolean;
+    handleRefresh: React.Dispatch<React.SetStateAction<any[]>>;
+    draftQuota: KeyforgeDraftQuota | null;
+    refreshDraftQuota: () => Promise<KeyforgeDraftQuota | null>;
+};
+
+  const FormNewDraftKeyforge = ({ handleClose, show, handleRefresh, draftQuota, refreshDraftQuota }: FormNewDraftKeyforgeProps) => {
     const { showOngletAlerte } = useOngletAlerteContext();
     const {sessionUser} = useSessionUserContext();
     const inputsRef = useRef({});
@@ -23,6 +33,21 @@ interface KeyforgeSet {
     const [loadingSet, setLoadingSet] = useState(false);
     const { callApiFetch } = useApiFetch();
     const [listeSets, setListeSets] = useState<KeyforgeSet[]>([]);
+    const [checkingQuota, setCheckingQuota] = useState(true);
+    const [creating, setCreating] = useState(false);
+    const submitting = useRef(false);
+    const canSubmit = unlockBtnValiderCreateNewDraft && draftQuota?.canCreate
+        && !checkingQuota && !creating;
+
+    useEffect(() => {
+        if (!show) return;
+        let cancelled = false;
+        setCheckingQuota(true);
+        refreshDraftQuota().finally(() => {
+            if (!cancelled) setCheckingQuota(false);
+        });
+        return () => { cancelled = true; };
+    }, [show, sessionUser?.id]);
 
     useEffect(() => {
         const fetchSets = async () => {
@@ -62,78 +87,97 @@ interface KeyforgeSet {
     };
 
     const handleCreateNewDraft = async () => {
-        const dateNow = new Date();
-        const dateFormated = convertDateToDateLong(dateNow);
-        const result = await callApiFetch(
-            '/api/keyforge/creationNewDraft',
-            'Erreur lors de la création du draft KeyForge',
-            undefined,
-            {
-                method: 'POST',
-                body: JSON.stringify({
-                    parID: sessionUser.id.toString() + "-" + dateFormated,
-                    parJoueurA: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
-                    parJoueurB: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
+        if (!canSubmit || !sessionUser?.id || submitting.current) return;
+        submitting.current = true;
+        setCreating(true);
+        try {
+            // Recount on the server before submission; the POST also enforces the limit atomically.
+            const currentQuota = await refreshDraftQuota();
+            if (!currentQuota?.canCreate) return;
 
-                    parPresenceAnomalies:
-                        inputsRef?.current["checkAvecAnomalies"]?.checked ?? false,
+            const dateNow = new Date();
+            const dateFormated = convertDateToDateLong(dateNow);
+            const result = await callApiFetch(
+                '/api/keyforge/creationNewDraft',
+                'Erreur lors de la création du draft KeyForge',
+                undefined,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        parID: sessionUser.id.toString() + "-" + dateFormated,
+                        parJoueurA: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
+                        parJoueurB: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
 
-                    parSet: IDSetSelected,
-                    parDateCreation: dateNow,
-                    parDateMaj: dateNow,
-                    parTitreDraft: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
-                    parEtat: 0
-                })
+                        parPresenceAnomalies:
+                            inputsRef?.current["checkAvecAnomalies"]?.checked ?? false,
+
+                        parSet: IDSetSelected,
+                        parDateCreation: dateNow,
+                        parDateMaj: dateNow,
+                        parTitreDraft: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
+                        parEtat: 0
+                    })
+                }
+            );
+
+            await refreshDraftQuota();
+            if (!result) {
+                return;
             }
-        );
 
-        if (!result) {
-            return;
+            showOngletAlerte(
+                'success',
+                '(Création draft)',
+                '',
+                `Le nouveau draft KeyForge "${inputsRef?.current["titreDraft"]?.value || "(sans nom)"}" a bien été créé !`
+            );
+
+            handleClose(false);
+
+            setListeSets(prevListeSets =>
+                prevListeSets.map(currentSet => ({
+                    ...currentSet,
+                    selected: false
+                }))
+            );
+
+            setUnlockBtnValiderCreateNewDraft(false);
+            handleRefresh(prev => [
+                ...prev,
+                {
+                    id: sessionUser.id.toString() + "-" + dateFormated,
+                    titre: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
+                    avecAnomalies: inputsRef?.current["checkAvecAnomalies"]?.checked,
+                    dateCreation: dateNow,
+                    dateDerModif: dateNow,
+                    etat: 0,
+                    pseudoJ1: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
+                    pseudoJ2: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
+                    setID: IDSetSelected,
+                    idSet: IDSetSelected
+                }
+            ]);
+
+            setIDSetSelected(null);
+        } finally {
+            submitting.current = false;
+            setCreating(false);
         }
-
-        showOngletAlerte(
-            'success',
-            '(Création draft)',
-            '',
-            `Le nouveau draft KeyForge "${inputsRef?.current["titreDraft"]?.value || "(sans nom)"}" a bien été créé !`
-        );
-
-        handleClose(false);
-
-        setListeSets(prevListeSets =>
-            prevListeSets.map(currentSet => ({
-                ...currentSet,
-                selected: false
-            }))
-        );
-
-        setUnlockBtnValiderCreateNewDraft(false);
-        handleRefresh(prev => [
-            ...prev,
-            {
-                id: sessionUser.id.toString() + "-" + dateFormated,
-                titre: inputsRef?.current["titreDraft"]?.value || "(sans nom)",
-                avecAnomalies: inputsRef?.current["checkAvecAnomalies"]?.checked,
-                dateCreation: dateNow,
-                dateDerModif: dateNow,
-                etat: 0,
-                pseudoJ1: inputsRef?.current["pseudoJoueurA"]?.value || "Joueur A",
-                pseudoJ2: inputsRef?.current["pseudoJoueurB"]?.value || "Joueur B",
-                setID: IDSetSelected,
-                idSet: IDSetSelected
-            }
-        ]);
-
-        setIDSetSelected(null);
     };
 
     return (
-    <Modal show={show} onHide={() => handleClose(false)} centered>
-      <Modal.Header closeButton className={`${styles.borderTop} bgcolorC modalTopBordBotTransparent`}>
+    <Modal show={show} onHide={() => { if (!submitting.current) handleClose(false); }} centered>
+      <Modal.Header closeButton={!creating} className={`${styles.borderTop} bgcolorC modalTopBordBotTransparent`}>
         <Modal.Title className="txtColorWhite">Création d'un nouveau draft</Modal.Title>
       </Modal.Header>
 
       <Modal.Body className={`bgcolorC ${styles.borderMid}`}>
+            {draftQuota && !draftQuota.canCreate && (
+                <p className="txtColorWhite" role="alert">{getDraftLimitMessage(draftQuota.limit)}</p>
+            )}
+            {!draftQuota && !checkingQuota && (
+                <p className="txtColorWhite" role="alert">Impossible de vérifier le nombre de drafts. Fermez puis rouvrez cette fenêtre pour réessayer.</p>
+            )}
             <div id="formCreateNewDraft">
                 <div className="row">             
                     <div className="col-12 mt-3 d-flex justify-content-center">
@@ -189,8 +233,8 @@ interface KeyforgeSet {
 
       <Modal.Footer className={`${styles.LoginModalBot} ${styles.borderBottom}`}>         
             <div className="col-12 d-flex justify-content-center">
-                <Button disabled={!unlockBtnValiderCreateNewDraft} className={`btn btn-primary ${unlockBtnValiderCreateNewDraft ? "btn-ColorA" : "btn-ColorInactif"}`} onClick={() => handleCreateNewDraft()}>
-                    Créer le draft
+                <Button disabled={!canSubmit} className={`btn btn-primary ${canSubmit ? "btn-ColorA" : "btn-ColorInactif"}`} onClick={() => handleCreateNewDraft()}>
+                    {creating ? 'Création en cours…' : checkingQuota ? 'Vérification…' : 'Créer le draft'}
                 </Button>
             </div>
       </Modal.Footer>

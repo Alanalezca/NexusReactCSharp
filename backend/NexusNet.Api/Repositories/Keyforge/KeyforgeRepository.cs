@@ -21,7 +21,8 @@ public interface IKeyforgeRepository
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(string idDraft);
 
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(string idDraft);
-    Task<bool> CreateDraftAsync(CreateKeyforgeDraftDto dto,int userId);
+    Task<KeyforgeDraftQuotaDto> GetDraftQuotaAsync(int userId);
+    Task<CreateKeyforgeDraftResult> CreateDraftAsync(CreateKeyforgeDraftDto dto,int userId);
     Task<bool> DeleteDraftAsync(string idDraft, int userId);
     Task<bool> UpdateFactionsDraftAsync(UpdateKeyforgeFactionsDto dto, int userId);
     Task<bool> CreatePoolCartesAsync(string idDraft, List<CreateKeyforgePoolCarteDto> cartes, int userId);
@@ -352,10 +353,35 @@ public class KeyforgeRepository : IKeyforgeRepository
             .ToListAsync();
     }
 
-    public async Task<bool> CreateDraftAsync(
+    public async Task<KeyforgeDraftQuotaDto> GetDraftQuotaAsync(int userId)
+    {
+        var count = await _context.Database.SqlQueryRaw<int>(@"
+            SELECT COUNT(*)::int AS ""Value""
+            FROM tab_keyforge_draftsessions
+            WHERE ""CreePar"" = {0}
+        ", userId).SingleAsync();
+
+        return new KeyforgeDraftQuotaDto { Count = count };
+    }
+
+    public async Task<CreateKeyforgeDraftResult> CreateDraftAsync(
         CreateKeyforgeDraftDto dto,
         int userId)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync(
+            System.Data.IsolationLevel.ReadCommitted);
+
+        // Serialize creations for this user, including requests from other API instances.
+        // The first key reserves a namespace for KeyForge draft creation locks.
+        await _context.Database.ExecuteSqlRawAsync(
+            "SELECT pg_advisory_xact_lock({0}, {1})", 1262896722, userId);
+
+        var quota = await GetDraftQuotaAsync(userId);
+        if (!quota.CanCreate)
+        {
+            return CreateKeyforgeDraftResult.LimitReached;
+        }
+
         var rowsAffected = await _context.Database.ExecuteSqlRawAsync(@"
             INSERT INTO tab_keyforge_draftsessions
             (
@@ -396,7 +422,10 @@ public class KeyforgeRepository : IKeyforgeRepository
             dto.ParEtat
         );
 
-        return rowsAffected > 0;
+        await transaction.CommitAsync();
+        return rowsAffected > 0
+            ? CreateKeyforgeDraftResult.Created
+            : CreateKeyforgeDraftResult.Failed;
     }
 
     public async Task<bool> DeleteDraftAsync(

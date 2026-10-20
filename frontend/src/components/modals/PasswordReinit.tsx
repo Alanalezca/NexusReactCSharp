@@ -74,10 +74,10 @@ const ReinitPasswordForm = ({ handleClose, show, handleShowLogin }: ReinitPasswo
         </Modal.Body>
 
         <Modal.Footer className={`${styles.ReinitPasswordModalBot} ${styles.borderBottom}`}>
-          <Button variant="link" className={styles.login} disabled={loading} onClick={() => {
+          <button type="button" className={styles.login} disabled={loading} onClick={() => {
             close();
             handleShowLogin(true);
-          }}>Se connecter</Button>
+          }}>Se connecter</button>
           <Button
             type="submit"
             variant="primary"

@@ -260,6 +260,27 @@ public class KeyforgeController : ControllerBase
     // ============================================================
 
     [Authorize]
+    [HttpGet("draft-quota")]
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+    public async Task<IActionResult> GetDraftQuota()
+    {
+        if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+        {
+            return Unauthorized(new { message = "Utilisateur non authentifié" });
+        }
+
+        try
+        {
+            return Ok(await _keyforgeService.GetDraftQuotaAsync(userId));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors du comptage des drafts KeyForge : {ex.Message}");
+            return StatusCode(500, new { message = "Impossible de vérifier le nombre de drafts existants." });
+        }
+    }
+
+    [Authorize]
     [HttpPost("creationNewDraft")]
     public async Task<IActionResult> CreateDraft(
         [FromBody] CreateKeyforgeDraftDto dto)
@@ -275,12 +296,20 @@ public class KeyforgeController : ControllerBase
                 );
             }
 
-            var success = await _keyforgeService.CreateDraftAsync(
+            var result = await _keyforgeService.CreateDraftAsync(
                 dto,
                 userId
             );
 
-            if (!success)
+            if (result == CreateKeyforgeDraftResult.LimitReached)
+            {
+                return Conflict(new
+                {
+                    message = $"Vous avez atteint la limite de {KeyforgeDraftQuotaDto.DefaultLimit} drafts KeyForge."
+                });
+            }
+
+            if (result != CreateKeyforgeDraftResult.Created)
             {
                 return StatusCode(
                     500,
