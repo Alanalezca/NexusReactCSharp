@@ -1,6 +1,11 @@
 .inputSearch {
     background-color: var(--backgroundColorD);
-    color: var(--txtColorWhite)
+    color: var(--txtColorWhite);
+}
+
+input.inputSearch::placeholder {
+    color: var(--txtColorWhite);
+    opacity: 1;
 }
 
 .inputSearch:focus {
