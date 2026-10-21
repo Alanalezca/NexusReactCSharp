@@ -30,7 +30,41 @@ public class AppDbContext : DbContext
         // mapping table existante PostgreSQL
         modelBuilder.Entity<User>().ToTable("tab_users");
 
-        // optionnel (recommandé)
-        modelBuilder.Entity<AppSession>().ToTable("app_sessions");
+        modelBuilder.Entity<AppSession>(entity =>
+        {
+            entity.ToTable("app_sessions");
+            entity.HasKey(session => session.Id);
+
+            entity.Property(session => session.Id)
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(session => session.UserId)
+                .HasColumnName("user_id")
+                .IsRequired();
+
+            entity.Property(session => session.Token)
+                .HasColumnName("token")
+                .IsRequired();
+
+            entity.HasAlternateKey(session => session.Token)
+                .HasName("token");
+
+            entity.Property(session => session.CreatedAt)
+                .HasColumnName("created_at")
+                .HasColumnType("timestamp with time zone")
+                .HasDefaultValueSql("now()")
+                .IsRequired();
+
+            entity.Property(session => session.ExpiresAt)
+                .HasColumnName("expires_at")
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
+
+            entity.Property(session => session.RevokedAt)
+                .HasColumnName("revoked_at")
+                .HasColumnType("timestamp with time zone")
+                .IsRequired(false);
+        });
     }
 }

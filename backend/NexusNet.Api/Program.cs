@@ -12,6 +12,8 @@ using NexusNet.Api.Services.DiceThrone;
 using NexusNet.Api.Services.Keyforge;
 using NexusNet.Api.Services.Smashup;
 using NexusNet.Api.Services.Email;
+using NexusNet.Api.Repositories.Sessions;
+using NexusNet.Api.Services.Sessions;
 using Npgsql;
 using System.Security.Claims;
 using System.Text;
@@ -25,6 +27,12 @@ var builder = WebApplication.CreateBuilder(args);
 // CONTROLLERS
 // -----------------------------------
 builder.Services.AddControllers();
+
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<SessionOperationLocks>();
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+builder.Services.AddScoped<ISessionValidationRepository, SessionValidationRepository>();
+builder.Services.AddScoped<ISessionValidationService, SessionValidationService>();
 
 
 // -----------------------------------
@@ -151,6 +159,21 @@ builder.Services
                 }
 
                 return Task.CompletedTask;
+            },
+
+            OnTokenValidated = async context =>
+            {
+                // Retain the cryptographically validated identity for logout even when
+                // the session/account check rejects it (for example a blocked account).
+                context.HttpContext.Items[typeof(ISessionValidationService)] = context.Principal;
+                var sessionValidation = context.HttpContext.RequestServices
+                    .GetRequiredService<ISessionValidationService>();
+
+                if (context.Principal is null || !await sessionValidation.ValidateAsync(
+                    context.Principal, context.HttpContext.RequestAborted))
+                {
+                    context.Fail("Session invalide, expirée ou révoquée.");
+                }
             },
 
             OnChallenge = context =>

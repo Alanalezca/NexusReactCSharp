@@ -14,6 +14,7 @@ import ManagerImg from '../components/modals/ManagerImg';
     const menuRef = useRef<HTMLUListElement | null>(null);
     const burgerRef = useRef<HTMLButtonElement | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [loggingOut, setLoggingOut] = useState(false);
     const [showModalLogin, setShowModalLogin] = useState(false);
     const [showModalSubscribe, setShowModalSubscribe] = useState(false);
     const [showModalReinitPassword, setShowModalReinitPassword] = useState(false);
@@ -125,7 +126,18 @@ import ManagerImg from '../components/modals/ManagerImg';
                     <div className={styles.btnLogo}>
                       <button className={`bx bxs-exit bxNormalOrange`} 
                         aria-label="Déconnexion" 
-                        onClick={async () => {await logout(); showOngletAlerte('success', '(Déconnexion)', '', 'Vous êtes à présent déconnecté.');}}>
+                        disabled={loggingOut}
+                        aria-busy={loggingOut}
+                        onClick={async () => {
+                          setLoggingOut(true);
+                          const success = await logout();
+                          setLoggingOut(false);
+                          if (success) {
+                            showOngletAlerte('success', '(Déconnexion)', '', 'Vous êtes à présent déconnecté.');
+                          } else {
+                            showOngletAlerte('error', '(Déconnexion)', '', 'La déconnexion a échoué. Veuillez réessayer.');
+                          }
+                        }}>
                       </button>
                     </div>
                   </div>

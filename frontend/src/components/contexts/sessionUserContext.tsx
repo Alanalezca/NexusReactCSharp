@@ -15,7 +15,8 @@ type SessionUserContextType = {
   sessionUser: User | null;
   loading: boolean;
   login: (loginOrEmail: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<boolean>;
+  clearSession: () => void;
 };
 
 const SessionUserContext = createContext<SessionUserContextType | null>(null);
@@ -48,21 +49,24 @@ export function SessionUserContextProvider({ children }: { children: ReactNode }
     }
   };
 
-  const logout = async (): Promise<void> => {
+  const clearSession = () => setSessionUser(null);
+
+  const logout = async (): Promise<boolean> => {
     try {
       await apiFetch("/api/auth/logout", {
         method: "POST",
       });
+      clearSession();
+      return true;
     } catch (err) {
       console.error("Erreur logout :", err);
-    } finally {
-      setSessionUser(null);
+      return false;
     }
   };
 
 
   return (
-    <SessionUserContext.Provider value={{ sessionUser, loading, login, logout }}>
+    <SessionUserContext.Provider value={{ sessionUser, loading, login, logout, clearSession }}>
       {children}
     </SessionUserContext.Provider>
   );

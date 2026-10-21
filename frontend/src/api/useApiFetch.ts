@@ -7,7 +7,7 @@ import { useSessionUserContext } from "../components/contexts/sessionUserContext
 export default function useApiFetch() {
   const navigate = useNavigate();
   const { showOngletAlerte } = useOngletAlerteContext();
-  const { logout } = useSessionUserContext();
+  const { clearSession } = useSessionUserContext();
 
   const handleError = (error: unknown, titreMessageError: string) => {
     console.error(titreMessageError, error);
@@ -21,7 +21,7 @@ export default function useApiFetch() {
           error.message
         );
 
-        logout();
+        clearSession();
         navigate("/");
         return;
       }

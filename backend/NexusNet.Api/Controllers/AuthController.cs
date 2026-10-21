@@ -11,6 +11,7 @@ using BCrypt.Net;
 using System.Text;
 using System.Security.Cryptography;
 using NexusNet.Api.Services.Email;
+using NexusNet.Api.Services.Sessions;
 
 namespace NexusNet.Api.Controllers;
 
@@ -22,17 +23,20 @@ public class AuthController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly IEmailService _emailService;
     private readonly ILogger<AuthController> _logger;
+    private readonly ISessionValidationService _sessionValidation;
 
     public AuthController(
         AppDbContext db,
         IConfiguration configuration,
         IEmailService emailService,
-        ILogger<AuthController> logger)
+        ILogger<AuthController> logger,
+        ISessionValidationService sessionValidation)
     {
         _db = db;
         _configuration = configuration;
         _emailService = emailService;
         _logger = logger;
+        _sessionValidation = sessionValidation;
     }
 
     // -----------------------------------
@@ -90,7 +94,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        return CreateAuthentication(user, "Login successful");
+        return await CreateAuthenticationAsync(user, "Login successful");
     }
 
     // -----------------------------------
@@ -194,27 +198,30 @@ public class AuthController : ControllerBase
 
         var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(dto.token)));
         var now = DateTime.UtcNow;
-        var validToken = await _db.Users.AsNoTracking().AnyAsync(x =>
-            x.hashtokenreinitialisationpassword == tokenHash &&
-            x.expirationtokenreinitialisationpassword > now);
+        var userId = await _db.Users.AsNoTracking()
+            .Where(x => x.hashtokenreinitialisationpassword == tokenHash &&
+                x.expirationtokenreinitialisationpassword > now)
+            .Select(x => (int?)x.id)
+            .FirstOrDefaultAsync(HttpContext.RequestAborted);
 
-        if (!validToken)
+        if (userId is null)
             return BadRequest(new { message = invalidLink });
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.password);
-        now = DateTime.UtcNow;
+        bool updated;
+        try
+        {
+            updated = await _sessionValidation.ResetPasswordAsync(
+                userId.Value, tokenHash, passwordHash, HttpContext.RequestAborted);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError("Échec de réinitialisation du mot de passe pour le compte {UserId} ({ErrorType}).",
+                userId.Value, ex.GetType().Name);
+            return StatusCode(500, new { message = "Impossible de modifier le mot de passe. Veuillez réessayer." });
+        }
 
-        // Vérification et consommation dans la même requête : deux validations
-        // simultanées du même lien ne peuvent pas changer le mot de passe deux fois.
-        var updated = await _db.Users
-            .Where(x => x.hashtokenreinitialisationpassword == tokenHash &&
-                x.expirationtokenreinitialisationpassword > now)
-            .ExecuteUpdateAsync(setters => setters
-                .SetProperty(x => x.password, passwordHash)
-                .SetProperty(x => x.hashtokenreinitialisationpassword, (string?)null)
-                .SetProperty(x => x.expirationtokenreinitialisationpassword, (DateTime?)null));
-
-        if (updated == 0)
+        if (!updated)
             return BadRequest(new { message = invalidLink });
 
         return Ok(new { message = "Votre mot de passe a été modifié. Vous pouvez à présent vous connecter." });
@@ -224,8 +231,19 @@ public class AuthController : ControllerBase
     // DISCONNECT
     // -----------------------------------
     [HttpPost("logout")]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout()
     {
+        try
+        {
+            var principal = HttpContext.Items[typeof(ISessionValidationService)] as ClaimsPrincipal ?? User;
+            await _sessionValidation.RevokeCurrentAsync(principal, HttpContext.RequestAborted);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError("Échec de révocation de la session lors de la déconnexion ({ErrorType}).", ex.GetType().Name);
+            return StatusCode(500, new { message = "La déconnexion a échoué. Veuillez réessayer." });
+        }
+
         Response.Cookies.Delete("jwt", new CookieOptions
         {
             HttpOnly = true,
@@ -475,7 +493,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    private IActionResult CreateAuthentication(User user, string message)
+    private async Task<IActionResult> CreateAuthenticationAsync(User user, string message)
     {
         var key = _configuration["Jwt:Key"];
 
@@ -491,8 +509,17 @@ public class AuthController : ControllerBase
             SecurityAlgorithms.HmacSha256
         );
 
+        var sessionDurationHours = _configuration.GetValue<int>("Jwt:SessionDurationHours", 168);
+        if (sessionDurationHours <= 0)
+            return StatusCode(500, "JWT session duration must be positive");
+
+        var createdAt = DateTime.UtcNow;
+        var expiresAt = createdAt.AddHours(sessionDurationHours);
+        var sessionToken = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+
         var claims = new[]
         {
+            new Claim("sid", sessionToken),
             new Claim(ClaimTypes.NameIdentifier, user.id.ToString()),
             new Claim(ClaimTypes.Email, user.email),
             new Claim(ClaimTypes.Role, user.role?.ToString() ?? ""),
@@ -500,12 +527,6 @@ public class AuthController : ControllerBase
             new Claim("statut", user.statut ?? ""),
             new Claim("grade", user.grade ?? "")
         };
-
-        var sessionDurationHours = _configuration.GetValue<int>("Jwt:SessionDurationHours", 168);
-        if (sessionDurationHours <= 0)
-            return StatusCode(500, "JWT session duration must be positive");
-
-        var expiresAt = DateTime.UtcNow.AddHours(sessionDurationHours);
 
         var tokenDescriptor = new JwtSecurityToken(
             claims: claims,
@@ -515,6 +536,54 @@ public class AuthController : ControllerBase
 
         var token = new JwtSecurityTokenHandler()
             .WriteToken(tokenDescriptor);
+
+        // Store the session reference, not the JWT. Only issue the cookie after persistence.
+        var session = new AppSession
+        {
+            UserId = user.id,
+            Token = sessionToken,
+            CreatedAt = createdAt,
+            ExpiresAt = expiresAt,
+            RevokedAt = null
+        };
+        try
+        {
+            await using var transaction = await _db.Database.BeginTransactionAsync(HttpContext.RequestAborted);
+
+            // Serialize session creation with password reset on the user row. A login
+            // that checked the old password before a reset must not create a valid session afterwards.
+            var allowed = await _db.Database.SqlQueryRaw<int>(@"
+                SELECT 1 AS ""Value""
+                FROM tab_users
+                WHERE ""id"" = {0} AND ""password"" = {1}
+                    AND ""emailverifie"" = TRUE
+                    AND ""accesblock"" IS NOT TRUE AND ""suspendu"" IS NOT TRUE
+                FOR UPDATE
+            ", user.id, user.password).ToListAsync(HttpContext.RequestAborted);
+
+            if (allowed.Count == 0) return Unauthorized("Invalid credentials");
+
+            _db.AppSessions.Add(session);
+            await _db.SaveChangesAsync(HttpContext.RequestAborted);
+            await transaction.CommitAsync(HttpContext.RequestAborted);
+        }
+        catch (DbUpdateException ex)
+        {
+            if (ex.InnerException is Npgsql.PostgresException postgresError)
+            {
+                _logger.LogError("Impossible de créer la session pour le compte {UserId}. Code PostgreSQL {SqlState}, table {TableName}, contrainte {ConstraintName}.",
+                    user.id, postgresError.SqlState, postgresError.TableName, postgresError.ConstraintName);
+            }
+            else
+            {
+                _logger.LogError("Impossible de créer la session pour le compte {UserId} ({ErrorType}, {CauseType}).",
+                    user.id, ex.GetType().Name, ex.InnerException?.GetType().Name);
+            }
+            return StatusCode(500, new { message = "Impossible de créer la session. Veuillez réessayer." });
+        }
+
+        _logger.LogInformation("Session {SessionId} enregistrée pour le compte {UserId} dans la base {Database}.",
+            session.Id, user.id, _db.Database.GetDbConnection().Database);
 
         Response.Cookies.Append("jwt", token, new CookieOptions
         {
