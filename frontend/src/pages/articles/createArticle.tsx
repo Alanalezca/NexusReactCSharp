@@ -43,11 +43,22 @@ type InputForm = {
   lienImg: string;
 };
 
+const EMPTY_INPUT_FORM: InputForm = {
+  codearticle: "",
+  titre: "",
+  resume: "",
+  slug: "",
+  contenu: "",
+  lienImg: "",
+};
+
 const CreateArticle = () => {
   const { slug } = useParams<{ slug: string }>();
 
   const [loadingArticleAEditer, setLoadingArticleAEditer] = useState(Boolean(slug));
   const [loadingTags, setLoadingTags] = useState(true);
+  const [formLoadFailed, setFormLoadFailed] = useState(false);
+  const [loadedForm, setLoadedForm] = useState<{ userId: string; slug?: string } | null>(null);
   const [loadingValidationCreateArticle, setLoadingValidationCreateArticle] = useState(false);
   const [loadingUploadImage, setLoadingUploadImage] = useState(false);
   const [loadingIsDeletingImg, SetloadingIsDeletingImg] = useState(false);
@@ -61,14 +72,8 @@ const CreateArticle = () => {
   const { showOngletAlerte } = useOngletAlerteContext();
   const { callApiFetch } = useApiFetch();
 
-  const [inputForm, setInputForm] = useState<InputForm>({
-    codearticle: "",
-    titre: "",
-    resume: "",
-    slug: "",
-    contenu: "",
-    lienImg: null,
-  });
+  const [inputForm, setInputForm] = useState<InputForm>(EMPTY_INPUT_FORM);
+  const formReady = loadedForm !== null && loadedForm.userId === sessionUser?.id && loadedForm.slug === slug;
 
   const btnResetActif = lienImgCree && (lienImgCree == inputForm.lienImg);
   const btnUploadActif = inputForm.slug && inputForm.slug !== "";
@@ -96,94 +101,82 @@ const CreateArticle = () => {
       ...prev,
       codearticle: currentArticle.codeArticle,
       titre: currentArticle.titre,
-      resume: currentArticle.resume,
+      resume: currentArticle.resume ?? "",
       slug: currentArticle.slug,
       contenu: currentArticle.contenu,
-      lienImg: currentArticle.lienImg,
+      lienImg: currentArticle.lienImg ?? "",
     }));
 
     setHtmlContent(convertImagesSrcInHtml(currentArticle.contenu));
   };
 
   useEffect(() => {
-    if (!slug) {
-      setArticle(null);
+    let cancelled = false;
+    setLoadedForm(null);
+    setFormLoadFailed(false);
+    setArticle(null);
+    setTags([]);
+    setInputForm(EMPTY_INPUT_FORM);
+    setHtmlContent("");
+    setLienImgCree(null);
+
+    if (!sessionUser?.id) {
       setLoadingArticleAEditer(false);
-      return;
-    }
-
-    if (!sessionUser) {
-      setLoadingArticleAEditer(false);
-      return;
-    }
-
-    const fetchArticle = async () => {
-      const viewedKey = `article-viewed-${slug}`;
-      const shouldIncrementView = !sessionStorage.getItem(viewedKey);
-
-      const data = await callApiFetch<ArticleDb>(
-        `/api/articles/view/${slug}?incrementView=${shouldIncrementView}`,
-        "Erreur lors du chargement de l'article",
-        setLoadingArticleAEditer
-      );
-
-      if (data) {
-        const articleModify: ArticleDb = {
-          ...data,
-          tags: splitTags(data.tags),
-        };
-
-        setArticle(articleModify);
-        handleSetterInputFormFromDB(articleModify);
-
-        if (shouldIncrementView) {
-          sessionStorage.setItem(viewedKey, "true");
-        }
-      } else {
-        setArticle(null);
-      }
-    };
-
-    fetchArticle();
-  }, [slug, sessionUser]);
-
-  useEffect(() => {
-    if (!sessionUser) {
       setLoadingTags(false);
       return;
     }
 
-    const callGetAllTags = async () => {
-      const data = await callApiFetch<TagArticle[]>(
-      "/api/articles/tags",
-      "Erreur lors du chargement des tags",
-      setLoadingTags
-      );
+    setLoadingArticleAEditer(Boolean(slug));
+    setLoadingTags(true);
 
-      if (data) {
-      setTags(data);
+    const fetchForm = async () => {
+      const viewedKey = `article-viewed-${slug}`;
+      const shouldIncrementView = Boolean(slug) && !sessionStorage.getItem(viewedKey);
+
+      try {
+        // Initialize the selected tags only once both responses are available.
+        const [tagData, articleData] = await Promise.all([
+          callApiFetch<TagArticle[]>("/api/articles/tags", "Erreur lors du chargement des tags"),
+          slug
+            ? callApiFetch<ArticleDb>(
+                `/api/articles/view/${slug}?incrementView=${shouldIncrementView}`,
+                "Erreur lors du chargement de l'article"
+              )
+            : Promise.resolve(null),
+        ]);
+
+        if (cancelled) return;
+        if (articleData && shouldIncrementView) {
+          sessionStorage.setItem(viewedKey, "true");
+        }
+        if (!tagData || (slug && !articleData)) {
+          setFormLoadFailed(true);
+          return;
+        }
+
+        const selectedTags = splitTags(articleData?.tags);
+        setTags(tagData.map((tag) => ({ ...tag, checked: selectedTags.includes(tag.libelle) })));
+
+        if (articleData) {
+          const articleModify = { ...articleData, tags: selectedTags };
+          setArticle(articleModify);
+          handleSetterInputFormFromDB(articleModify);
+        }
+        setLoadedForm({ userId: sessionUser.id, slug });
+      } finally {
+        if (!cancelled) {
+          setLoadingArticleAEditer(false);
+          setLoadingTags(false);
+        }
       }
     };
 
-    callGetAllTags();
-
-  }, [sessionUser]);
-
-  useEffect(() => {
-    if (!article?.tags) return;
-
-    const articleTags = splitTags(article.tags);
-
-    setTags((currentTags) =>
-      currentTags.map((tag) => ({
-        ...tag,
-        checked: articleTags.includes(tag.libelle),
-      }))
-    );
-  }, [article]);
+    fetchForm();
+    return () => { cancelled = true; };
+  }, [slug, sessionUser?.id]);
 
   const handleEditCurrentArticle = async () => {
-    if (!article) return;
+    if (!article || !formReady) return;
 
     const dateNow = new Date();
     const tagsToInsert = tags.filter((currentTag) => currentTag.checked);
@@ -219,7 +212,7 @@ const CreateArticle = () => {
   };
 
   const handleCreateNewArticle = async () => {
-    if (!sessionUser) return;
+    if (!sessionUser || slug || !formReady) return;
 
     const dateNow = new Date();
     const dateFormated = convertDateToDateLong(dateNow);
@@ -347,12 +340,17 @@ const CreateArticle = () => {
     return doc.body.innerHTML;
   };
 
-  const isLoading = loadingSession || loadingArticleAEditer || loadingTags;
+  const isLoading = loadingSession || loadingArticleAEditer || loadingTags ||
+    (Boolean(sessionUser) && !formReady && !formLoadFailed);
 
   return (
     <div className="container-xl mt-4">
       {isLoading ? (
         <Loader />
+      ) : formLoadFailed ? (
+        <p className="txtColorWhite mt-4" role="alert">
+          Impossible de charger le formulaire et ses tags. Actualisez la page pour réessayer.
+        </p>
       ) : sessionUser?.grade === "Administrateur" ? (
         <div className="row">
           <div className="col-12 col-lg-12">
