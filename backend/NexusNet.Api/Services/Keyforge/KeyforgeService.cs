@@ -25,11 +25,13 @@ public interface IKeyforgeService
     );
 
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(
-        string idDraft
+        string idDraft,
+        int userId
     );
 
     Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(
-        string idDraft
+        string idDraft,
+        int userId
     );
     Task<KeyforgeDraftQuotaDto> GetDraftQuotaAsync(int userId);
 
@@ -119,15 +121,17 @@ public class KeyforgeService : IKeyforgeService
     }
 
     public async Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(
-        string idDraft)
+        string idDraft,
+        int userId)
     {
-        return await _keyforgeRepository.GetPoolCartesPourDraftAsync(idDraft);
+        return await _keyforgeRepository.GetPoolCartesPourDraftAsync(idDraft, userId);
     }
 
     public async Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(
-        string idDraft)
+        string idDraft,
+        int userId)
     {
-        return await _keyforgeRepository.GetPoolCartesValideesAsync(idDraft);
+        return await _keyforgeRepository.GetPoolCartesValideesAsync(idDraft, userId);
     }
 
     public Task<KeyforgeDraftQuotaDto> GetDraftQuotaAsync(int userId)

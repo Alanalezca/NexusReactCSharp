@@ -18,9 +18,9 @@ public interface IKeyforgeRepository
 
     Task<List<KeyforgeBaseCarteDto>> GetBasePoolCartesAsync(string[] factions);
 
-    Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(string idDraft);
+    Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(string idDraft, int userId);
 
-    Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(string idDraft);
+    Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(string idDraft, int userId);
     Task<KeyforgeDraftQuotaDto> GetDraftQuotaAsync(int userId);
     Task<CreateKeyforgeDraftResult> CreateDraftAsync(CreateKeyforgeDraftDto dto,int userId);
     Task<bool> DeleteDraftAsync(string idDraft, int userId);
@@ -266,7 +266,8 @@ public class KeyforgeRepository : IKeyforgeRepository
     }
 
     public async Task<List<KeyforgePoolCarteDto>> GetPoolCartesPourDraftAsync(
-    string idDraft)
+    string idDraft,
+    int userId)
     {
         return await _context.Database
             .SqlQueryRaw<KeyforgePoolCarteDto>(@"
@@ -302,15 +303,23 @@ public class KeyforgeRepository : IKeyforgeRepository
                     ON c.""Faction"" = f.""ID""
 
                 WHERE a.""IDDraftSession"" = {0}
+                AND EXISTS (
+                    SELECT 1
+                    FROM tab_keyforge_draftsessions d
+                    WHERE d.""ID"" = a.""IDDraftSession""
+                    AND d.""CreePar"" = {1}
+                )
 
                 ORDER BY a.""Classement"";
             ",
-            idDraft)
+            idDraft,
+            userId)
             .ToListAsync();
     }
 
     public async Task<List<KeyforgePoolCarteDto>> GetPoolCartesValideesAsync(
-    string idDraft)
+    string idDraft,
+    int userId)
     {
         return await _context.Database
             .SqlQueryRaw<KeyforgePoolCarteDto>(@"
@@ -346,10 +355,17 @@ public class KeyforgeRepository : IKeyforgeRepository
                     ON c.""Faction"" = f.""ID""
 
                 WHERE a.""IDDraftSession"" = {0}
+                AND EXISTS (
+                    SELECT 1
+                    FROM tab_keyforge_draftsessions d
+                    WHERE d.""ID"" = a.""IDDraftSession""
+                    AND d.""CreePar"" = {1}
+                )
 
                 ORDER BY a.""Classement"";
             ",
-            idDraft)
+            idDraft,
+            userId)
             .ToListAsync();
     }
 

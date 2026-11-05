@@ -213,8 +213,13 @@ public class KeyforgeController : ControllerBase
     {
         try
         {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            {
+                return Unauthorized(new { message = "Utilisateur non authentifié" });
+            }
+
             var cartes = await _keyforgeService
-                .GetPoolCartesPourDraftAsync(idDraft);
+                .GetPoolCartesPourDraftAsync(idDraft, userId);
 
             return Ok(cartes);
         }
@@ -240,8 +245,13 @@ public class KeyforgeController : ControllerBase
     {
         try
         {
+            if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
+            {
+                return Unauthorized(new { message = "Utilisateur non authentifié" });
+            }
+
             var cartes = await _keyforgeService
-                .GetPoolCartesValideesAsync(idDraft);
+                .GetPoolCartesValideesAsync(idDraft, userId);
 
             return Ok(cartes);
         }
